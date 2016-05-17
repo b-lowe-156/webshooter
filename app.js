@@ -1,40 +1,26 @@
-//1.
-var webSocketServer = require('ws').Server;
-var http = require('http');
-var fs = require('fs');
+var server = require('http').createServer()
+  , url = require('url')
+  , WebSocketServer = require('ws').Server
+  , wss = new WebSocketServer({ server: server })
+  , express = require('express')
+  , app = express()
+  , port = 4080;
 
-
-//2.
-var webSocketServerObject = new webSocketServer({ port: 9060 });
- 
-//3.
-webSocketServerObject.on('connection', function (socketObject) {
- 
-    socketObject.on('message', function (message) {
-        console.log('The' + message + 'Message Received from \n from IP ' + socketObject.upgradeReq.connection.remoteAddress);
- 
-        socketObject.send("Received " + message);
-    });
- 
-    socketObject.on('close', function (c, d) {
-        console.log('Disconnect ' + c + ' -- ' + d);
-    });
+app.use(function (req, res) {
+  res.send({ msg: "hello" });
 });
 
-//4.
-var server = http.createServer(function (req, resp) {
- 
-    fs.readFile("../pages/client.html", function (error, pgResp) {
-        if (error) {
-            resp.writeHead(404);
-            resp.write('Contents you are looking are Not Found');
-        } else {
-            resp.writeHead(200, { 'Content-Type': 'text/html' });
-            resp.end(pgResp);
-        }
-    });
-});
-//5.
-server.listen(5050);
+wss.on('connection', function connection(ws) {
+  var location = url.parse(ws.upgradeReq.url, true);
+  // you might use location.query.access_token to authenticate or share sessions
+  // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
 
-console.log('Server started');
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+
+  ws.send('something');
+});
+
+server.on('request', app);
+server.listen(port, function () { console.log('Listening on ' + server.address().port) });
