@@ -1,26 +1,21 @@
-var server = require('http').createServer()
-  , url = require('url')
-  , WebSocketServer = require('ws').Server
-  , wss = new WebSocketServer({ server: server })
+var WebSocketServer = require('ws').Server
+  , http = require('http')
   , express = require('express')
-  , app = express()
-  , port = 4080;
+  , app = express();
 
-app.use(function (req, res) {
-  res.send({ msg: "hello" });
-});
+app.use(express.static(__dirname + '/www'));
 
-wss.on('connection', function connection(ws) {
-  var location = url.parse(ws.upgradeReq.url, true);
-  // you might use location.query.access_token to authenticate or share sessions
-  // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+var server = http.createServer(app);
+server.listen(8080);
 
-  ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
+var wss = new WebSocketServer({server: server});
+wss.on('connection', function(ws) {
+  var id = setInterval(function() {
+    ws.send(JSON.stringify(process.memoryUsage()), function() { /* ignore errors */ });
+  }, 100);
+  console.log('started client interval');
+  ws.on('close', function() {
+    console.log('stopping client interval');
+    clearInterval(id);
   });
-
-  ws.send('something');
 });
-
-server.on('request', app);
-server.listen(port, function () { console.log('Listening on ' + server.address().port) });
