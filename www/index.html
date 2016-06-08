@@ -3,8 +3,36 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
     <title>Babylon - Getting Started</title>
-    <!--- link to the last version of babylon --->
-    <script src="build/babylon.max.js"></script>
+    <!--- link to the last version of babylon
+    <script src="libs/babylon.max.js"></script>
+     --->
+    <script src="http://www.babylonjs.com/cannon.js"></script>
+    <script src="http://www.babylonjs.com/Oimo.js"></script>
+    <script src="http://www.babylonjs.com/babylon.js">
+
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.fireMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.waterMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.lavaMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.normalMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.skyMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.triPlanarMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.terrainMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.gradientMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.furMaterial.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.gridMaterial.min.js"></script>
+
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.brickProceduralTexture.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.cloudProceduralTexture.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.fireProceduralTexture.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.grassProceduralTexture.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.marbleProceduralTexture.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.roadProceduralTexture.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.starfieldProceduralTexture.min.js"></script>
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.woodProceduralTexture.min.js"></script>    
+
+    <script src="http://babylonjs-playground.azurewebsites.net/babylon.objFileLoader.js"></script>
+    
+    
     <style>
         html, body {
             overflow: hidden;
@@ -20,17 +48,8 @@
             touch-action: none;
         }
     </style>
-  
-    <style>
-      body {
-        font-family: Tahoma, Geneva, sans-serif;
-      }
-
-      div {
-        display: inline;
-      }
-    </style>
     <script>
+    /* 
       function updateStats(memuse) {
         document.getElementById('rss').innerHTML = memuse.rss;
         document.getElementById('heapTotal').innerHTML = memuse.heapTotal;
@@ -42,10 +61,8 @@
       ws.onmessage = function (event) {
         updateStats(JSON.parse(event.data));
       };
+    */
     </script>
-  </head>
-  <body>
-    <canvas id="renderCanvas"></canvas>
     <script>
         window.addEventListener('DOMContentLoaded', function(){
             // get the canvas DOM element
@@ -56,32 +73,98 @@
 
             // createScene function that creates and return the scene
             var createScene = function(){
-                // create a basic BJS Scene object
-                var scene = new BABYLON.Scene(engine);
+              var scene = new BABYLON.Scene(engine);
+            
+            // Camera
+              var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(5, 4, -47), scene);
+              camera.setTarget(BABYLON.Vector3.Zero());
+              camera.attachControl(canvas, true);
+            
+            // Light
+            var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-1, -2, -1), scene);
+            light.position = new BABYLON.Vector3(20, 40, 20);
+            light.intensity = 0.8;
+            
+            // Create terrain material
+            var terrainMaterial = new BABYLON.TerrainMaterial("terrainMaterial", scene);
+              terrainMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+              terrainMaterial.specularPower = 64;
+            
+            // Set the mix texture (represents the RGB values)
+              terrainMaterial.mixTexture = new BABYLON.Texture("textures/mixMap.png", scene);
+            
+            // Diffuse textures following the RGB values of the mix map
+            // diffuseTexture1: Red
+            // diffuseTexture2: Green
+            // diffuseTexture3: Blue
+              terrainMaterial.diffuseTexture1 = new BABYLON.Texture("textures/floor.png", scene);
+              terrainMaterial.diffuseTexture2 = new BABYLON.Texture("textures/rock.png", scene);
+              terrainMaterial.diffuseTexture3 = new BABYLON.Texture("textures/grass.png", scene);
+              
+            // Bump textures according to the previously set diffuse textures
+              terrainMaterial.bumpTexture1 = new BABYLON.Texture("textures/floor_bump.png", scene);
+              terrainMaterial.bumpTexture2 = new BABYLON.Texture("textures/rockn.png", scene);
+              terrainMaterial.bumpTexture3 = new BABYLON.Texture("textures/grassn.png", scene);
+            
+              // Rescale textures according to the terrain
+              terrainMaterial.diffuseTexture1.uScale = terrainMaterial.diffuseTexture1.vScale = 10;
+              terrainMaterial.diffuseTexture2.uScale = terrainMaterial.diffuseTexture2.vScale = 10;
+              terrainMaterial.diffuseTexture3.uScale = terrainMaterial.diffuseTexture3.vScale = 10;
 
-                // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-                var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5,-10), scene);
+	            var box = BABYLON.Mesh.CreateBox("box", 6.0, scene);
+              box.position.y = 5;
 
-                // target the camera to scene origin
-                camera.setTarget(BABYLON.Vector3.Zero());
+              var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
+              sphere.position.y = 15;
+              sphere.position.z = 10;
 
-                // attach the camera to the canvas
-                camera.attachControl(canvas, false);
+              // Shadows
+              var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
+              shadowGenerator.getShadowMap().renderList.push(sphere);
+              shadowGenerator.getShadowMap().renderList.push(box);
+              
+              shadowGenerator.useVarianceShadowMap = true;
+/*
+              var shadowGenerator2 = new BABYLON.ShadowGenerator(1024, light2);
+              shadowGenerator2.getShadowMap().renderList.push(torus);
+              shadowGenerator2.usePoissonSampling = true;
+  
+  */
+              
+              // Ground
+              var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
+              ground.position.y = -2.05;
+              ground.material = terrainMaterial;
+            
+            	ground.receiveShadows = true;
+              
+              /*
+              scene.executeWhenready( function() {  
+                  var rayPick = new BABYLON.Ray(sphere.position, new BABYLON.Vector3(0, -1, 0));
+                  var meshFound = scene.pickWithRay(rayPick, function (item) {
+                    if (item.name.indexOf("ground") == 0)
+                        return true;
+                    else
+                        return false;
+                  });
+                }
+              );
+*/
 
-                // create a basic light, aiming 0,1,0 - meaning, to the sky
-                var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), scene);
-
-                // create a built-in "sphere" shape; its constructor takes 5 params: name, width, depth, subdivisions, scene
-                var sphere = BABYLON.Mesh.CreateSphere('sphere1', 16, 2, scene);
-
-                // move the sphere upward 1/2 of its height
-                sphere.position.y = 1;
-
-                // create a built-in "ground" shape; its constructor takes the same 5 params as the sphere's one
-                var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, scene);
-
-                // return the created scene
-                return scene;
+      scene.executeWhenReady(function () {
+                  var rayPick = new BABYLON.Ray(sphere.position, new BABYLON.Vector3(0, -1, 0));
+                  var meshFound = scene.pickWithRay(rayPick, function (item) {
+                    if (item.name.indexOf("ground") == 0)
+                        return true;
+                    else
+                        return false;
+                  });
+      });
+            
+          //    var pickInfo = ground.pick(sphere.position.x, sphere.position.z);
+          //    sphere.position.y = pickInfo.pickedPoint.y;
+              
+              return scene;
             }
 
             // call the createScene function
@@ -98,9 +181,15 @@
             });
         });
     </script>
+  </head>
+  <body>
+    <canvas id="renderCanvas" style="width: 100%"></canvas>
+
+    <!--
     <strong>Server Stats</strong><br>
     RSS: <div id='rss'></div><br>
     Heap total: <div id='heapTotal'></div><br>
     Heap used: <div id='heapUsed'></div><br>
+    -->
   </body>
 </html>
