@@ -164,6 +164,22 @@
           //    var pickInfo = ground.pick(sphere.position.x, sphere.position.z);
           //    sphere.position.y = pickInfo.pickedPoint.y;
               
+             
+              
+	var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, scene, false);
+	var water = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(512, 512));
+	water.backFaceCulling = true;
+	water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
+	water.windForce = -5;
+	water.waveHeight = 0.2;
+	water.bumpHeight = 0.05;
+	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.015);
+	water.colorBlendFactor = 0.5;
+	water.addToRenderList(ground);
+	waterMesh.material = water;
+              
+              
+              
               return scene;
             }
 
