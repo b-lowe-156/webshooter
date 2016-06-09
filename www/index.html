@@ -49,19 +49,18 @@
         }
     </style>
     <script>
-    /* 
-      function updateStats(memuse) {
-        document.getElementById('rss').innerHTML = memuse.rss;
-        document.getElementById('heapTotal').innerHTML = memuse.heapTotal;
-        document.getElementById('heapUsed').innerHTML = memuse.heapUsed;
-      }
+    //function updateStats(memuse) {
+    //    document.getElementById('rss').innerHTML = memuse.rss;
+    //    document.getElementById('heapTotal').innerHTML = memuse.heapTotal;
+    //    document.getElementById('heapUsed').innerHTML = memuse.heapUsed;
+    //  }
 
-      var host = window.document.location.host.replace(/:.*/, '');
-      var ws = new WebSocket('ws://' + host + ':8080');
-      ws.onmessage = function (event) {
-        updateStats(JSON.parse(event.data));
-      };
-    */
+    //  var host = window.document.location.host.replace(/:.*/, '');
+    //  var ws = new WebSocket('ws://' + host + ':8080');
+    //  ws.onmessage = function (event) {
+    //    updateStats(JSON.parse(event.data));
+    //  };
+    //*/
     </script>
     <script>
         window.addEventListener('DOMContentLoaded', function(){
@@ -130,9 +129,15 @@
               shadowGenerator2.usePoissonSampling = true;
   
   */
-              
+              var subdivisions = 300;
+              var width = 300;
+              var height = 300;
+            
+              var options = {width: width, height: height, subdivisions: subdivisions, minHeight: 0,  maxHeight: 60};//, onReady: setQuads};
+                
               // Ground
-              var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
+              var ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap("ground", "textures/heightMap.png", options, scene);
+              
               ground.position.y = -2.05;
               ground.material = terrainMaterial;
             
