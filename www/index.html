@@ -64,12 +64,7 @@
     </script>
     <script>
         window.addEventListener('DOMContentLoaded', function(){
-          
-        // Altitude
-        // ============================================================
-        var heightMapQuads;
-        var quadsReady = false;
-        
+
         var subdivisions = 300;
         var width = 300;
         var height = 300;
@@ -78,6 +73,13 @@
         var maxX = width / 2;
         var minZ = -height / 2;
         var maxZ = height / 2;
+          
+        var sphere;
+          
+        // Altitude
+        // ============================================================
+        var heightMapQuads;
+        var quadsReady = false;
         
         // populates the array "quads" with quad elements :
         // a quad V1V2V3V4 is a Vector2 (slope V1V4) and two Vector4, the facet plane equations
@@ -176,8 +178,8 @@
               var scene = new BABYLON.Scene(engine);
             
             // Camera
-              var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(5, 4, -47), scene);
-              camera.setTarget(BABYLON.Vector3.Zero());
+              var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 40, 0), scene);
+              camera.setTarget(new BABYLON.Vector3(0, 0, 0));
               camera.attachControl(canvas, true);
             
             // Light
@@ -214,7 +216,7 @@
 	            var box = BABYLON.Mesh.CreateBox("box", 6.0, scene);
               box.position.y = 5;
 
-              var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
+              sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
               sphere.position.y = 15;
               sphere.position.z = 10;
 
@@ -230,9 +232,9 @@
               shadowGenerator2.usePoissonSampling = true;
   
   */
-              var options = {width: width, height: height, subdivisions: subdivisions, minHeight: 0,  maxHeight: 30, onReady: setQuads};
                 
               // Ground
+              var options = {width: width, height: height, subdivisions: subdivisions, minHeight: 0,  maxHeight: 10, onReady: setQuads};
               var ground = BABYLON.MeshBuilder.CreateGroundFromHeightMap("ground", "textures/heightMap.png", options, scene);
               
               ground.position.y = -2.05;
@@ -254,8 +256,7 @@
 */
 
       scene.executeWhenReady(function () {
-                  box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
-                  sphere.position.y = getAltitudeAt(sphere.position.x, sphere.position.z, heightMapQuads, options);
+        ready = true;
       });
             
           //    var pickInfo = ground.pick(sphere.position.x, sphere.position.z);
@@ -275,6 +276,16 @@
 	water.addToRenderList(ground);
 	waterMesh.material = water;
               
+              
+  scene.registerBeforeRender(function() {
+      if (quadsReady) {
+    
+        box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
+        
+        sphere.position.x += 0.1;
+        sphere.position.y = getAltitudeAt(sphere.position.x, sphere.position.z, heightMapQuads, options);
+      }
+  });
               
               
               return scene;
