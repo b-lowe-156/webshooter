@@ -271,9 +271,10 @@
 	water.windForce = -5;
 	water.waveHeight = 0.2;
 	water.bumpHeight = 0.05;
-	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.015);
+	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.315);
 	water.colorBlendFactor = 0.5;
 	water.addToRenderList(ground);
+  water.addToRenderList(sphere);
 	waterMesh.material = water;
               
               
