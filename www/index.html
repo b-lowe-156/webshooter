@@ -277,9 +277,38 @@
   water.addToRenderList(sphere);
 	waterMesh.material = water;
               
-              
+  var dude = null;
+	var skeleton;
+	BABYLON.SceneLoader.ImportMesh("him", "models/", "Dude.babylon", scene, function (newMeshes, particleSystems, skeletons) {
+
+	    dude = newMeshes[0];
+      
+
+
+
+		skeleton = skeletons[0];
+	//	console.log(skeleton.bones)
+	    dude.rotation.y = Math.PI;
+		dude.scaling = new BABYLON.Vector3(0.2,0.2,0.2);
+	    dude.position = new BABYLON.Vector3(0, 0, 0);
+		skeleton.position = new BABYLON.Vector3(0, 0, 0);
+		skeleton.scaling = new BABYLON.Vector3(0.2,0.2,0.2);
+					
+		sphere.attachToBone(skeleton.bones[34], dude);
+              /*
+		sphere.scaling = new BABYLON.Vector3(5, 5, 5);
+		
+  */            
+	   scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);
+
+	});
+  
   scene.registerBeforeRender(function() {
       if (quadsReady) {
+    
+        if(dude !== null) {
+            dude.position.z+= 0.005;
+        }
     
         box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
         
