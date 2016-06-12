@@ -307,7 +307,8 @@
       if (quadsReady) {
     
         if(dude !== null) {
-            dude.position.z+= 0.005;
+            dude.position.z+= 0.05;
+            dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
         }
     
         box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
