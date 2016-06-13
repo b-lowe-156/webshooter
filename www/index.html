@@ -31,6 +31,8 @@
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.woodProceduralTexture.min.js"></script>    
 
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.objFileLoader.js"></script>
+
+    <script src="js/controlling.js">
     
     
     <style>
@@ -73,8 +75,6 @@
         var maxX = width / 2;
         var minZ = -height / 2;
         var maxZ = height / 2;
-          
-        var sphere;
           
         // Altitude
         // ============================================================
@@ -216,13 +216,8 @@
 	            var box = BABYLON.Mesh.CreateBox("box", 6.0, scene);
               box.position.y = 5;
 
-              sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
-              sphere.position.y = 15;
-              sphere.position.z = 10;
-
               // Shadows
               var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-              shadowGenerator.getShadowMap().renderList.push(sphere);
               shadowGenerator.getShadowMap().renderList.push(box);
               
               shadowGenerator.useVarianceShadowMap = true;
@@ -242,26 +237,10 @@
             
             	ground.receiveShadows = true;
               
-              /*
-              scene.executeWhenready( function() {  
-                  var rayPick = new BABYLON.Ray(sphere.position, new BABYLON.Vector3(0, -1, 0));
-                  var meshFound = scene.pickWithRay(rayPick, function (item) {
-                    if (item.name.indexOf("ground") == 0)
-                        return true;
-                    else
-                        return false;
-                  });
-                }
-              );
-*/
-
       scene.executeWhenReady(function () {
         ready = true;
       });
-            
-          //    var pickInfo = ground.pick(sphere.position.x, sphere.position.z);
-          //    sphere.position.y = pickInfo.pickedPoint.y;
-              
+             
              
               
 	var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, scene, false);
@@ -274,7 +253,6 @@
 	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.315);
 	water.colorBlendFactor = 0.5;
 	water.addToRenderList(ground);
-  water.addToRenderList(sphere);
 	waterMesh.material = water;
               
   var dude = null;
@@ -289,16 +267,11 @@
 		skeleton = skeletons[0];
 	//	console.log(skeleton.bones)
 	    dude.rotation.y = Math.PI;
-		dude.scaling = new BABYLON.Vector3(0.2,0.2,0.2);
+		dude.scaling = new BABYLON.Vector3(0.1,0.1,0.1);
 	    dude.position = new BABYLON.Vector3(0, 0, 0);
 		skeleton.position = new BABYLON.Vector3(0, 0, 0);
-		skeleton.scaling = new BABYLON.Vector3(0.2,0.2,0.2);
+		skeleton.scaling = new BABYLON.Vector3(0.1,0.1,0.1);
 					
-		sphere.attachToBone(skeleton.bones[34], dude);
-              /*
-		sphere.scaling = new BABYLON.Vector3(5, 5, 5);
-		
-  */            
 	   scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);
 
 	});
@@ -307,14 +280,28 @@
       if (quadsReady) {
     
         if(dude !== null) {
-            dude.position.z+= 0.05;
+
+            var dirX = 0.1;
+            var dirZ = 0.1; 
+            if (controlling.forward) {
+                dude.position.x += dirX;
+            }
+            if (controlling.backward) {
+                dude.position.x -= dirX;
+            }
+            if (controlling.strafeLeft) {
+                dude.position.z += dirZ;
+            }
+            if (controlling.strafeRight) {
+                dude.position.z -= dirZ;
+            }
+          
             dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
         }
     
         box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
-        
-        sphere.position.x += 0.1;
-        sphere.position.y = getAltitudeAt(sphere.position.x, sphere.position.z, heightMapQuads, options);
+
+
       }
   });
               
@@ -334,7 +321,16 @@
             window.addEventListener('resize', function(){
                 engine.resize();
             });
-        });
+
+            window.addEventListener('keydown', function(e) {
+                controlling.handleKeydownEvent(e);
+            });
+
+            window.addEventListener('keyup', function(e) {
+                controlling.handleKeyupEvent(e);
+            });
+
+          });
     </script>
   </head>
   <body>
