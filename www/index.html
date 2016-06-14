@@ -236,6 +236,42 @@
               ground.material = terrainMaterial;
             
             	ground.receiveShadows = true;
+
+
+
+              canvas.onclick = function() {
+                canvas.requestPointerLock();
+              }
+
+              // pointer lock event listeners
+
+              // Hook pointer lock state change events for different browsers
+              document.addEventListener('pointerlockchange', lockChangeAlert, false);
+              document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+              function lockChangeAlert() {
+                if(document.pointerLockElement === canvas ||
+                document.mozPointerLockElement === canvas) {
+                  console.log('The pointer lock status is now locked');
+                  document.addEventListener("mousemove", canvasLoop, false);
+                } else {
+                  console.log('The pointer lock status is now unlocked');  
+                  document.removeEventListener("mousemove", canvasLoop, false);
+                }
+              }
+
+              function canvasLoop(e) {
+                var movementX = e.movementX ||
+                    e.mozMovementX          ||
+                    0;
+
+                var movementY = e.movementY ||
+                    e.mozMovementY      ||
+                    0;
+
+                    console.log(movementX + " " + movementY);
+              }
+
+
               
       scene.executeWhenReady(function () {
         ready = true;
