@@ -235,7 +235,7 @@
               ground.position.y = -2.05;
               ground.material = terrainMaterial;
             
-            	ground.receiveShadows = true;
+            	//ground.receiveShadows = true;
 
 
 
@@ -267,6 +267,10 @@
                 var movementY = e.movementY ||
                     e.mozMovementY      ||
                     0;
+
+                    if ( dude != null ) {
+                      dude.rotation.y += 0.01 * movementX;
+                    }
 
                     console.log(movementX + " " + movementY);
               }
