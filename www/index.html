@@ -182,7 +182,7 @@
             // Camera
               camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 40, 0), scene);
               camera.setTarget(new BABYLON.Vector3(0, 0, 0));
-              camera.attachControl(canvas, true);
+              //camera.attachControl(canvas, true);
             
             // Light
             var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-1, -2, -1), scene);
@@ -272,6 +272,7 @@
 
                     if ( dude != null ) {
                       dude.rotation.y += 0.01 * movementX;
+                      camera.rotation.y = dude.rotation.y;
                     }
 
                     console.log(movementX + " " + movementY);
