@@ -67,6 +67,8 @@
     <script>
         window.addEventListener('DOMContentLoaded', function(){
 
+        var camera;
+
         var subdivisions = 300;
         var width = 300;
         var height = 300;
@@ -178,7 +180,7 @@
               var scene = new BABYLON.Scene(engine);
             
             // Camera
-              var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 40, 0), scene);
+              camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 40, 0), scene);
               camera.setTarget(new BABYLON.Vector3(0, 0, 0));
               camera.attachControl(canvas, true);
             
@@ -337,7 +339,11 @@
             }
           
             dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
+            
+            camera.position.x = dude.position.x;
+            camera.position.z = dude.position.z;
         }
+        
     
         box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
 
