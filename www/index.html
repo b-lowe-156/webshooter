@@ -185,6 +185,7 @@
               
               camera.setTarget(new BABYLON.Vector3(0, 0, 0));
               camera.beta = 0.4;
+              camera.alpha = Math.PI / 2;
               //camera.attachControl(canvas, true);
             
             // Light
@@ -276,7 +277,7 @@
                     if ( dude != null ) {
                       dude.rotation.y += 0.01 * movementX;
                       //camera.rotation.y += 0.00001;
-                      camera.alpha = -1 * dude.rotation.y;
+                      camera.alpha = Math.PI / 2 - dude.rotation.y;
                     }
 
                     console.log(movementX + " " + movementY);
@@ -313,7 +314,7 @@
 
 		skeleton = skeletons[0];
 	//	console.log(skeleton.bones)
-	    dude.rotation.y = Math.PI;
+	    dude.rotation.y = 0; //Math.PI / 2;
 		dude.scaling = new BABYLON.Vector3(0.1,0.1,0.1);
 	    dude.position = new BABYLON.Vector3(0, 0, 0);
 		skeleton.position = new BABYLON.Vector3(0, 0, 0);
@@ -328,10 +329,14 @@
     
         if(dude !== null) {
 
-            var dirX = 0.1;
-            var dirZ = 0.1; 
+//var x = Math.sin(dude.rotation.y);
+//var z = Math.cos(dude.rotation.y);
+
+            var dirX = Math.sin(dude.rotation.y);
+            var dirZ = Math.cos(dude.rotation.y); 
             if (controlling.forward) {
-                dude.position.x += dirX;
+                dude.position.x -= dirX;
+                dude.position.z -= dirZ;
             }
             if (controlling.backward) {
                 dude.position.x -= dirX;
@@ -345,6 +350,7 @@
           
             dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
             
+
             camera.target.x = dude.position.x;
             camera.target.z = dude.position.z;
         }
