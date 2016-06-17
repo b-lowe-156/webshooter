@@ -180,8 +180,11 @@
               var scene = new BABYLON.Scene(engine);
             
             // Camera
-              camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 40, 0), scene);
+             // camera = new BABYLON.TargetCamera("camera1", new BABYLON.Vector3(0, 40, 0), scene);
+              camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 50, BABYLON.Vector3.Zero(), scene);
+              
               camera.setTarget(new BABYLON.Vector3(0, 0, 0));
+              camera.beta = 0.4;
               //camera.attachControl(canvas, true);
             
             // Light
@@ -272,7 +275,8 @@
 
                     if ( dude != null ) {
                       dude.rotation.y += 0.01 * movementX;
-                      camera.rotation.y = dude.rotation.y;
+                      //camera.rotation.y += 0.00001;
+                      camera.alpha = -1 * dude.rotation.y;
                     }
 
                     console.log(movementX + " " + movementY);
@@ -341,8 +345,8 @@
           
             dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
             
-            camera.position.x = dude.position.x;
-            camera.position.z = dude.position.z;
+            camera.target.x = dude.position.x;
+            camera.target.z = dude.position.z;
         }
         
     
