@@ -177,16 +177,12 @@
 
             // createScene function that creates and return the scene
             var createScene = function(){
-              var scene = new BABYLON.Scene(engine);
-            
-            // Camera
-             // camera = new BABYLON.TargetCamera("camera1", new BABYLON.Vector3(0, 40, 0), scene);
-              camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 50, BABYLON.Vector3.Zero(), scene);
-              
-              camera.setTarget(new BABYLON.Vector3(0, 22, 0));
-              camera.beta = 1.1;
-              camera.alpha = Math.PI / 2;
-              //camera.attachControl(canvas, true);
+            var scene = new BABYLON.Scene(engine);
+          
+            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 50, BABYLON.Vector3.Zero(), scene);
+            camera.setTarget(new BABYLON.Vector3(0, 30, 0));
+            camera.beta = 0.4;
+            camera.alpha = Math.PI / 2;
             
             // Light
             var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-1, -2, -1), scene);
@@ -195,8 +191,8 @@
             
             // Create terrain material
             var terrainMaterial = new BABYLON.TerrainMaterial("terrainMaterial", scene);
-              terrainMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-              terrainMaterial.specularPower = 64;
+            terrainMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            terrainMaterial.specularPower = 64;
             
             // Set the mix texture (represents the RGB values)
               terrainMaterial.mixTexture = new BABYLON.Texture("textures/mixMap.png", scene);
@@ -243,8 +239,6 @@
             
             	//ground.receiveShadows = true;
 
-
-
               canvas.onclick = function() {
                 canvas.requestPointerLock();
               }
@@ -266,21 +260,16 @@
               }
 
               function canvasLoop(e) {
-                var movementX = e.movementX ||
-                    e.mozMovementX          ||
-                    0;
+                var movementX = e.movementX || e.mozMovementX || 0;
+                var movementY = e.movementY || e.mozMovementY || 0;
 
-                var movementY = e.movementY ||
-                    e.mozMovementY      ||
-                    0;
+                if ( dude != null ) {
+                  dude.rotation.y += 0.001 * movementX;
+                  //camera.rotation.y += 0.00001;
+                  camera.alpha = Math.PI / 2 - dude.rotation.y;
+                }
 
-                    if ( dude != null ) {
-                      dude.rotation.y += 0.01 * movementX;
-                      //camera.rotation.y += 0.00001;
-                      camera.alpha = Math.PI / 2 - dude.rotation.y;
-                    }
-
-                    console.log(movementX + " " + movementY);
+                console.log(movementX + " " + movementY);
               }
 
 
@@ -307,58 +296,50 @@
 	var skeleton;
 	BABYLON.SceneLoader.ImportMesh("him", "models/", "Dude.babylon", scene, function (newMeshes, particleSystems, skeletons) {
 
-	    dude = newMeshes[0];
+    dude = newMeshes[0];
+
+    skeleton = skeletons[0];
+    //	console.log(skeleton.bones)
+    dude.rotation.y = 0; //Math.PI / 2;
+    var skale = 0.08;
+    dude.scaling = new BABYLON.Vector3(skale, skale, skale);
+    dude.position = new BABYLON.Vector3(0, 0, 0);
+    skeleton.position = new BABYLON.Vector3(0, 0, 0);
+    skeleton.scaling = new BABYLON.Vector3(skale, skale, skale);
       
-
-
-
-		skeleton = skeletons[0];
-	//	console.log(skeleton.bones)
-	    dude.rotation.y = 0; //Math.PI / 2;
-		dude.scaling = new BABYLON.Vector3(0.1,0.1,0.1);
-	    dude.position = new BABYLON.Vector3(0, 0, 0);
-		skeleton.position = new BABYLON.Vector3(0, 0, 0);
-		skeleton.scaling = new BABYLON.Vector3(0.1,0.1,0.1);
-					
-	   scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);
-
+    scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);
 	});
   
   scene.registerBeforeRender(function() {
       if (quadsReady) {
     
         if(dude !== null) {
-
-//var x = Math.sin(dude.rotation.y);
-//var z = Math.cos(dude.rotation.y);
-
-            var dirX = Math.sin(dude.rotation.y);
-            var dirZ = Math.cos(dude.rotation.y); 
+            var moveSpeed = 0.1;
             if (controlling.forward) {
-                dude.position.x -= dirX;
-                dude.position.z -= dirZ;
+                dude.position.x -= Math.sin(dude.rotation.y) * moveSpeed;
+                dude.position.z -= Math.cos(dude.rotation.y) * moveSpeed;
             }
             if (controlling.backward) {
-                dude.position.x -= dirX;
+                dude.position.x += Math.sin(dude.rotation.y) * moveSpeed;
+                dude.position.z += Math.cos(dude.rotation.y) * moveSpeed;
             }
             if (controlling.strafeLeft) {
-                dude.position.z += dirZ;
+                dude.position.x += Math.sin(dude.rotation.y + Math.PI / 2) * moveSpeed;
+                dude.position.z += Math.cos(dude.rotation.y + Math.PI / 2) * moveSpeed;
             }
             if (controlling.strafeRight) {
-                dude.position.z -= dirZ;
+                dude.position.x -= Math.sin(dude.rotation.y + Math.PI / 2) * moveSpeed;
+                dude.position.z -= Math.cos(dude.rotation.y + Math.PI / 2) * moveSpeed;
             }
           
             dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
-            
 
-            camera.target.x = dude.position.x;
-            camera.target.z = dude.position.z;
+            camera.target.x = dude.position.x - Math.sin(dude.rotation.y) * 5;
+            camera.target.y = dude.position.y + 30;
+            camera.target.z = dude.position.z - Math.cos(dude.rotation.y) * 5;
         }
-        
     
         box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
-
-
       }
   });
               
