@@ -263,13 +263,14 @@
                 var movementX = e.movementX || e.mozMovementX || 0;
                 var movementY = e.movementY || e.mozMovementY || 0;
 
-                if ( dude != null ) {
-                  dude.rotation.y += 0.001 * movementX;
-                  //camera.rotation.y += 0.00001;
-                  camera.alpha = Math.PI / 2 - dude.rotation.y;
+                if (movementX < 100 && movementX > -100) {
+                  if ( dude != null ) {
+                    dude.rotation.y += 0.001 * movementX;
+                    //camera.rotation.y += 0.00001;
+                    camera.alpha = Math.PI / 2 - dude.rotation.y;
+                    console.log(movementX);
+                  }
                 }
-
-                console.log(movementX + " " + movementY);
               }
 
 
