@@ -68,6 +68,7 @@
         window.addEventListener('DOMContentLoaded', function(){
 
         var camera;
+        var cameraAngle = Math.PI / 2;
 
         var subdivisions = 300;
         var width = 300;
@@ -182,7 +183,7 @@
             camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 50, BABYLON.Vector3.Zero(), scene);
             camera.setTarget(new BABYLON.Vector3(0, 30, 0));
             camera.beta = 0.4;
-            camera.alpha = Math.PI / 2;
+            camera.alpha = cameraAngle;
             
             // Light
             var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(-1, -2, -1), scene);
@@ -267,7 +268,21 @@
                   if ( dude != null ) {
                     dude.rotation.y += 0.001 * movementX;
                     //camera.rotation.y += 0.00001;
-                    camera.alpha = Math.PI / 2 - dude.rotation.y;
+
+                    var targetAngle = Math.PI / 2 - dude.rotation.y;
+                    var diff = targetAngle - camera.alpha;
+
+                    console.log(diff, targetAngle, camera.alpha);
+
+                    if (diff > 0.2) {
+                      camera.alpha += 0.01;
+                    }
+
+
+                    //camera.alpha = targetAngle;
+
+
+
                     console.log(movementX);
                   }
                 }
