@@ -269,20 +269,6 @@
                     dude.rotation.y += 0.001 * movementX;
                     //camera.rotation.y += 0.00001;
 
-                    var targetAngle = Math.PI / 2 - dude.rotation.y;
-                    var diff = targetAngle - camera.alpha;
-
-                    console.log(diff, targetAngle, camera.alpha);
-
-                    if (diff > 0.2) {
-                      camera.alpha += 0.01;
-                    }
-
-
-                    //camera.alpha = targetAngle;
-
-
-
                     console.log(movementX);
                   }
                 }
@@ -353,6 +339,16 @@
             camera.target.x = dude.position.x - Math.sin(dude.rotation.y) * 5;
             camera.target.y = dude.position.y + 30;
             camera.target.z = dude.position.z - Math.cos(dude.rotation.y) * 5;
+
+            var targetAngle = Math.PI / 2 - dude.rotation.y;
+            var diff = targetAngle - camera.alpha;
+
+            console.log(diff, targetAngle, camera.alpha);
+
+            if (diff > 0.2) {
+              camera.alpha += 0.01;
+            }
+            //camera.alpha = targetAngle;
         }
     
         box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
