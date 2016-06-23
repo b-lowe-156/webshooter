@@ -356,9 +356,11 @@
           
             dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
 
-            camera.target.x = dude.position.x - Math.sin(dude.rotation.y) * 5;
+          //  camera.target.x = dude.position.x - Math.sin(dude.rotation.y) * 5;
+          camera.target.x = dude.position.x;
             camera.target.y = dude.position.y + 30;
-            camera.target.z = dude.position.z - Math.cos(dude.rotation.y) * 5;
+          //  camera.target.z = dude.position.z - Math.cos(dude.rotation.y) * 5;
+          camera.target.z = dude.position.z;
 
             var targetAngle = Math.PI / 2 - dude.rotation.y;
             var diff = targetAngle - camera.alpha;
