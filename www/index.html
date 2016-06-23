@@ -370,6 +370,10 @@
             if (diff > 0.2) {
               camera.alpha += 0.01;
             }
+            else if (diff < -0.2) {
+              camera.alpha -= 0.01;
+            }
+            
             //camera.alpha = targetAngle;
         }
     
