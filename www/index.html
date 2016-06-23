@@ -310,6 +310,26 @@
     skeleton.scaling = new BABYLON.Vector3(skale, skale, skale);
       
     scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);
+    
+    window.addEventListener("click", function (e) {	    
+        var bullet = BABYLON.Mesh.CreateSphere('bullet', 3, 0.3, scene);
+        var startPos = dude.position;
+        
+        bullet.position = new BABYLON.Vector3(startPos.x, startPos.y, startPos.z);
+        bullet.material =  new BABYLON.StandardMaterial('texture1', scene);
+        bullet.material.diffuseColor = new BABYLON.Color3(3, 2, 0);
+      
+        var bulletDirection = new BABYLON.Vector3(0, 0, 0);
+        
+        bulletDirection.x = -Math.sin(dude.rotation.y);
+        bulletDirection.z = -Math.cos(dude.rotation.y);
+        
+        bulletDirection.normalize();
+          
+        scene.registerBeforeRender(function () {
+            bullet.position.addInPlace(bulletDirection);
+        });
+    });
 	});
   
   scene.registerBeforeRender(function() {
@@ -343,7 +363,7 @@
             var targetAngle = Math.PI / 2 - dude.rotation.y;
             var diff = targetAngle - camera.alpha;
 
-            console.log(diff, targetAngle, camera.alpha);
+            console.log( targetAngle, camera.alpha);
 
             if (diff > 0.2) {
               camera.alpha += 0.01;
