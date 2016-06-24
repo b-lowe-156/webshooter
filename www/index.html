@@ -274,7 +274,14 @@
                 }
               }
 
-
+var linesMaterial = new BABYLON.StandardMaterial("texture1", scene);
+linesMaterial.alpha = 0.1;
+linesMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+var lines = BABYLON.Mesh.CreateLines("lines", [
+    new BABYLON.Vector3(0, 4, 0),
+    new BABYLON.Vector3(0, 4, -400)
+], scene);
+lines.material = linesMaterial;
               
       scene.executeWhenReady(function () {
         ready = true;
@@ -373,7 +380,10 @@
             else if (diff < -0.2) {
               camera.alpha -= 0.01;
             }
-            
+            lines.position.x = dude.position.x;
+            lines.position.y = dude.position.y;
+            lines.position.z = dude.position.z;
+            lines.rotation.y = dude.rotation.y;
             //camera.alpha = targetAngle;
         }
     
