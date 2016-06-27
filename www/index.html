@@ -218,18 +218,12 @@
 
 	            var box = BABYLON.Mesh.CreateBox("box", 6.0, scene);
               box.position.y = 5;
-
+              
               // Shadows
               var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
               shadowGenerator.getShadowMap().renderList.push(box);
               
               shadowGenerator.useVarianceShadowMap = true;
-/*
-              var shadowGenerator2 = new BABYLON.ShadowGenerator(1024, light2);
-              shadowGenerator2.getShadowMap().renderList.push(torus);
-              shadowGenerator2.usePoissonSampling = true;
-  
-  */
                 
               // Ground
               var options = {width: width, height: height, subdivisions: subdivisions, minHeight: 0,  maxHeight: 10, onReady: setQuads};
@@ -275,14 +269,14 @@
               }
 
 var linesMaterial = new BABYLON.StandardMaterial("texture1", scene);
-linesMaterial.alpha = 0.1;
-linesMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
-var lines = BABYLON.Mesh.CreateLines("lines", [
-    new BABYLON.Vector3(0, 4, 0),
-    new BABYLON.Vector3(0, 4, -400)
-], scene);
+linesMaterial.alpha = 0.7;
+linesMaterial.diffuseColor = new BABYLON.Color3(1, 0.7, 0.7);
+    
+var lines = BABYLON.Mesh.CreatePlane("gridline_main", 0.1, scene);
+lines.scaling.y = 1000;
+lines.rotation.x = 0.5 * Math.PI;
 lines.material = linesMaterial;
-              
+
       scene.executeWhenReady(function () {
         ready = true;
       });
@@ -319,7 +313,7 @@ lines.material = linesMaterial;
     scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);
     
     window.addEventListener("click", function (e) {	    
-        var bullet = BABYLON.Mesh.CreateSphere('bullet', 3, 0.3, scene);
+        var bullet = BABYLON.Mesh.CreateSphere('bullet', 3, 0.4, scene);
         var startPos = dude.position;
         
         bullet.position = new BABYLON.Vector3(startPos.x, startPos.y, startPos.z);
@@ -328,10 +322,8 @@ lines.material = linesMaterial;
       
         var bulletDirection = new BABYLON.Vector3(0, 0, 0);
         
-        bulletDirection.x = -Math.sin(dude.rotation.y);
-        bulletDirection.z = -Math.cos(dude.rotation.y);
-        
-        bulletDirection.normalize();
+        bulletDirection.x = -2 * Math.sin(dude.rotation.y);
+        bulletDirection.z = -2 * Math.cos(dude.rotation.y);
           
         scene.registerBeforeRender(function () {
             bullet.position.addInPlace(bulletDirection);
@@ -387,7 +379,8 @@ lines.material = linesMaterial;
             //camera.alpha = targetAngle;
         }
     
-        box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
+        //box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
+        //plan.position.y = getAltitudeAt(plan.position.x, plan.position.z, heightMapQuads, options);
       }
   });
               
