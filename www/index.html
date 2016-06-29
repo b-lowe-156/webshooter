@@ -3,6 +3,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
     <title>Babylon - Getting Started</title>
+
+    <script src="libs/SAT.js"></script>
+    
     <!--- link to the last version of babylon
     <script src="libs/babylon.max.js"></script>
      --->
@@ -379,7 +382,7 @@ lines.material = linesMaterial;
             //camera.alpha = targetAngle;
         }
     
-        //box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
+        box.position.y = getAltitudeAt(box.position.x, box.position.z, heightMapQuads, options);
         //plan.position.y = getAltitudeAt(plan.position.x, plan.position.z, heightMapQuads, options);
       }
   });
