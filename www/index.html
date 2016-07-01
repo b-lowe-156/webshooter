@@ -70,13 +70,13 @@
     <script>
         window.addEventListener('DOMContentLoaded', function(){
             
-        var circle = new SAT.Circle(new SAT.Vector(10,10), 2);
+        var circle = new SAT.Circle(new SAT.Vector(10,10), 1);
         var response = new SAT.Response();
         var polygon = new SAT.Polygon(new SAT.Vector(), [
           new SAT.Vector(3.0, 3.0),
-          new SAT.Vector(3.0, -3.0),
+          new SAT.Vector(-3.0, 3.0),
           new SAT.Vector(-3.0, -3.0),
-          new SAT.Vector(-3.0, 3.0)
+          new SAT.Vector(3.0, -3.0)
         ]);
 
         var camera;
@@ -319,7 +319,7 @@ lines.material = linesMaterial;
     dude.position = new BABYLON.Vector3(0, 0, 0);
     skeleton.position = new BABYLON.Vector3(0, 0, 0);
     skeleton.scaling = new BABYLON.Vector3(skale, skale, skale);
-      
+
     scene.beginAnimation(skeletons[0], 0, 100, true, 1.0);
     
     window.addEventListener("click", function (e) {	    
@@ -379,6 +379,11 @@ lines.material = linesMaterial;
             circle.pos.y = dude.position.z;
             
             var collided = SAT.testPolygonCircle(polygon, circle, response);
+
+            if (collided) {
+              dude.position.x += response.overlapV.x;
+              dude.position.z += response.overlapV.y;
+            }
             
             console.log(collided);   
                          
