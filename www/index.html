@@ -69,6 +69,15 @@
     </script>
     <script>
         window.addEventListener('DOMContentLoaded', function(){
+            
+        var circle = new SAT.Circle(new SAT.Vector(10,10), 2);
+        var response = new SAT.Response();
+        var polygon = new SAT.Polygon(new SAT.Vector(), [
+          new SAT.Vector(3.0, 3.0),
+          new SAT.Vector(3.0, -3.0),
+          new SAT.Vector(-3.0, -3.0),
+          new SAT.Vector(-3.0, 3.0)
+        ]);
 
         var camera;
         var cameraAngle = Math.PI / 2;
@@ -265,8 +274,6 @@
                   if ( dude != null ) {
                     dude.rotation.y += 0.001 * movementX;
                     //camera.rotation.y += 0.00001;
-
-                    console.log(movementX);
                   }
                 }
               }
@@ -358,16 +365,25 @@ lines.material = linesMaterial;
           
             dude.position.y = getAltitudeAt(dude.position.x, dude.position.z, heightMapQuads, options);
 
-          //  camera.target.x = dude.position.x - Math.sin(dude.rotation.y) * 5;
-          camera.target.x = dude.position.x;
+            //  camera.target.x = dude.position.x - Math.sin(dude.rotation.y) * 5;
+            camera.target.x = dude.position.x;
             camera.target.y = dude.position.y + 30;
-          //  camera.target.z = dude.position.z - Math.cos(dude.rotation.y) * 5;
-          camera.target.z = dude.position.z;
+            //  camera.target.z = dude.position.z - Math.cos(dude.rotation.y) * 5;
+            camera.target.z = dude.position.z;
 
+            response.clear();
+            
+            //var collided = polygon.collidesWith(circle, response);
+            
+            circle.pos.x = dude.position.x;
+            circle.pos.y = dude.position.z;
+            
+            var collided = SAT.testPolygonCircle(polygon, circle, response);
+            
+            console.log(collided);   
+                         
             var targetAngle = Math.PI / 2 - dude.rotation.y;
             var diff = targetAngle - camera.alpha;
-
-            console.log( targetAngle, camera.alpha);
 
             if (diff > 0.2) {
               camera.alpha += 0.01;
