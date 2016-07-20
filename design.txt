@@ -1,0 +1,60 @@
+- Sichtrange (halber Kuchen)
+
+# Minimap
+- man sieht die gesamte Karte
+- man sieht die Buddys
+- die Objectives mit Status
+- Killevents für kurze Zeit
+- Schüsse ohne Silencer für kurze Zeit
+
+# Klassen
+
+Assault
+- Rifle mit Grenade Launcher
+- Pistolen
+
+Sniper
+- Sniper Rifle (non auto high range damage)
+- Stinger
+
+Support
+- Lmg
+- Mortar
+
+Panzerjäger
+- Panzerfaust
+- Shotgun
+
+Demolition
+- Granatwerfer
+- Smg
+
+- Smoke
+- Splitter
+- High explosive
+- Flash
+- Claymore
+- Antitank Mine
+
+--- Silencer
+--- Sentry
+--- Messer
+--- Drohne
+--- Helm
+--- Kevlar
+
+# Fahrzeuge
+
+- Main Battle Tank big cannon
+- Light Armored Vehicle small cannon
+- Attack heli unguided missles
+
+--- Jeep Hmg
+--- Anti Air tank
+--- Panzerhaubitzen
+--- Raketen-Lkw
+
+--- Transport heli 2 miniguns
+
+--- Abfangjäger cannon + stingers
+--- Bomber cannon + bomben
