@@ -9,39 +9,69 @@
 
 # Klassen
 
-Assault
+ATTACK
+
+Soldier
 - Rifle mit Grenade Launcher
 - Pistolen
+- Splitter
+- Energieboost
 
-Sniper
-- Sniper Rifle (non auto high range damage)
-- Stinger
+Assault
+- Rpg
+- Shotgun
+- Flash
+- Schild
+
+DEFENCE
+
+Demolition
+- Granatwerfer
+- Shotgun
+- Napalm
+- Sentry
 
 Support
 - Lmg
 - Mortar
-
-Panzerjäger
-- Panzerfaust
-- Shotgun
-
-Demolition
-- Granatwerfer
-- Smg
-
-- Smoke
-- Splitter
-- High explosive
-- Flash
 - Claymore
-- Antitank Mine
+- Nachschubkiste
 
---- Silencer
---- Sentry
---- Messer
---- Drohne
+INTEL
+
+Sniper
+- Sniper Rifle (non auto high range damage)
+- Smg
+- Luftschlag
+- Drohne
+
+Scout
+- Smg mit Silencer
+- Dagger
+- Smoke
+- Radar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########## Backlog
+
+- Antitank Mine
+- Stinger
+
 --- Helm
 --- Kevlar
+
 
 # Fahrzeuge
 
