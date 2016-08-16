@@ -192,7 +192,7 @@
             var createScene = function(){
             var scene = new BABYLON.Scene(engine);
           
-            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 50, BABYLON.Vector3.Zero(), scene);
+            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 200, BABYLON.Vector3.Zero(), scene);
             camera.setTarget(new BABYLON.Vector3(0, 30, 0));
             camera.beta = 0.4;
             camera.alpha = cameraAngle;
@@ -204,7 +204,7 @@
             
             // Create terrain material
             var terrainMaterial = new BABYLON.TerrainMaterial("terrainMaterial", scene);
-            terrainMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+            terrainMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
             terrainMaterial.specularPower = 64;
             
             // Set the mix texture (represents the RGB values)
@@ -215,13 +215,13 @@
             // diffuseTexture2: Green
             // diffuseTexture3: Blue
               terrainMaterial.diffuseTexture1 = new BABYLON.Texture("textures/floor.png", scene);
-              terrainMaterial.diffuseTexture2 = new BABYLON.Texture("textures/rock.png", scene);
-              terrainMaterial.diffuseTexture3 = new BABYLON.Texture("textures/grass.png", scene);
+              terrainMaterial.diffuseTexture2 = new BABYLON.Texture("textures/grass.png", scene);
+              terrainMaterial.diffuseTexture3 = new BABYLON.Texture("textures/sand.jpg", scene);
               
             // Bump textures according to the previously set diffuse textures
               terrainMaterial.bumpTexture1 = new BABYLON.Texture("textures/floor_bump.png", scene);
-              terrainMaterial.bumpTexture2 = new BABYLON.Texture("textures/rockn.png", scene);
-              terrainMaterial.bumpTexture3 = new BABYLON.Texture("textures/grassn.png", scene);
+              terrainMaterial.bumpTexture2 = new BABYLON.Texture("textures/grassn.png", scene);
+              terrainMaterial.bumpTexture3 = new BABYLON.Texture("textures/sand-normal.jpg", scene);
             
               // Rescale textures according to the terrain
               terrainMaterial.diffuseTexture1.uScale = terrainMaterial.diffuseTexture1.vScale = 10;
@@ -345,7 +345,7 @@ lines.material = linesMaterial;
       if (quadsReady) {
     
         if(dude !== null) {
-            var moveSpeed = 0.1;
+            var moveSpeed = 0.5;
             if (controlling.forward) {
                 dude.position.x -= Math.sin(dude.rotation.y) * moveSpeed;
                 dude.position.z -= Math.cos(dude.rotation.y) * moveSpeed;
