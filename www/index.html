@@ -82,9 +82,9 @@
         var camera;
         var cameraAngle = Math.PI / 2;
 
-        var subdivisions = 300;
-        var width = 300;
-        var height = 300;
+        var subdivisions = 600;
+        var width = 600;
+        var height = 600;
 
         var minX = -width / 2;
         var maxX = width / 2;
@@ -293,7 +293,7 @@ lines.material = linesMaterial;
              
              
               
-	var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 512, 512, 32, scene, false);
+	var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 1000, 1000, 32, scene, false);
 	var water = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(512, 512));
 	water.backFaceCulling = true;
 	water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
@@ -301,7 +301,7 @@ lines.material = linesMaterial;
 	water.waveHeight = 0.2;
 	water.bumpHeight = 0.05;
 	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.315);
-	water.colorBlendFactor = 0.5;
+	water.colorBlendFactor = 0.1;
 	water.addToRenderList(ground);
 	waterMesh.material = water;
               
