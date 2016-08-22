@@ -79,12 +79,14 @@
           new SAT.Vector(3.0, -3.0)
         ]);
 
+        var scene;
+
         var camera;
         var cameraAngle = Math.PI / 2;
 
-        var subdivisions = 600;
-        var width = 600;
-        var height = 600;
+        var subdivisions = 40;
+        var width = 400;
+        var height = 400;
 
         var minX = -width / 2;
         var maxX = width / 2;
@@ -158,8 +160,29 @@
           return quads;
         };
 
-        // callback function to call when the ground is ready
-        var setQuads = function(mesh) {
+          // callback function to call when the ground is ready
+          var setQuads = function(mesh) {
+
+          var groundCSG = BABYLON.CSG.FromMesh(mesh);
+
+          var waterMesh = BABYLON.Mesh.CreateGround("waterMeshTmp", 1000, 1000, 32, scene, false);
+          var water = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(512, 512));
+          water.backFaceCulling = true;
+          water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
+          water.windForce = -5;
+          water.waveHeight = 0.2;
+          water.bumpHeight = 0.05;
+          water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.315);
+          water.colorBlendFactor = 0.1;
+          water.addToRenderList(mesh);
+          waterMesh.material = water;
+
+          var waterCSG = BABYLON.CSG.FromMesh(waterMesh);
+         // var subMesh = waterCSG.subtract(groundCSG);
+         // subMesh.toMesh("waterMesh", water, scene);
+
+         // waterMesh.setEnabled(0);
+
           heightMapQuads = computeHeightMapQuads(mesh);
           quadsReady = true;
         };
@@ -190,9 +213,9 @@
 
             // createScene function that creates and return the scene
             var createScene = function(){
-            var scene = new BABYLON.Scene(engine);
+            scene = new BABYLON.Scene(engine);
           
-            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 200, BABYLON.Vector3.Zero(), scene);
+            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 70, BABYLON.Vector3.Zero(), scene);
             camera.setTarget(new BABYLON.Vector3(0, 30, 0));
             camera.beta = 0.4;
             camera.alpha = cameraAngle;
@@ -246,6 +269,12 @@
             
             	//ground.receiveShadows = true;
 
+                          
+
+
+
+
+
               canvas.onclick = function() {
                 canvas.requestPointerLock();
               }
@@ -291,20 +320,6 @@ lines.material = linesMaterial;
         ready = true;
       });
              
-             
-              
-	var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 1000, 1000, 32, scene, false);
-	var water = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(512, 512));
-	water.backFaceCulling = true;
-	water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
-	water.windForce = -5;
-	water.waveHeight = 0.2;
-	water.bumpHeight = 0.05;
-	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.315);
-	water.colorBlendFactor = 0.1;
-	water.addToRenderList(ground);
-	waterMesh.material = water;
-              
   var dude = null;
 	var skeleton;
 	BABYLON.SceneLoader.ImportMesh("him", "models/", "Dude.babylon", scene, function (newMeshes, particleSystems, skeletons) {
@@ -385,8 +400,6 @@ lines.material = linesMaterial;
               dude.position.z += response.overlapV.y;
             }
             
-            console.log(collided);   
-                         
             var targetAngle = Math.PI / 2 - dude.rotation.y;
             var diff = targetAngle - camera.alpha;
 
