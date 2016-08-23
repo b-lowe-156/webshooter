@@ -177,15 +177,14 @@
 	water.windForce = -5;
 	water.waveHeight = 0.01;
 	water.bumpHeight = 0.05;
-	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.015);
-	water.colorBlendFactor = 0.0;
-          water.colorBlendFactor = 0.1;
+//	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.015);
+          water.colorBlendFactor = 0.0;
           water.addToRenderList(mesh);
           waterMesh.material = water;
 
 
 	// fog stack - layers of stacked thin boxes with changing visibility
-	var startViz = 0.1;
+	var startViz = 0.02;
 	var endViz = 0.25;
 	var layerCount = 10;
 	var changeViz = (startViz-endViz)/layerCount;
@@ -198,7 +197,7 @@ for (var i = 0; i < layerCount; i++) {
     	box.scaling = new BABYLON.Vector3(xzScale, yScale, xzScale);
     	box.position = new BABYLON.Vector3(i*shift, i*yScale, 0);
    		box.material = new BABYLON.StandardMaterial("bmat", scene);
-    	box.material.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.5);
+    	box.material.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.7);
 		box.visibility = startViz - (i*changeViz);
     water.addToRenderList(box);
 	}
