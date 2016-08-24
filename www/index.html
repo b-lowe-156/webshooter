@@ -165,6 +165,7 @@
           // callback function to call when the ground is ready
           var setQuads = function(mesh) {
 
+          var groundCSG = BABYLON.CSG.FromMesh(mesh);
         var skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
@@ -175,23 +176,35 @@
         skyboxMaterial.disableLighting = true;
         skybox.material = skyboxMaterial;
 
-          var waterMesh = BABYLON.Mesh.CreateGround("waterMeshTmp", 400, 400, 100, scene, false);
+
+
+
+
+
+          var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 400, 400, 32, scene, false);
           var water = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(512, 512));
           water.backFaceCulling = true;
           water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
+          water.colorBlendFactor = 0.1;
           water.windForce = -5;
           water.waveHeight = 0.01;
           water.bumpHeight = 0.05;
           water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.015);
           water.colorBlendFactor = 0.1;
+          water.addToRenderList(mesh);
+          waterMesh.material = water;
           water.addToRenderList(skybox);
 
+
 	// fog stack - layers of stacked thin boxes with changing visibility
+	var startViz = 0.1;
+	var endViz = 0.25;
 	var startViz = 0.01;
 	var endViz = 0.2;
 	var layerCount = 10;
 	var changeViz = (startViz-endViz)/layerCount;
 	var xzScale = 400;
+	var yScale = -0.3;
 	var yScale = -0.4;
 	var shift = 0.05;
 
@@ -205,6 +218,9 @@ for (var i = 0; i < layerCount; i++) {
     water.addToRenderList(box);
 	}
 
+//          var waterCSG = BABYLON.CSG.FromMesh(waterMesh);
+         // var subMesh = waterCSG.subtract(groundCSG);
+         // subMesh.toMesh("waterMesh", water, scene);
 /*
           var groundCSG = BABYLON.CSG.FromMesh(mesh);
           var box = BABYLON.Mesh.CreateBox("box", 10, scene);
@@ -212,6 +228,7 @@ for (var i = 0; i < layerCount; i++) {
           box.position.y = 10;
           var boxCSG = BABYLON.CSG.FromMesh(box);
 
+         // waterMesh.setEnabled(0);
           var subMesh = groundCSG.subtract(boxCSG);
           subMesh.toMesh("csg", terrainMaterial, scene);
           subMesh.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
@@ -270,6 +287,7 @@ for (var i = 0; i < layerCount; i++) {
             light.intensity = 0.8;
             
             // Create terrain material
+            var terrainMaterial = new BABYLON.TerrainMaterial("terrainMaterial", scene);
             terrainMaterial = new BABYLON.TerrainMaterial("terrainMaterial", scene);
             terrainMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
             terrainMaterial.specularPower = 64;
