@@ -14,7 +14,10 @@
     <script src="http://www.babylonjs.com/babylon.js">
 
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.fireMaterial.min.js"></script>
-    <script src="http://babylonjs-playground.azurewebsites.net/babylon.waterMaterial.min.js"></script>
+    <!-- script src="http://babylonjs-playground.azurewebsites.net/babylon.waterMaterial.min.js"></script -->
+
+    <script src="libs/babylon.waterMaterial.js"></script>
+
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.lavaMaterial.min.js"></script>
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.normalMaterial.min.js"></script>
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.skyMaterial.min.js"></script>
@@ -174,12 +177,12 @@
           var water = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(512, 512));
           water.backFaceCulling = true;
           water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
-	water.windForce = -5;
-	water.waveHeight = 0.01;
-	water.bumpHeight = 0.05;
-//	water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.015);
+          water.windForce = -1;
+          water.waveHeight = 0.01;
+          water.bumpHeight = 0.05;
+      //    water.waterColor = new BABYLON.Color3(1.0, 1.0, 1.0);
           water.colorBlendFactor = 0.0;
-          water.addToRenderList(mesh);
+          water.addToRefractionList(mesh);
           waterMesh.material = water;
 
 
