@@ -17,12 +17,13 @@
     <!-- script src="http://babylonjs-playground.azurewebsites.net/babylon.waterMaterial.min.js"></script -->
 
     <script src="libs/babylon.waterMaterial.js"></script>
+    <script src="libs/babylon.terrainMaterial.js"></script>
 
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.lavaMaterial.min.js"></script>
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.normalMaterial.min.js"></script>
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.skyMaterial.min.js"></script>
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.triPlanarMaterial.min.js"></script>
-    <script src="http://babylonjs-playground.azurewebsites.net/babylon.terrainMaterial.min.js"></script>
+    <!--script src="http://babylonjs-playground.azurewebsites.net/babylon.terrainMaterial.min.js"></script -->
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.gradientMaterial.min.js"></script>
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.furMaterial.min.js"></script>
     <script src="http://babylonjs-playground.azurewebsites.net/babylon.gridMaterial.min.js"></script>
@@ -96,6 +97,8 @@
         var minZ = -height / 2;
         var maxZ = height / 2;
           
+        var terrainMaterial;
+
         // Altitude
         // ============================================================
         var heightMapQuads;
@@ -167,32 +170,46 @@
           var setQuads = function(mesh) {
 
           var groundCSG = BABYLON.CSG.FromMesh(mesh);
+        var skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
+        var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/TropicalSunnyDay", scene);
+        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        skyboxMaterial.disableLighting = true;
+        skybox.material = skyboxMaterial;
 
 
 
 
 
 
-          var waterMesh = BABYLON.Mesh.CreateGround("waterMeshTmp", 1000, 1000, 32, scene, false);
+          var waterMesh = BABYLON.Mesh.CreateGround("waterMesh", 400, 400, 32, scene, false);
           var water = new BABYLON.WaterMaterial("water", scene, new BABYLON.Vector2(512, 512));
           water.backFaceCulling = true;
           water.bumpTexture = new BABYLON.Texture("textures/waterbump.png", scene);
-          water.windForce = -1;
+          water.colorBlendFactor = 0.1;
+          water.windForce = -5;
           water.waveHeight = 0.01;
-          water.bumpHeight = 0.05;
-      //    water.waterColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-          water.colorBlendFactor = 0.0;
-          water.addToRefractionList(mesh);
+          water.bumpHeight = 0.03;
+          water.waterColor = new BABYLON.Color3(0.047, 0.23, 0.015);
+          water.colorBlendFactor = 0.1;
+          water.addToRenderList(mesh);
           waterMesh.material = water;
+          water.addToRenderList(skybox);
 
 
 	// fog stack - layers of stacked thin boxes with changing visibility
-	var startViz = 0.02;
+	var startViz = 0.1;
 	var endViz = 0.25;
+	var startViz = 0.01;
+	var endViz = 0.2;
 	var layerCount = 10;
 	var changeViz = (startViz-endViz)/layerCount;
 	var xzScale = 400;
 	var yScale = -0.3;
+	var yScale = -0.4;
 	var shift = 0.05;
 
 for (var i = 0; i < layerCount; i++) {
@@ -200,7 +217,7 @@ for (var i = 0; i < layerCount; i++) {
     	box.scaling = new BABYLON.Vector3(xzScale, yScale, xzScale);
     	box.position = new BABYLON.Vector3(i*shift, i*yScale, 0);
    		box.material = new BABYLON.StandardMaterial("bmat", scene);
-    	box.material.emissiveColor = new BABYLON.Color3(0.3, 0.3, 0.7);
+    	box.material.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.5);
 		box.visibility = startViz - (i*changeViz);
     water.addToRenderList(box);
 	}
@@ -208,8 +225,27 @@ for (var i = 0; i < layerCount; i++) {
 //          var waterCSG = BABYLON.CSG.FromMesh(waterMesh);
          // var subMesh = waterCSG.subtract(groundCSG);
          // subMesh.toMesh("waterMesh", water, scene);
+/*
+          var groundCSG = BABYLON.CSG.FromMesh(mesh);
+          var box = BABYLON.Mesh.CreateBox("box", 10, scene);
+          box.scaling = new BABYLON.Vector3(500, 10, 500);
+          box.position.y = 10;
+          var boxCSG = BABYLON.CSG.FromMesh(box);
 
          // waterMesh.setEnabled(0);
+          var subMesh = groundCSG.subtract(boxCSG);
+          subMesh.toMesh("csg", terrainMaterial, scene);
+          subMesh.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+          water.addToRenderList(subMesh);
+*/
+          water.addToRenderList(mesh);
+          waterMesh.material = water;
+
+//mesh.dispose();
+//box.dispose();
+//waterMesh.dispose();
+
+          //waterMesh.setEnabled(0);
 
           heightMapQuads = computeHeightMapQuads(mesh);
           quadsReady = true;
@@ -256,6 +292,7 @@ for (var i = 0; i < layerCount; i++) {
             
             // Create terrain material
             var terrainMaterial = new BABYLON.TerrainMaterial("terrainMaterial", scene);
+            terrainMaterial = new BABYLON.TerrainMaterial("terrainMaterial", scene);
             terrainMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
             terrainMaterial.specularPower = 64;
             
@@ -296,7 +333,7 @@ for (var i = 0; i < layerCount; i++) {
               ground.position.y = -6;
               ground.material = terrainMaterial;
             
-            	//ground.receiveShadows = true;
+            	ground.receiveShadows = true;
 
                           
 
