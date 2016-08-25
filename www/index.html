@@ -217,7 +217,7 @@ for (var i = 0; i < layerCount; i++) {
     	box.scaling = new BABYLON.Vector3(xzScale, yScale, xzScale);
     	box.position = new BABYLON.Vector3(i*shift, i*yScale, 0);
    		box.material = new BABYLON.StandardMaterial("bmat", scene);
-    	box.material.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.5);
+    	box.material.emissiveColor = new BABYLON.Color3(0.4, 0.4, 0.7);
 		box.visibility = startViz - (i*changeViz);
     water.addToRenderList(box);
 	}
@@ -279,7 +279,7 @@ for (var i = 0; i < layerCount; i++) {
             var createScene = function(){
             scene = new BABYLON.Scene(engine);
           
-            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 150, BABYLON.Vector3.Zero(), scene);
+            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 120, BABYLON.Vector3.Zero(), scene);
             camera.setTarget(new BABYLON.Vector3(0, 30, 0));
             camera.beta = 0.4;
             camera.alpha = cameraAngle;
