@@ -77,10 +77,10 @@
         var circle = new SAT.Circle(new SAT.Vector(10,10), 1);
         var response = new SAT.Response();
         var polygon = new SAT.Polygon(new SAT.Vector(), [
-          new SAT.Vector(3.0, 3.0),
-          new SAT.Vector(-3.0, 3.0),
-          new SAT.Vector(-3.0, -3.0),
-          new SAT.Vector(3.0, -3.0)
+          new SAT.Vector(3.0 + 100, 3.0 + 20),
+          new SAT.Vector(-3.0 + 100, 3.0 + 20),
+          new SAT.Vector(-3.0 + 100, -3.0 + 20),
+          new SAT.Vector(3.0 + 100, -3.0 + 20)
         ]);
 
         var scene;
@@ -279,8 +279,8 @@ for (var i = 0; i < layerCount; i++) {
             var createScene = function(){
             scene = new BABYLON.Scene(engine);
           
-            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 120, BABYLON.Vector3.Zero(), scene);
-            camera.setTarget(new BABYLON.Vector3(0, 30, 0));
+            camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 100, BABYLON.Vector3.Zero(), scene);
+            camera.setTarget(new BABYLON.Vector3(0, 40, 0));
             camera.beta = 0.4;
             camera.alpha = cameraAngle;
 
@@ -318,8 +318,10 @@ for (var i = 0; i < layerCount; i++) {
               terrainMaterial.diffuseTexture3.uScale = terrainMaterial.diffuseTexture3.vScale = 10;
 
 	            var box = BABYLON.Mesh.CreateBox("box", 6.0, scene);
+              box.position.x = 100;
               box.position.y = 5;
-              
+              box.position.z = 20;
+
               // Shadows
               var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
               shadowGenerator.getShadowMap().renderList.push(box);
