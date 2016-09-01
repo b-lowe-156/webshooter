@@ -34,11 +34,8 @@ gulp.task('server:restart', ['ts'], function() {
     server.restart();
 });
 
-gulp.task('serve', ['server:start'], function() {
+gulp.task('default', ['server:start'], function() {
     gulp.watch(serverTS, ['server:restart']);
-});
-
-gulp.task('browser-sync', ['serve'], function() {
 	browserSync.init(null, {
         files: ["www/**/*.*"],
         browser: "google chrome",
