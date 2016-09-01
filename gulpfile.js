@@ -4,9 +4,9 @@ var ts = require('gulp-typescript');
 var server = require('gulp-develop-server');
 var browserSync = require('browser-sync').create();
 
-var serverTS = ["**/*.ts", "!node_modules/**", '!bin/**'];
+var serverTS = ["src/*.ts", "!node_modules/**", '!bin/**'];
 
-gulp.task('ts', function() {
+gulp.task('ts', ['clean'], function() {
     return gulp
         .src(serverTS, {base: './'})
         .pipe(ts({ module: 'commonjs', noImplicitAny: true }))
@@ -16,9 +16,7 @@ gulp.task('ts', function() {
 gulp.task('clean', function () {
     return gulp
         .src([
-            'app.js',
-            '**/*.js',
-            '**/*.js.map',
+            'www/build/',
             '!node_modules/**',
             '!gulpfile.js',
             '!bin/**'
@@ -42,9 +40,8 @@ gulp.task('serve', ['server:start'], function() {
 
 gulp.task('browser-sync', ['serve'], function() {
 	browserSync.init(null, {
-		proxy: "http://localhost:5000",
         files: ["www/**/*.*"],
         browser: "google chrome",
-        port: 8080,
+        port: 7000,
 	});
 });
