@@ -6,6 +6,7 @@
     <title>pim</title>
     <script src="https://unpkg.com/react@15.3.1/dist/react.js"></script>
     <script src="https://unpkg.com/react-dom@15.3.1/dist/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router/2.8.0/ReactRouter.js"></script>
     <script src="https://unpkg.com/babel-core@5.8.38/browser.min.js"></script>
     <script src="https://unpkg.com/jquery@3.1.0/dist/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css">
@@ -28,7 +29,7 @@ var data = [
 var Table = React.createClass({
     getInitialState: function() {
         return({
-            selectedRow: 3,
+            selectedRow: -1,
             cols: cols,
             data: data
         });
@@ -71,7 +72,16 @@ var Table = React.createClass({
         console.log(this);
     },
 });
-ReactDOM.render(<Table/>, document.getElementById('example'));
+var Router = ReactRouter;
+var Route = Router.Route;
+ReactDOM.render( (
+        <Table/>
+        //<Router>
+        //    <Route path="/" component={Table} />
+        //</Router>
+    ),
+    document.getElementById('example')
+);
     </script>
   </body>
 </html>
