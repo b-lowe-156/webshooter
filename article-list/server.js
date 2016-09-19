@@ -11,6 +11,7 @@ const app = express();
 app.set('port', (process.env.API_PORT || 3001));
 
 const COLUMNS = [
+  'NDB_No',
   'sugar_g',
   'carbohydrate_g',
   'protein_g',
