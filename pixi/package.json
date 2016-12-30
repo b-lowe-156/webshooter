@@ -1,0 +1,20 @@
+{
+  "name": "webpack-pixi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babelify": "^7.3.0",
+    "brfs": "^1.4.1",
+    "json-loader": "^0.5.4",
+    "matter-js": "^0.11.1",
+    "pixi.js": "^4.3.0",
+    "transform-loader": "^0.2.3",
+    "webpack": "^1.12.9"
+  }
+}
