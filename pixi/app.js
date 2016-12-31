@@ -11,10 +11,7 @@ var player = {
 }
 
 function init() {
-    var Engine = Matter.Engine,
-    World = Matter.World,
-    Bodies = Matter.Bodies;
-
+    var { Engine, World, Bodies } = Matter
     var engine = Engine.create();
 
     // create two boxes and a ground
@@ -27,9 +24,6 @@ function init() {
 
     // run the engine
     Engine.run(engine);
-
-    // run the renderer
-    // Render.run(render);
 
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true });
     document.body.appendChild(renderer.view);
@@ -50,7 +44,6 @@ function init() {
     stage.interactive = true;
 
     var background = new PIXI.Graphics();
-
     var fovMask = new PIXI.Graphics();
 
     // set a fill and line style
@@ -73,7 +66,6 @@ function init() {
     stage.addChild(fovMask);
 
     background.mask = fovMask
-
 
     // run the render loop
     animate();
