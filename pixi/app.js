@@ -31,16 +31,6 @@ function init() {
     // create the root of the scene graph
     var stage = new PIXI.Container();
 
-    var boxAGrapfhic = new PIXI.Graphics();
-    stage.addChild(boxAGrapfhic);
-    boxAGrapfhic.lineStyle(4, 0xFFFFFF, 1);
-    boxAGrapfhic.drawRect(0, 0, 76, 76)
-
-    var boxBGrapfhic = new PIXI.Graphics();
-    stage.addChild(boxBGrapfhic);
-    boxBGrapfhic.lineStyle(4, 0xFFFFFF, 1);
-    boxBGrapfhic.drawRect(0, 0, 76, 76)
-
     stage.interactive = true;
 
     var background = new PIXI.Graphics();
@@ -64,6 +54,19 @@ function init() {
 
     stage.addChild(background);
     stage.addChild(fovMask);
+
+    var boxAGrapfhic = new PIXI.Graphics();
+    stage.addChild(boxAGrapfhic);
+    boxAGrapfhic.lineStyle(4, 0xFFFFFF, 1);
+    boxAGrapfhic.drawRect(0, 0, 76, 76)
+    boxAGrapfhic.rotation += 0.5
+    boxAGrapfhic.mask = fovMask
+
+    var boxBGrapfhic = new PIXI.Graphics();
+    stage.addChild(boxBGrapfhic);
+    boxBGrapfhic.lineStyle(4, 0xFFFFFF, 1);
+    boxBGrapfhic.drawRect(0, 0, 76, 76)
+    boxBGrapfhic.mask = fovMask
 
     background.mask = fovMask
 
