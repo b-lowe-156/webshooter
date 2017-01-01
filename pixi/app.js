@@ -5,25 +5,43 @@ window.onload = init
 var controlling = new Controlling();
 
 var player = {
-    x: 10,
-    y: 10,
+    x: 40,
+    y: 40,
     rotation: 1 * Math.PI,
 }
 
 function init() {
-    var { Engine, World, Bodies } = Matter
+    var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
 
     // create two boxes and a ground
     var boxA = Bodies.rectangle(400, 200, 80, 80);
     var boxB = Bodies.rectangle(450, 50, 80, 80);
-    var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
+    var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
+    var playerPhysics = Bodies.circle(40, 40, 20);
 
+    var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
+    var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
+    var ground = Bodies.rectangle(0, 600, 1800, 10, { isStatic: true });
+    var right = Bodies.rectangle(800, 0, 10, 1200, { isStatic: true });
+
+    engine.world.gravity.x = 0.0
+    engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [boxA, boxB, ground]);
+    World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
 
+    /*
+    var render = Render.create({
+        element: document.body,
+        engine: engine
+    });
+    */
+    
     // run the engine
     Engine.run(engine);
+
+    // run the renderer
+    // Render.run(render);
 
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true });
     document.body.appendChild(renderer.view);
@@ -46,7 +64,7 @@ function init() {
 
     // set a fill and a line style again and draw a rectangle
     fovMask.beginFill(0xFFFFFF, 1);
-    background.drawRect(startX, startY, width, height)
+   // background.drawRect(startX, startY, width, height)
 
     var polygons = []
     polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
@@ -57,15 +75,25 @@ function init() {
 
     var boxAGrapfhic = new PIXI.Graphics();
     stage.addChild(boxAGrapfhic);
-    boxAGrapfhic.lineStyle(4, 0xFFFFFF, 1);
-    boxAGrapfhic.drawRect(0, 0, 76, 76)
-    boxAGrapfhic.rotation += 0.5
+    boxAGrapfhic.lineStyle(1, 0xFFFFFF, 1);
+//    boxAGrapfhic.drawRect( 0, 0, 80, 80)
+
+    boxAGrapfhic.moveTo(-40, -40);
+    boxAGrapfhic.lineTo( 40, -40);
+    boxAGrapfhic.lineTo( 40, 40);
+    boxAGrapfhic.lineTo( -40, 40);
+    boxAGrapfhic.lineTo( -40, -40);
+
     boxAGrapfhic.mask = fovMask
 
     var boxBGrapfhic = new PIXI.Graphics();
     stage.addChild(boxBGrapfhic);
-    boxBGrapfhic.lineStyle(4, 0xFFFFFF, 1);
-    boxBGrapfhic.drawRect(0, 0, 76, 76)
+    boxBGrapfhic.lineStyle(1, 0xFFFFFF, 1);
+    boxBGrapfhic.moveTo(-40, -40);
+    boxBGrapfhic.lineTo( 40, -40);
+    boxBGrapfhic.lineTo( 40, 40);
+    boxBGrapfhic.lineTo( -40, 40);
+    boxBGrapfhic.lineTo( -40, -40);
     boxBGrapfhic.mask = fovMask
 
     background.mask = fovMask
@@ -81,39 +109,47 @@ function init() {
     }
 
     function move(){ 
-        var moveSpeed = 5;
+        var moveSpeed = 0.001;
         if (controlling.forward) {
-            player.x += Math.sin(player.rotation) * moveSpeed;
-            player.y += Math.cos(player.rotation) * moveSpeed;
+            playerPhysics.force.x += Math.sin(player.rotation) * moveSpeed;
+            playerPhysics.force.y += Math.cos(player.rotation) * moveSpeed;
         }
         if (controlling.backward) {
-            player.x -= Math.sin(player.rotation) * moveSpeed;
-            player.y -= Math.cos(player.rotation) * moveSpeed;
+            playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
+            playerPhysics.force.y -= Math.cos(player.rotation) * moveSpeed;
         }
         if (controlling.strafeLeft) {
-            player.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
-            player.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
+            playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
+            playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
         if (controlling.strafeRight) {
-            player.x -= Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
-            player.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
+            playerPhysics.force.x -= Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
+            playerPhysics.force.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
         background.lineStyle(4, 0xFFFFFF, 1);
         background.beginFill(0xFF700B, 1);
         background.drawRect(0, 0, 800, 600);
 
-        console.log(boxB.angle)
-        background.drawRect(boxA.position.x, boxA.position.y, 76, 76)
-        background.drawRect(boxB.position.x, boxB.position.y, 76, 76)
+      //  console.log(playerPhysics)
+        //background.drawRect(boxA.position.x, boxA.position.y, 76, 76)
+        //background.drawRect(boxB.position.x, boxB.position.y, 76, 76)
+
+        boxAGrapfhic.position.x = boxA.position.x
+        boxAGrapfhic.position.y = boxA.position.y
+        boxAGrapfhic.rotation = boxA.angle
+        
+        boxBGrapfhic.position.x = boxB.position.x
+        boxBGrapfhic.position.y = boxB.position.y
+        boxBGrapfhic.rotation = boxB.angle
 
         background.lineStyle(0);
         background.beginFill(0xFFFF0B, 1.0);
-        background.drawCircle(player.x, player.y, 20);
+        background.drawCircle(playerPhysics.position.x, playerPhysics.position.y, 20);
         background.endFill();
 
         // when the mouse is moved, we determine the new visibility polygon 	
-        var visibility = createLightPolygon(player.x, player.y);
+        var visibility = createLightPolygon(playerPhysics.position.x, playerPhysics.position.y);
         // then we draw it
         fovMask.clear();
         fovMask.beginFill(0xFFFFFF, 1);
