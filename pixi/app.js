@@ -131,9 +131,7 @@ function init() {
         background.beginFill(0xFF700B, 1);
         background.drawRect(0, 0, 800, 600);
 
-      //  console.log(playerPhysics)
-        //background.drawRect(boxA.position.x, boxA.position.y, 76, 76)
-        //background.drawRect(boxB.position.x, boxB.position.y, 76, 76)
+        background.drawRect(startX, startY, width, height)
 
         boxAGrapfhic.position.x = boxA.position.x
         boxAGrapfhic.position.y = boxA.position.y
@@ -152,6 +150,11 @@ function init() {
         var visibility = createLightPolygon(playerPhysics.position.x, playerPhysics.position.y);
         // then we draw it
         fovMask.clear();
+
+        fovMask.lineStyle(1, 0x333333, 1.0);
+        fovMask.drawRect(startX, startY, width, height)
+
+        fovMask.lineStyle(1, 0xFFFFFF, 1);
         fovMask.beginFill(0xFFFFFF, 1);
         fovMask.moveTo(visibility[0][0],visibility[0][1]);	
         for(var i=1;i<=visibility.length;i++){
