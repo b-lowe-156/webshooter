@@ -18,7 +18,7 @@ function init() {
     var boxA = Bodies.rectangle(400, 200, 80, 80);
     var boxB = Bodies.rectangle(450, 50, 80, 80);
     var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
-    var playerPhysics = Bodies.circle(40, 40, 20);
+    var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
     var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
     var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
@@ -109,7 +109,7 @@ function init() {
     }
 
     function move(){ 
-        var moveSpeed = 0.001;
+        var moveSpeed = 0.01;
         if (controlling.forward) {
             playerPhysics.force.x += Math.sin(player.rotation) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation) * moveSpeed;
