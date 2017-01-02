@@ -1,4 +1,5 @@
 var PIXI = require('pixi.js')
+import createLinearGradient from './src/lighting'
 
 window.onload = init
 
@@ -13,6 +14,11 @@ var player = {
 function init() {
     var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
+
+    var container = new PIXI.Container();
+    var brt = new PIXI.BaseRenderTexture(800, 600, PIXI.SCALE_MODES.LINEAR, 1);
+    var rt = new PIXI.RenderTexture(brt);
+    var sprite = new PIXI.Sprite(rt);
 
     // create two boxes and a ground
     var boxA = Bodies.rectangle(400, 200, 80, 80);
@@ -54,6 +60,14 @@ function init() {
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
 
+    var gradient = createLinearGradient(800, 600, {
+        // These are the gradients stops, starting at the beginning (0.0) with white and ending with black at the end (1.0).
+        0.0: 'white',
+        1.0: 'black', // black color will make pixels transparent.
+    }, function mapToSprite(canvas) {
+        return new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas)))
+    })
+
     // set a fill and line style
     fovMask.beginFill(0xFFFFFF);
 
@@ -65,13 +79,19 @@ function init() {
     // set a fill and a line style again and draw a rectangle
     fovMask.beginFill(0xFFFFFF, 1);
    // background.drawRect(startX, startY, width, height)
+   
+    sprite.mask = fovMask
+   // background.mask = fovMask
 
     var polygons = []
     polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
     polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
 
-    stage.addChild(background);
-    stage.addChild(fovMask);
+    container.addChild(fovMask)
+    container.addChild(gradient)
+    
+    stage.addChild(sprite)
+    stage.addChild(background)
 
     var boxAGrapfhic = new PIXI.Graphics();
     stage.addChild(boxAGrapfhic);
@@ -96,7 +116,7 @@ function init() {
     boxBGrapfhic.lineTo( -40, -40);
     boxBGrapfhic.mask = fovMask
 
-    background.mask = fovMask
+    //background.mask = fovMask
 
     // run the render loop
     animate();
@@ -104,6 +124,8 @@ function init() {
     function animate() {
         background.clear()
         move()
+
+        renderer.render(container, rt)
         renderer.render(stage)
         requestAnimationFrame(animate)
     }
@@ -127,7 +149,7 @@ function init() {
             playerPhysics.force.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
-        background.lineStyle(4, 0xFFFFFF, 1);
+        background.lineStyle(2, 0xFFFFFF, 1);
         background.beginFill(0xFF700B, 1);
         background.drawRect(0, 0, 800, 600);
 

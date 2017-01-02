@@ -30,12 +30,16 @@ module.exports = {
     // that we might need elsewhere in our build.
     loaders: [
       {
-        test: /\.json$/,
         // We could restrict using json-loader only on .json files in the
         // node_modules/pixi.js directory, but the ability to load .json files
         // could be useful elsewhere in our app, so I usually don't.
         //include: path.resolve(__dirname, 'node_modules/pixi.js'),
-        loader: 'json'
+        test: /.js?$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        query: {
+          presets: ['es2015']
+        }
       }
     ],
 
