@@ -80,18 +80,18 @@ function init() {
     fovMask.beginFill(0xFFFFFF, 1);
    // background.drawRect(startX, startY, width, height)
    
-    sprite.mask = fovMask
-   // background.mask = fovMask
+sprite.mask = fovMask
+   background.mask = gradient
 
     var polygons = []
     polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
     polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
 
-    container.addChild(fovMask)
+    stage.addChild(fovMask)
     container.addChild(gradient)
     
     stage.addChild(sprite)
-    stage.addChild(background)
+    container.addChild(background)
 
     var boxAGrapfhic = new PIXI.Graphics();
     stage.addChild(boxAGrapfhic);
