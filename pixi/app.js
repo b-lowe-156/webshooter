@@ -88,8 +88,8 @@ function init() {
     fovMask.beginFill(0xFFFFFF, 1);
    // background.drawRect(startX, startY, width, height)
    
-sprite.mask = fovMask
-   background.mask = gradient
+    sprite.mask = fovMask
+    background.mask = gradient
 
     var polygons = []
     polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
@@ -157,9 +157,11 @@ sprite.mask = fovMask
             playerPhysics.force.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
-        //playerPhysics.position.x, playerPhysics.position.y
-        stage.position.x = -playerPhysics.position.x + 400
-        stage.position.y = -playerPhysics.position.y + 300
+        stage.pivot.x = playerPhysics.position.x;
+        stage.pivot.y = playerPhysics.position.y;
+        stage.position.x = renderer.width / 2;
+        stage.position.y = renderer.height / 2 + 260;
+        stage.rotation = 0.0
 
         background.lineStyle(2, 0xFFFFFF, 1);
         background.beginFill(0xFF700B, 1);
