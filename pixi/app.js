@@ -1,5 +1,5 @@
 var PIXI = require('pixi.js')
-import createLinearGradient from './src/lighting'
+import { createLinearGradient, createRadialGradient } from './src/lighting'
 
 window.onload = init
 
@@ -60,7 +60,15 @@ function init() {
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
 
-    var gradient = createLinearGradient(800, 600, {
+    var gradient2 = createLinearGradient(800, 600, {
+        // These are the gradients stops, starting at the beginning (0.0) with white and ending with black at the end (1.0).
+        0.0: 'white',
+        1.0: 'black', // black color will make pixels transparent.
+    }, function mapToSprite(canvas) {
+        return new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas)))
+    })
+
+    var gradient = createRadialGradient(800, 600, {
         // These are the gradients stops, starting at the beginning (0.0) with white and ending with black at the end (1.0).
         0.0: 'white',
         1.0: 'black', // black color will make pixels transparent.
