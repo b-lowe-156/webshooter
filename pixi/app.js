@@ -149,6 +149,10 @@ sprite.mask = fovMask
             playerPhysics.force.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
+        //playerPhysics.position.x, playerPhysics.position.y
+        stage.position.x = -playerPhysics.position.x + 400
+        stage.position.y = -playerPhysics.position.y + 300
+
         background.lineStyle(2, 0xFFFFFF, 1);
         background.beginFill(0xFF700B, 1);
         background.drawRect(0, 0, 800, 600);
