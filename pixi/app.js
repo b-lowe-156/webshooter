@@ -8,7 +8,8 @@ var controlling = new Controlling();
 var player = {
     x: 40,
     y: 40,
-    rotation: 1 * Math.PI,
+    rotation: 0,
+    cameraRotation: 1 * Math.PI,
 }
 
 function init() {
@@ -49,8 +50,37 @@ function init() {
     // run the renderer
     // Render.run(render);
 
-    var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true });
+    var renderCanvas = document.getElementById('renderCanvas')
+    var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
     document.body.appendChild(renderer.view);
+
+    renderCanvas.onclick = function() {
+        renderCanvas.requestPointerLock();
+    }
+
+    // Hook pointer lock state change events for different browsers
+    document.addEventListener('pointerlockchange', lockChangeAlert, false);
+    document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+    function lockChangeAlert() {
+        if (document.pointerLockElement === renderCanvas ||
+            document.mozPointerLockElement === renderCanvas) {
+            console.log('The pointer lock status is now locked');
+            document.addEventListener("mousemove", canvasLoop, false);
+        } else {
+            console.log('The pointer lock status is now unlocked');
+            document.removeEventListener("mousemove", canvasLoop, false);
+        }
+    }
+
+    function canvasLoop(e) {
+        var movementX = e.movementX || e.mozMovementX || 0;
+        var movementY = e.movementY || e.mozMovementY || 0;
+        if (movementX < 100 && movementX > -100) {
+            player.rotation += 0.001 * movementX
+            player.cameraRotation += 0.00001
+        }
+    }
+
 
     // create the root of the scene graph
     var stage = new PIXI.Container();
@@ -141,27 +171,27 @@ function init() {
     function move(){ 
         var moveSpeed = 0.01;
         if (controlling.forward) {
-            playerPhysics.force.x += Math.sin(player.rotation) * moveSpeed;
-            playerPhysics.force.y += Math.cos(player.rotation) * moveSpeed;
-        }
-        if (controlling.backward) {
             playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
             playerPhysics.force.y -= Math.cos(player.rotation) * moveSpeed;
         }
-        if (controlling.strafeLeft) {
-            playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
-            playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
+        if (controlling.backward) {
+            playerPhysics.force.x += Math.sin(player.rotation) * moveSpeed;
+            playerPhysics.force.y += Math.cos(player.rotation) * moveSpeed;
         }
-        if (controlling.strafeRight) {
+        if (controlling.strafeLeft) {
             playerPhysics.force.x -= Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
+        }
+        if (controlling.strafeRight) {
+            playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
+            playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
         stage.pivot.x = playerPhysics.position.x;
         stage.pivot.y = playerPhysics.position.y;
         stage.position.x = renderer.width / 2;
         stage.position.y = renderer.height / 2 + 260;
-        stage.rotation = 0.0
+        stage.rotation = player.rotation
 
         background.lineStyle(2, 0xFFFFFF, 1);
         background.beginFill(0xFF700B, 1);
