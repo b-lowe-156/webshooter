@@ -76,8 +76,8 @@ function init() {
         var movementX = e.movementX || e.mozMovementX || 0;
         var movementY = e.movementY || e.mozMovementY || 0;
         if (movementX < 100 && movementX > -100) {
-            player.rotation += 0.001 * movementX
-            player.cameraRotation += 0.00001
+            player.rotation -= 0.001 * movementX
+            player.cameraRotation -= 0.00001
         }
     }
 
