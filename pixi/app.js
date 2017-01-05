@@ -1,5 +1,5 @@
 var PIXI = require('pixi.js')
-import { createLinearGradient, createRadialGradient } from './src/lighting'
+import { createLightingSprite, castShadow, drawAmbientLight } from './src/lighting'
 
 window.onload = init
 
@@ -60,21 +60,8 @@ function init() {
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
 
-    var gradient2 = createLinearGradient(800, 600, {
-        // These are the gradients stops, starting at the beginning (0.0) with white and ending with black at the end (1.0).
-        0.0: 'white',
-        1.0: 'black', // black color will make pixels transparent.
-    }, function mapToSprite(canvas) {
-        return new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas)))
-    })
-
-    var gradient = createRadialGradient(800, 600, {
-        // These are the gradients stops, starting at the beginning (0.0) with white and ending with black at the end (1.0).
-        0.0: 'white',
-        1.0: 'black', // black color will make pixels transparent.
-    }, function mapToSprite(canvas) {
-        return new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas)))
-    })
+    var lightingSprite = createLightingSprite(800, 600)
+    //drawAmbientLight(lightingSprite)
 
     // set a fill and line style
     fovMask.beginFill(0xFFFFFF);
@@ -89,14 +76,14 @@ function init() {
    // background.drawRect(startX, startY, width, height)
    
     sprite.mask = fovMask
-    background.mask = gradient
+    background.mask = lightingSprite
 
     var polygons = []
     polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
     polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
 
     stage.addChild(fovMask)
-    container.addChild(gradient)
+    container.addChild(lightingSprite)
     
     stage.addChild(sprite)
     container.addChild(background)
