@@ -1,16 +1,3 @@
-var radialLights = [
-    {
-        x:200,
-        y:200,
-        radius:150
-    },
-    {
-        x:500,
-        y:400,
-        radius:200
-    }
-];
-
 var ambientLights = [
     {
         x:0,
@@ -20,7 +7,7 @@ var ambientLights = [
     }
 ]
 
-export function createLightingSprite(width, height) {
+export function createLightingSprite(lightSources, width, height) {
     var canvas = document.createElement('canvas')
 
     canvas.width = width
@@ -28,27 +15,33 @@ export function createLightingSprite(width, height) {
 
     var ctx = canvas.getContext('2d')
 
-    for (var i = 0; i < radialLights.length; i++) {
-        var light = radialLights[i]
-        var gradient = ctx.createRadialGradient(light.x, light.y, 0, light.x, light.y, light.radius)
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)')
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
-        ctx.fillStyle = gradient
-        ctx.arc(light.x, light.y, light.radius, 0, 2 * Math.PI)
-        ctx.fill()
+    for (var i = 0; i < lightSources.length; i++) {
+        var light = lightSources[i]
+
+        ctx.drawImage(light.canvas,
+                0, 0, light.canvas.width, light.canvas.height,
+                light.pos.x - light.canvas.width / 2, light.pos.y - light.canvas.height / 2, light.canvas.width, light.canvas.height,
+            );
+
     }
 
     for (var i = 0; i < ambientLights.length; i++) {
         var light = ambientLights[i]
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.65)'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'
         ctx.fillRect(light.x, light.y, light.width, light.height)
     }
 
     return new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas)))
 }
 
-export function castShadow(lightingSprite) {
-}
-
-export function drawAmbientLight(lightingSprite) {
+// and this is how the library generates the visibility polygon starting
+// from an array of polygons and a source point
+export function createLightPolygon(polygons, x, y){
+    var segments = VisibilityPolygon.convertToSegments(polygons);
+    segments = VisibilityPolygon.breakIntersections(segments);
+    var position = [x, y];
+    if (VisibilityPolygon.inPolygon(position, polygons[polygons.length-1])) {
+        return VisibilityPolygon.compute(position, segments);
+    }      
+    return null;
 }

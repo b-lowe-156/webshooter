@@ -1,5 +1,6 @@
 var PIXI = require('pixi.js')
-import { createLightingSprite, castShadow, drawAmbientLight } from './src/lighting'
+import { createLightingSprite, createLightPolygon } from './src/lighting'
+import { initLightSources } from './src/static_light'
 
 window.onload = init
 
@@ -90,9 +91,6 @@ function init() {
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
 
-    var lightingSprite = createLightingSprite(800, 600)
-    //drawAmbientLight(lightingSprite)
-
     // set a fill and line style
     fovMask.beginFill(0xFFFFFF);
 
@@ -105,12 +103,17 @@ function init() {
     fovMask.beginFill(0xFFFFFF, 1);
    // background.drawRect(startX, startY, width, height)
    
-    sprite.mask = fovMask
-    background.mask = lightingSprite
-
     var polygons = []
     polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
     polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
+
+    var lightSources = initLightSources(polygons)
+    lightSources.forEach( lightSource => console.log(lightSource) )
+
+    var lightingSprite = createLightingSprite(lightSources, 800, 600)
+
+//    sprite.mask = fovMask
+    background.mask = lightingSprite
 
     stage.addChild(fovMask)
     container.addChild(lightingSprite)
@@ -200,7 +203,7 @@ function init() {
         background.endFill();
 
         // when the mouse is moved, we determine the new visibility polygon 	
-        var visibility = createLightPolygon(playerPhysics.position.x, playerPhysics.position.y);
+        var visibility = createLightPolygon(polygons, playerPhysics.position.x, playerPhysics.position.y);
         // then we draw it
         fovMask.clear();
 
@@ -214,18 +217,6 @@ function init() {
             fovMask.lineTo(visibility[i%visibility.length][0],visibility[i%visibility.length][1]);		
         }
         fovMask.endFill();
-    }
-
-    // and this is how the library generates the visibility polygon starting
-    // from an array of polygons and a source point
-    function createLightPolygon(x,y){
-        var segments = VisibilityPolygon.convertToSegments(polygons);
-        segments = VisibilityPolygon.breakIntersections(segments);
-        var position = [x, y];
-        if (VisibilityPolygon.inPolygon(position, polygons[polygons.length-1])) {
-            return VisibilityPolygon.compute(position, segments);
-        }      
-        return null;
     }
 }
 
