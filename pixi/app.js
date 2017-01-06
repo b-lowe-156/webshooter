@@ -10,7 +10,7 @@ var player = {
     x: 40,
     y: 40,
     rotation: 0,
-    cameraRotation: 1 * Math.PI,
+    cameraRotation: 0,
 }
 
 function init() {
@@ -78,7 +78,6 @@ function init() {
         var movementY = e.movementY || e.mozMovementY || 0;
         if (movementX < 100 && movementX > -100) {
             player.rotation -= 0.001 * movementX
-            player.cameraRotation -= 0.00001
         }
     }
 
@@ -108,11 +107,9 @@ function init() {
     polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
 
     var lightSources = initLightSources(polygons)
-    lightSources.forEach( lightSource => console.log(lightSource) )
-
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
-//    sprite.mask = fovMask
+    sprite.mask = fovMask
     background.mask = lightingSprite
 
     stage.addChild(fovMask)
@@ -143,6 +140,13 @@ function init() {
     boxBGrapfhic.lineTo( -40, 40);
     boxBGrapfhic.lineTo( -40, -40);
     boxBGrapfhic.mask = fovMask
+
+    var playerAimLine = new PIXI.Graphics();
+    stage.addChild(playerAimLine);
+    playerAimLine.lineStyle(1, 0xFF0000, 1);
+    playerAimLine.moveTo(0, 0);
+    playerAimLine.lineTo( 300, 0);
+    playerAimLine.mask = fovMask
 
     //background.mask = fovMask
 
@@ -177,11 +181,26 @@ function init() {
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
-        stage.pivot.x = playerPhysics.position.x;
-        stage.pivot.y = playerPhysics.position.y;
-        stage.position.x = renderer.width / 2;
-        stage.position.y = renderer.height / 2 + 260;
-        stage.rotation = player.rotation
+        { // camera
+            stage.pivot.x = playerPhysics.position.x;
+            stage.pivot.y = playerPhysics.position.y;
+            stage.position.x = renderer.width / 2;
+            stage.position.y = renderer.height / 2 + 260;
+
+            //var targetAngle = Math.PI / 2 - player.rotation
+            var diff = player.rotation - stage.rotation
+
+            if (diff > 0.2) {
+              stage.rotation += 0.01;
+            }
+            else if (diff < -0.2) {
+              stage.rotation -= 0.01;
+            }
+
+            playerAimLine.position.x = playerPhysics.position.x
+            playerAimLine.position.y = playerPhysics.position.y
+            playerAimLine.rotation = player.rotation
+        }
 
         background.lineStyle(2, 0xFFFFFF, 1);
         background.beginFill(0xFF700B, 1);
