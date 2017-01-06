@@ -199,7 +199,7 @@ function init() {
 
             playerAimLine.position.x = playerPhysics.position.x
             playerAimLine.position.y = playerPhysics.position.y
-            playerAimLine.rotation = player.rotation
+            playerAimLine.rotation = -player.rotation - 0.5 * Math.PI
         }
 
         background.lineStyle(2, 0xFFFFFF, 1);
