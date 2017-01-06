@@ -74,13 +74,20 @@ function init() {
     }
 
     function canvasLoop(e) {
-        var movementX = e.movementX || e.mozMovementX || 0;
-        var movementY = e.movementY || e.mozMovementY || 0;
-        if (movementX < 100 && movementX > -100) {
-            player.rotation -= 0.001 * movementX
+        let x = e.movementX || e.mozMovementX || 0
+
+        var diff = player.rotation - player.cameraRotation
+        let diffToHeight = false
+        if (diff > (0.5 * Math.PI)) {
+            diffToHeight = true
+        }
+        else if (diff < -(0.5 * Math.PI)) {
+            diffToHeight = true
+        }
+        if (x < 100 && x > -100 && !diffToHeight) {
+            player.rotation -= 0.001 * x
         }
     }
-
 
     // create the root of the scene graph
     var stage = new PIXI.Container();
@@ -187,14 +194,18 @@ function init() {
             stage.position.x = renderer.width / 2;
             stage.position.y = renderer.height / 2 + 260;
 
-            //var targetAngle = Math.PI / 2 - player.rotation
-            var diff = player.rotation - stage.rotation
+            var diff = player.rotation - player.cameraRotation
+            let y = Math.pow(Math.E, (-0.05 * Math.pow(diff, 4 )))
+            console.log('diff:', diff)
+            console.log('y:', y)
 
             if (diff > 0.2) {
-              stage.rotation += 0.01;
+                player.cameraRotation += 0.01
+                stage.rotation = player.cameraRotation
             }
             else if (diff < -0.2) {
-              stage.rotation -= 0.01;
+                player.cameraRotation -= 0.01
+                stage.rotation = player.cameraRotation
             }
 
             playerAimLine.position.x = playerPhysics.position.x
