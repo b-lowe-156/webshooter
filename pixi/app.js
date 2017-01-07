@@ -10,7 +10,6 @@ var player = {
     x: 40,
     y: 40,
     rotation: 0,
-    cameraRotation: 0,
 }
 
 function init() {
@@ -196,19 +195,13 @@ function init() {
             stage.position.x = renderer.width / 2;
             stage.position.y = renderer.height / 2 + 260;
 
-            var diff = player.rotation - playerPhysics.angle
-           // let y = Math.pow(Math.E, (-0.05 * Math.pow(diff, 4 )))
-           // console.log('diff:', diff)
-           // console.log('y:', y)
-
-            if (diff > 0.01) {
-                playerPhysics.torque = 0.01
-              //  player.cameraRotation += 0.01
+            let diff = player.rotation - playerPhysics.angle
+            const rotSpeed = 0.03
+            if (diff > rotSpeed) {
+                playerPhysics.torque = rotSpeed
             }
-            else if (diff < -0.01) {
-                playerPhysics.torque = -0.01
-              //  player.cameraRotation -= 0.01
-              //  stage.rotation = player.cameraRotation
+            else if (diff < -rotSpeed) {
+                playerPhysics.torque = -rotSpeed
             }
             else {
                 playerPhysics.torque = 0
