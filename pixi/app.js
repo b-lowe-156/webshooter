@@ -76,7 +76,7 @@ function init() {
     function canvasLoop(e) {
         let x = e.movementX || e.mozMovementX || 0
 
-        var diff = player.rotation - player.cameraRotation
+        var diff = player.rotation - playerPhysics.angle
         let diffToHeight = false
         if (diff > (0.5 * Math.PI)) {
             diffToHeight = true
@@ -188,25 +188,32 @@ function init() {
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
+        console.log(playerPhysics.angle)
+
         { // camera
             stage.pivot.x = playerPhysics.position.x;
             stage.pivot.y = playerPhysics.position.y;
             stage.position.x = renderer.width / 2;
             stage.position.y = renderer.height / 2 + 260;
 
-            var diff = player.rotation - player.cameraRotation
-            let y = Math.pow(Math.E, (-0.05 * Math.pow(diff, 4 )))
-            console.log('diff:', diff)
-            console.log('y:', y)
+            var diff = player.rotation - playerPhysics.angle
+           // let y = Math.pow(Math.E, (-0.05 * Math.pow(diff, 4 )))
+           // console.log('diff:', diff)
+           // console.log('y:', y)
 
-            if (diff > 0.2) {
-                player.cameraRotation += 0.01
-                stage.rotation = player.cameraRotation
+            if (diff > 0.01) {
+                playerPhysics.torque = 0.01
+              //  player.cameraRotation += 0.01
             }
-            else if (diff < -0.2) {
-                player.cameraRotation -= 0.01
-                stage.rotation = player.cameraRotation
+            else if (diff < -0.01) {
+                playerPhysics.torque = -0.01
+              //  player.cameraRotation -= 0.01
+              //  stage.rotation = player.cameraRotation
             }
+            else {
+                playerPhysics.torque = 0
+            }
+            stage.rotation = playerPhysics.angle
 
             playerAimLine.position.x = playerPhysics.position.x
             playerAimLine.position.y = playerPhysics.position.y
