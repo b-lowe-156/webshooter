@@ -20,6 +20,12 @@ function init() {
     var rt = new PIXI.RenderTexture(brt);
     var sprite = new PIXI.Sprite(rt);
 
+    const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 1.0)
+    console.log(mapTexture)
+
+    const map = new PIXI.Sprite(mapTexture)
+    container.addChild(map)
+
     // create two boxes and a ground
     var boxA = Bodies.rectangle(400, 200, 80, 80);
     var boxB = Bodies.rectangle(450, 50, 80, 80);
@@ -186,8 +192,6 @@ function init() {
             playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
-        
-        console.log('asd23')
 
         { // camera
             stage.pivot.x = playerPhysics.position.x;
