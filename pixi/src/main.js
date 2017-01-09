@@ -1,6 +1,5 @@
-var PIXI = require('pixi.js')
-import { createLightingSprite, createLightPolygon } from './src/lighting'
-import { initLightSources } from './src/static_light'
+import { createLightingSprite, createLightPolygon } from './lighting'
+import { initLightSources } from './static_light'
 
 window.onload = init
 
@@ -129,6 +128,7 @@ function init() {
     boxAGrapfhic.lineStyle(1, 0xFFFFFF, 1);
 //    boxAGrapfhic.drawRect( 0, 0, 80, 80)
 
+
     boxAGrapfhic.moveTo(-40, -40);
     boxAGrapfhic.lineTo( 40, -40);
     boxAGrapfhic.lineTo( 40, 40);
@@ -186,8 +186,8 @@ function init() {
             playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
-
-        console.log(playerPhysics.angle)
+        
+        console.log('asd23')
 
         { // camera
             stage.pivot.x = playerPhysics.position.x;
