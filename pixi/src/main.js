@@ -186,8 +186,6 @@ function init() {
             playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
-        
-        console.log('asd23')
 
         { // camera
             stage.pivot.x = playerPhysics.position.x;
