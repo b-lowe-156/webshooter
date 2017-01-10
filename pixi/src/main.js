@@ -20,7 +20,7 @@ function init() {
     var rt = new PIXI.RenderTexture(brt);
     var sprite = new PIXI.Sprite(rt);
 
-    const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 1.0)
+    const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 4.0)
     console.log(mapTexture)
 
     const map = new PIXI.Sprite(mapTexture)
