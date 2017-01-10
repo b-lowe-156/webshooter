@@ -20,6 +20,12 @@ function init() {
     var rt = new PIXI.RenderTexture(brt);
     var sprite = new PIXI.Sprite(rt);
 
+    const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 4.0)
+    console.log(mapTexture)
+
+    const map = new PIXI.Sprite(mapTexture)
+    container.addChild(map)
+
     // create two boxes and a ground
     var boxA = Bodies.rectangle(400, 200, 80, 80);
     var boxB = Bodies.rectangle(450, 50, 80, 80);
