@@ -12,7 +12,7 @@ var player = {
 }
 
 function init() {
-    var { Engine, World, Bodies, Render } = Matter
+    var { Engine, World, Bodies, Render, Svg } = Matter
     var engine = Engine.create();
 
     var container = new PIXI.Container();
@@ -20,40 +20,29 @@ function init() {
     var rt = new PIXI.RenderTexture(brt);
     var sprite = new PIXI.Sprite(rt);
 
-    const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 4.0)
-    console.log(mapTexture)
-
-    const map = new PIXI.Sprite(mapTexture)
-    container.addChild(map)
-
     // create two boxes and a ground
     var boxA = Bodies.rectangle(400, 200, 80, 80);
     var boxB = Bodies.rectangle(450, 50, 80, 80);
     var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
-    var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
-    var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
-    var ground = Bodies.rectangle(0, 600, 1800, 10, { isStatic: true });
-    var right = Bodies.rectangle(800, 0, 10, 1200, { isStatic: true });
+    var top = Bodies.rectangle(0, 0, 16000, 10, { isStatic: true });
+    var left = Bodies.rectangle(0, 0, 10, 12000, { isStatic: true });
+    var ground = Bodies.rectangle(0, 6000, 18000, 10, { isStatic: true });
+    var right = Bodies.rectangle(8000, 0, 10, 12000, { isStatic: true });
 
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
     World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
-
-    /*
-    var render = Render.create({
-        element: document.body,
-        engine: engine
-    });
-    */
+    
+    var render = Render.create({ element: document.body, engine: engine })
     
     // run the engine
     Engine.run(engine);
 
     // run the renderer
-    // Render.run(render);
+    Render.run(render);
 
     var renderCanvas = document.getElementById('renderCanvas')
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
@@ -106,6 +95,7 @@ function init() {
 
     var width = 120
     var height = 120
+//      var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var startX = 50
     var startY = 250
 
@@ -120,20 +110,49 @@ function init() {
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
-    sprite.mask = fovMask
-    background.mask = lightingSprite
+    //sprite.mask = fovMask
+ //   background.mask = lightingSprite
+    
+    // drawing
+    const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 1.0)
+    const map = new PIXI.Sprite(mapTexture)
+    stage.addChild(map)
+
+    // matters
+    let terrain
+    $.get('map.svg').done((data) => {
+        let vertexSets = []
+        $(data)
+        .find('path')
+        .each((i, path) => {
+            vertexSets.push(Svg.pathToVertices(path, 30))
+        });
+
+        $(data)
+        .find('rect')
+        .each((i, rect) => {
+            console.log(rect)
+        });
+
+
+        terrain = Bodies.fromVertices(400, 350, vertexSets, {
+            isStatic: true
+        }, true)
+
+        World.add(engine.world, terrain)
+    })
+
+
 
     stage.addChild(fovMask)
-    container.addChild(lightingSprite)
+   // stage.addChild(lightingSprite)
     
     stage.addChild(sprite)
-    container.addChild(background)
+    stage.addChild(background)
 
     var boxAGrapfhic = new PIXI.Graphics();
     stage.addChild(boxAGrapfhic);
     boxAGrapfhic.lineStyle(1, 0xFFFFFF, 1);
-//    boxAGrapfhic.drawRect( 0, 0, 80, 80)
-
 
     boxAGrapfhic.moveTo(-40, -40);
     boxAGrapfhic.lineTo( 40, -40);
@@ -141,24 +160,31 @@ function init() {
     boxAGrapfhic.lineTo( -40, 40);
     boxAGrapfhic.lineTo( -40, -40);
 
-    boxAGrapfhic.mask = fovMask
+  //  boxAGrapfhic.mask = fovMask
 
     var boxBGrapfhic = new PIXI.Graphics();
-    stage.addChild(boxBGrapfhic);
+    container.addChild(boxBGrapfhic);
     boxBGrapfhic.lineStyle(1, 0xFFFFFF, 1);
     boxBGrapfhic.moveTo(-40, -40);
     boxBGrapfhic.lineTo( 40, -40);
     boxBGrapfhic.lineTo( 40, 40);
     boxBGrapfhic.lineTo( -40, 40);
     boxBGrapfhic.lineTo( -40, -40);
-    boxBGrapfhic.mask = fovMask
+  //  boxBGrapfhic.mask = fovMask
+
+    let player = new PIXI.Graphics();
+    stage.addChild(player);
+    player.lineStyle(0);
+    player.beginFill(0xFFFF0B, 1.0);
+    player.drawCircle(0, 0, 20);
+    player.endFill();
 
     var playerAimLine = new PIXI.Graphics();
     stage.addChild(playerAimLine);
     playerAimLine.lineStyle(1, 0xFF0000, 1);
     playerAimLine.moveTo(0, 0);
     playerAimLine.lineTo( 300, 0);
-    playerAimLine.mask = fovMask
+  //  playerAimLine.mask = fovMask
 
     //background.mask = fovMask
 
@@ -217,11 +243,11 @@ function init() {
             playerAimLine.rotation = -player.rotation - 0.5 * Math.PI
         }
 
-        background.lineStyle(2, 0xFFFFFF, 1);
-        background.beginFill(0xFF700B, 1);
-        background.drawRect(0, 0, 800, 600);
+        //background.lineStyle(2, 0xFFFFFF, 1);
+        //background.beginFill(0xFF700B, 1);
+        //background.drawRect(0, 0, 800, 600);
 
-        background.drawRect(startX, startY, width, height)
+        //background.drawRect(startX, startY, width, height)
 
         boxAGrapfhic.position.x = boxA.position.x
         boxAGrapfhic.position.y = boxA.position.y
@@ -231,10 +257,17 @@ function init() {
         boxBGrapfhic.position.y = boxB.position.y
         boxBGrapfhic.rotation = boxB.angle
 
+        player.position.x = playerPhysics.position.x
+        player.position.y = playerPhysics.position.y
+
+        /*
         background.lineStyle(0);
         background.beginFill(0xFFFF0B, 1.0);
         background.drawCircle(playerPhysics.position.x, playerPhysics.position.y, 20);
         background.endFill();
+        */
+
+        /*
 
         // when the mouse is moved, we determine the new visibility polygon 	
         var visibility = createLightPolygon(polygons, playerPhysics.position.x, playerPhysics.position.y);
@@ -251,6 +284,8 @@ function init() {
             fovMask.lineTo(visibility[i%visibility.length][0],visibility[i%visibility.length][1]);		
         }
         fovMask.endFill();
+
+        */
     }
 }
 
