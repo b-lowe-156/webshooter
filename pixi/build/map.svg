@@ -26,10 +26,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="312.45593"
+     inkscape:cx="161.9432"
      inkscape:cy="284.30017"
      inkscape:document-units="px"
-     inkscape:current-layer="g3761"
+     inkscape:current-layer="svg8"
      showgrid="false"
      inkscape:snap-bbox="true"
      inkscape:bbox-nodes="true"
@@ -49,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -121,17 +121,13 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Ebene 2"
-     style="display:inline"
+     style="display:none"
      transform="translate(0,-138.24999)">
     <path
-       style="fill:none;stroke:#0047ec;stroke-width:0.36772236px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;stroke:#0047ec;stroke-width:0.36777082;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 0.18323709,138.40855 H 80.294131 l 9e-6,15.03769 h 57.70312 l -0.20727,-9.99807 h 71.29488 v 92.87276 h -25.85756 l 3e-5,41.67625 H 125.5242 l 1e-5,18.79907 H 7.849352 v -56.15563 l 21.167532,0.19462 V 195.4641 186.64479 H 0.18323709 Z"
        id="path3798"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccccccccccccc" />
   </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer3"
-     inkscape:label="Ebene 3" />
 </svg>

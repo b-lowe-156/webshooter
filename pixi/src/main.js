@@ -127,12 +127,42 @@ function init() {
         .each((i, path) => {
             vertexSets.push(Svg.pathToVertices(path, 30))
         });
-
         $(data)
-        .find('rect')
-        .each((i, rect) => {
-            console.log(rect)
-        });
+        .find('g')
+        .each((i, g) => {
+            //console.log("\n\n\n\n", g)
+            
+            for(var i = 0; i < g.children.length; i++) {
+               //console.log( g.children[i] )
+                for(var j = 0; j < g.children[i].children.length; j++) {
+                    const rect = g.children[i].children[j]
+                   // console.log( "rect", " ", rect )
+
+                    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    var newRect = rect.cloneNode(true)
+                    svg.appendChild(newRect);
+
+                    var canvas = document.createElement('canvas')
+                    canvas.width  = 200
+canvas.height = 200
+                    canvg(canvas, $(svg).html(), { log: true })
+
+                    console.log( $(svg).html() )
+
+                    stage.addChild(new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas))))
+
+                    document.body.appendChild(canvas);
+
+                   // const svgTexture = new PIXI.Texture.fromImage(svg, undefined, undefined, 1.0)
+                   // const svgSprite = new PIXI.Sprite(svgTexture)
+                   // stage.addChild(svgSprite)
+
+                }
+            }
+            //g.find('rect').each((i, rect) => {
+            //    console.log(rect)
+            //})
+        })
 
 
         terrain = Bodies.fromVertices(400, 350, vertexSets, {
