@@ -35,20 +35,20 @@ function init() {
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
     World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
-    
-    var render = Render.create({ element: document.body, engine: engine })
-    
+
+    //var render = Render.create({ element: document.body, engine: engine })
+
     // run the engine
     Engine.run(engine);
 
     // run the renderer
-    Render.run(render);
+    //Render.run(render);
 
     var renderCanvas = document.getElementById('renderCanvas')
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
     document.body.appendChild(renderer.view);
 
-    renderCanvas.onclick = function() {
+    renderCanvas.onclick = function () {
         renderCanvas.requestPointerLock();
     }
 
@@ -95,24 +95,24 @@ function init() {
 
     var width = 120
     var height = 120
-//      var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
+    //      var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var startX = 50
     var startY = 250
 
     // set a fill and a line style again and draw a rectangle
     fovMask.beginFill(0xFFFFFF, 1);
-   // background.drawRect(startX, startY, width, height)
-   
+    // background.drawRect(startX, startY, width, height)
+
     var polygons = []
-    polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
-    polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
+    polygons.push([[startX, startY], [startX + width, startY], [startX + width, startY + height], [startX, startY + height]])
+    polygons.push([[-1, -1], [800 + 1, -1], [800 + 1, 600 + 1], [-1, 600 + 1]]);
 
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
     //sprite.mask = fovMask
- //   background.mask = lightingSprite
-    
+    //   background.mask = lightingSprite
+
     // drawing
     const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 1.0)
     const map = new PIXI.Sprite(mapTexture)
@@ -123,47 +123,58 @@ function init() {
     $.get('map.svg').done((data) => {
         let vertexSets = []
         $(data)
-        .find('path')
-        .each((i, path) => {
-            vertexSets.push(Svg.pathToVertices(path, 30))
-        });
+            .find('path')
+            .each((i, path) => {
+                vertexSets.push(Svg.pathToVertices(path, 30))
+            });
         $(data)
-        .find('g')
-        .each((i, g) => {
-            //console.log("\n\n\n\n", g)
-            
-            for(var i = 0; i < g.children.length; i++) {
-               //console.log( g.children[i] )
-                for(var j = 0; j < g.children[i].children.length; j++) {
-                    const rect = g.children[i].children[j]
-                   // console.log( "rect", " ", rect )
+            .find('g')
+            .each((i, g) => {
+                //console.log("\n\n\n\n", g)
 
-                    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    var newRect = rect.cloneNode(true)
-                    svg.appendChild(newRect);
+                for (var i = 0; i < g.children.length; i++) {
+                    //console.log( g.children[i] )
+                    for (var j = 0; j < g.children[i].children.length; j++) {
+                        const rect = g.children[i].children[j]
+                        // console.log( "rect", " ", rect )
 
-                    var canvas = document.createElement('canvas')
-                    canvas.width  = 200
-canvas.height = 200
-                    canvg(canvas, $(svg).html(), { log: true })
+                        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+                        //console.log(svg)
+                        svg.appendChild(rect.cloneNode(true))
+/*
+                        var canvas = document.createElement('canvas')
+                        canvg(canvas, $(svg).html(), { log: true })
+                        console.log($(svg).html())
+                        */
+                        //console.log('data:image/svg+xml,' + svg)
+                        const serializedSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">' + $(svg).html() + '</svg>'
+                 //var serializedSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><text x="64" y="100" text-anchor="middle" font-size="100">😄</text></svg>'
 
-                    console.log( $(svg).html() )
+                        var texture = PIXI.Texture.fromImage('data:image/svg+xml,' + serializedSvg);
+                        stage.addChild(new PIXI.Sprite(texture))
 
-                    stage.addChild(new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas))))
+//                        document.body.appendChild(canvas);
 
-                    document.body.appendChild(canvas);
 
-                   // const svgTexture = new PIXI.Texture.fromImage(svg, undefined, undefined, 1.0)
-                   // const svgSprite = new PIXI.Sprite(svgTexture)
-                   // stage.addChild(svgSprite)
+                        // const svgTexture = new PIXI.Texture.fromImage(svg, undefined, undefined, 1.0)
+                        // const svgSprite = new PIXI.Sprite(svgTexture)
+                        // stage.addChild(svgSprite)
 
+                    }
                 }
-            }
-            //g.find('rect').each((i, rect) => {
-            //    console.log(rect)
-            //})
-        })
+                //g.find('rect').each((i, rect) => {
+                //    console.log(rect)
+                //})
+            })
 
+
+/*
+        var serializedSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><text x="64" y="100" text-anchor="middle" font-size="100">😄</text></svg>'
+        //var SVG_SOURCE = 'data:image/svg+xml,' + serializedSvg
+        var texture = PIXI.Texture.fromImage('data:image/svg+xml,' + serializedSvg);
+        var bunny = new PIXI.Sprite(texture); 
+        stage.addChild(bunny);
+*/
 
         terrain = Bodies.fromVertices(400, 350, vertexSets, {
             isStatic: true
@@ -175,8 +186,8 @@ canvas.height = 200
 
 
     stage.addChild(fovMask)
-   // stage.addChild(lightingSprite)
-    
+    // stage.addChild(lightingSprite)
+
     stage.addChild(sprite)
     stage.addChild(background)
 
@@ -185,22 +196,22 @@ canvas.height = 200
     boxAGrapfhic.lineStyle(1, 0xFFFFFF, 1);
 
     boxAGrapfhic.moveTo(-40, -40);
-    boxAGrapfhic.lineTo( 40, -40);
-    boxAGrapfhic.lineTo( 40, 40);
-    boxAGrapfhic.lineTo( -40, 40);
-    boxAGrapfhic.lineTo( -40, -40);
+    boxAGrapfhic.lineTo(40, -40);
+    boxAGrapfhic.lineTo(40, 40);
+    boxAGrapfhic.lineTo(-40, 40);
+    boxAGrapfhic.lineTo(-40, -40);
 
-  //  boxAGrapfhic.mask = fovMask
+    //  boxAGrapfhic.mask = fovMask
 
     var boxBGrapfhic = new PIXI.Graphics();
     container.addChild(boxBGrapfhic);
     boxBGrapfhic.lineStyle(1, 0xFFFFFF, 1);
     boxBGrapfhic.moveTo(-40, -40);
-    boxBGrapfhic.lineTo( 40, -40);
-    boxBGrapfhic.lineTo( 40, 40);
-    boxBGrapfhic.lineTo( -40, 40);
-    boxBGrapfhic.lineTo( -40, -40);
-  //  boxBGrapfhic.mask = fovMask
+    boxBGrapfhic.lineTo(40, -40);
+    boxBGrapfhic.lineTo(40, 40);
+    boxBGrapfhic.lineTo(-40, 40);
+    boxBGrapfhic.lineTo(-40, -40);
+    //  boxBGrapfhic.mask = fovMask
 
     let player = new PIXI.Graphics();
     stage.addChild(player);
@@ -213,8 +224,8 @@ canvas.height = 200
     stage.addChild(playerAimLine);
     playerAimLine.lineStyle(1, 0xFF0000, 1);
     playerAimLine.moveTo(0, 0);
-    playerAimLine.lineTo( 300, 0);
-  //  playerAimLine.mask = fovMask
+    playerAimLine.lineTo(300, 0);
+    //  playerAimLine.mask = fovMask
 
     //background.mask = fovMask
 
@@ -230,7 +241,7 @@ canvas.height = 200
         requestAnimationFrame(animate)
     }
 
-    function move(){ 
+    function move() {
         var moveSpeed = 0.01;
         if (controlling.forward) {
             playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
@@ -282,7 +293,7 @@ canvas.height = 200
         boxAGrapfhic.position.x = boxA.position.x
         boxAGrapfhic.position.y = boxA.position.y
         boxAGrapfhic.rotation = boxA.angle
-        
+
         boxBGrapfhic.position.x = boxB.position.x
         boxBGrapfhic.position.y = boxB.position.y
         boxBGrapfhic.rotation = boxB.angle
@@ -326,7 +337,7 @@ function Controlling() {
     this.strafeRight = false;
 }
 
-Controlling.prototype.handleKeydownEvent = function(e) {
+Controlling.prototype.handleKeydownEvent = function (e) {
     var code = e.keyCode;
     switch (code) {
         case 87: //'w':
@@ -341,12 +352,12 @@ Controlling.prototype.handleKeydownEvent = function(e) {
         case 68: //'d':
             this.strafeRight = true;
             break;
-    	
+
         default:
     }
 };
 
-Controlling.prototype.handleKeyupEvent = function(e) {
+Controlling.prototype.handleKeyupEvent = function (e) {
     var code = e.keyCode;
     switch (code) {
         case 87: //'w':
@@ -366,10 +377,10 @@ Controlling.prototype.handleKeyupEvent = function(e) {
     }
 };
 
-window.addEventListener('keydown', function(e) {
+window.addEventListener('keydown', function (e) {
     controlling.handleKeydownEvent(e);
 });
 
-window.addEventListener('keyup', function(e) {
+window.addEventListener('keyup', function (e) {
     controlling.handleKeyupEvent(e);
 });
