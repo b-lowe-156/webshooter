@@ -22,8 +22,8 @@ function init() {
 
     // create two boxes and a ground
     var boxA = Bodies.rectangle(400, 200, 80, 80);
-    var boxB = Bodies.rectangle(450, 50, 80, 80);
-    var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
+    var boxB = Bodies.rectangle(450, 300, 80, 80);
+  //  var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
     var top = Bodies.rectangle(0, 0, 16000, 10, { isStatic: true });
@@ -34,15 +34,15 @@ function init() {
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
+    World.add(engine.world, [boxA, boxB,  playerPhysics]);
 
-    //var render = Render.create({ element: document.body, engine: engine })
+    var render = Render.create({ element: document.body, engine: engine })
 
     // run the engine
     Engine.run(engine);
 
     // run the renderer
-    //Render.run(render);
+    Render.run(render);
 
     var renderCanvas = document.getElementById('renderCanvas')
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
@@ -113,74 +113,31 @@ function init() {
     //sprite.mask = fovMask
     //   background.mask = lightingSprite
 
-    // drawing
-    const mapTexture = new PIXI.Texture.fromImage('map.svg', undefined, undefined, 1.0)
-    const map = new PIXI.Sprite(mapTexture)
-    stage.addChild(map)
-
     // matters
     let terrain
     $.get('map.svg').done((data) => {
-        let vertexSets = []
-        $(data)
-            .find('path')
-            .each((i, path) => {
-                vertexSets.push(Svg.pathToVertices(path, 30))
-            });
         $(data)
             .find('g')
             .each((i, g) => {
-                //console.log("\n\n\n\n", g)
+                for (let i = 0; i < g.children.length; i++) {
+                    const rect = g.children[i]
+                    const levelBox = Bodies.rectangle(
+                        rect.x.baseVal.value + rect.width.baseVal.value / 2,
+                        rect.y.baseVal.value + rect.height.baseVal.value / 2,
+                        rect.width.baseVal.value,
+                        rect.height.baseVal.value,
+                        { isStatic: true }
+                    )
+                    World.add(engine.world, levelBox);
 
-                for (var i = 0; i < g.children.length; i++) {
-                    //console.log( g.children[i] )
-                    for (var j = 0; j < g.children[i].children.length; j++) {
-                        const rect = g.children[i].children[j]
-                        // console.log( "rect", " ", rect )
+                    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+                    svg.appendChild(rect.cloneNode(true))
 
-                        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-                        //console.log(svg)
-                        svg.appendChild(rect.cloneNode(true))
-/*
-                        var canvas = document.createElement('canvas')
-                        canvg(canvas, $(svg).html(), { log: true })
-                        console.log($(svg).html())
-                        */
-                        //console.log('data:image/svg+xml,' + svg)
-                        const serializedSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">' + $(svg).html() + '</svg>'
-                 //var serializedSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><text x="64" y="100" text-anchor="middle" font-size="100">😄</text></svg>'
-
-                        var texture = PIXI.Texture.fromImage('data:image/svg+xml,' + serializedSvg);
-                        stage.addChild(new PIXI.Sprite(texture))
-
-//                        document.body.appendChild(canvas);
-
-
-                        // const svgTexture = new PIXI.Texture.fromImage(svg, undefined, undefined, 1.0)
-                        // const svgSprite = new PIXI.Sprite(svgTexture)
-                        // stage.addChild(svgSprite)
-
-                    }
+                    const texture = PIXI.Texture.fromImage(
+                        'data:image/svg+xml,' + '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">' + $(svg).html() + '</svg>')
+                    stage.addChild(new PIXI.Sprite(texture))
                 }
-                //g.find('rect').each((i, rect) => {
-                //    console.log(rect)
-                //})
             })
-
-
-/*
-        var serializedSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><text x="64" y="100" text-anchor="middle" font-size="100">😄</text></svg>'
-        //var SVG_SOURCE = 'data:image/svg+xml,' + serializedSvg
-        var texture = PIXI.Texture.fromImage('data:image/svg+xml,' + serializedSvg);
-        var bunny = new PIXI.Sprite(texture); 
-        stage.addChild(bunny);
-*/
-
-        terrain = Bodies.fromVertices(400, 350, vertexSets, {
-            isStatic: true
-        }, true)
-
-        World.add(engine.world, terrain)
     })
 
 

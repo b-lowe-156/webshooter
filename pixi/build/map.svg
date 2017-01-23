@@ -11,7 +11,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="800"
    height="600"
-   viewBox="0 0 211.66666 158.75"
+   viewBox="0 0 800 600"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.0 r15299"
@@ -26,10 +26,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="161.9432"
-     inkscape:cy="284.30017"
+     inkscape:cx="434.91265"
+     inkscape:cy="355.97397"
      inkscape:document-units="px"
-     inkscape:current-layer="svg8"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:snap-bbox="true"
      inkscape:bbox-nodes="true"
@@ -49,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,76 +57,64 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline"
-     transform="translate(0,0)">
-    <g
-       id="g3761">
-      <rect
-         ry="0"
-         style="fill:#800000;stroke-width:0.24680531"
-         y="0.063553914"
-         x="-3.8235061e-007"
-         height="35.81411"
-         width="55.859329"
-         id="rect14" />
-      <rect
-         y="11.22863"
-         x="55.859333"
-         height="11.64033"
-         width="40.234951"
-         id="rect16"
-         style="fill:#000080;stroke-width:0.20358469" />
-      <rect
-         transform="rotate(-90)"
-         y="20.104982"
-         x="-76.11261"
-         height="11.64033"
-         width="40.234951"
-         id="rect16-0"
-         style="fill:#000080;stroke-width:0.20358469" />
-      <rect
-         y="75.968109"
-         x="5.3453903"
-         height="41.694046"
-         width="82.051743"
-         id="rect3703"
-         style="fill:#808000;stroke-width:0.32720858;opacity:0.99"
-         onclick="asd" />
-      <rect
-         y="92.064026"
-         x="87.397125"
-         height="11.64033"
-         width="40.234951"
-         id="rect16-8"
-         style="fill:#000080;stroke-width:0.20358469" />
-      <rect
-         y="3.8053293"
-         x="95.949753"
-         height="68.955536"
-         width="49.712143"
-         id="rect3720"
-         style="fill:#008000;stroke-width:0.26458332" />
-      <rect
-         transform="rotate(-90)"
-         y="115.99174"
-         x="-92.064026"
-         height="11.64033"
-         width="19.303162"
-         id="rect16-0-1"
-         style="fill:#000080;stroke-width:0.14101249" />
-    </g>
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Ebene 2"
-     style="display:none"
-     transform="translate(0,-138.24999)">
-    <path
-       style="fill:none;stroke:#0047ec;stroke-width:0.36777082;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 0.18323709,138.40855 H 80.294131 l 9e-6,15.03769 h 57.70312 l -0.20727,-9.99807 h 71.29488 v 92.87276 h -25.85756 l 3e-5,41.67625 H 125.5242 l 1e-5,18.79907 H 7.849352 v -56.15563 l 21.167532,0.19462 V 195.4641 186.64479 H 0.18323709 Z"
-       id="path3798"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccccccccccccc" />
+     style="display:inline">
+    <rect
+       style="fill:#000080;stroke:none;stroke-width:1.16162109"
+       id="rect16-0"
+       width="75.120667"
+       height="202.9776"
+       x="101.03897"
+       y="181.39009" />
+    <rect
+       onclick="asd"
+       style="opacity:0.98999999;fill:#808000;stroke:none;stroke-width:1.6849196"
+       id="rect3703"
+       width="429.724"
+       height="211.09662"
+       x="27.995049"
+       y="384.36771" />
+    <rect
+       style="fill:#000080;stroke:none;stroke-width:1.04833388"
+       id="rect16-8"
+       width="210.71976"
+       height="58.934898"
+       x="457.71899"
+       y="465.86121" />
+    <rect
+       style="fill:#000080;stroke:none;stroke-width:0.80270547"
+       id="rect16-0-1"
+       width="74.499832"
+       height="97.731758"
+       x="593.93896"
+       y="368.12946" />
+    <rect
+       ry="0"
+       style="display:inline;fill:#800000;fill-opacity:1;stroke:none;stroke-width:1.2708931"
+       y="0.063553914"
+       x="-3.8235061e-007"
+       height="181.32654"
+       width="292.54825"
+       id="rect14" />
+    <rect
+       y="56.592243"
+       x="292.54828"
+       height="58.934898"
+       width="210.71976"
+       id="rect16"
+       style="display:inline;fill:#000080;stroke:none;stroke-width:1.04833388" />
+    <rect
+       y="19.008133"
+       x="502.51108"
+       height="349.12131"
+       width="260.354"
+       id="rect3720"
+       style="display:inline;fill:#008000;stroke:none;stroke-width:1.36243868" />
+    <rect
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-width:1.36243868;stroke-opacity:1"
+       id="rect4499"
+       width="0.98977453"
+       height="3.8273809"
+       x="409.76663"
+       y="262.87421" />
   </g>
 </svg>
