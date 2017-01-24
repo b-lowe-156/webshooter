@@ -36,13 +36,13 @@ function init() {
     // add all of the bodies to the world
     World.add(engine.world, [boxA, boxB,  playerPhysics]);
 
-    var render = Render.create({ element: document.body, engine: engine })
+   // var render = Render.create({ element: document.body, engine: engine })
 
     // run the engine
     Engine.run(engine);
 
     // run the renderer
-    Render.run(render);
+  //  Render.run(render);
 
     var renderCanvas = document.getElementById('renderCanvas')
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
@@ -113,14 +113,17 @@ function init() {
     //sprite.mask = fovMask
     //   background.mask = lightingSprite
 
-    // matters
-    let terrain
+
+    /*
+
     $.get('map.svg').done((data) => {
         $(data)
             .find('g')
             .each((i, g) => {
                 for (let i = 0; i < g.children.length; i++) {
                     const rect = g.children[i]
+                    console.log(rect)
+                    /*
                     const levelBox = Bodies.rectangle(
                         rect.x.baseVal.value + rect.width.baseVal.value / 2,
                         rect.y.baseVal.value + rect.height.baseVal.value / 2,
@@ -129,7 +132,8 @@ function init() {
                         { isStatic: true }
                     )
                     World.add(engine.world, levelBox);
-
+*/
+/*
                     let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
                     svg.appendChild(rect.cloneNode(true))
 
@@ -140,6 +144,10 @@ function init() {
             })
     })
 
+*/
+    const mapTexture = new PIXI.Texture.fromImage('filter.svg', undefined, undefined, 1.0)
+    const map = new PIXI.Sprite(mapTexture)
+    stage.addChild(map)
 
 
     stage.addChild(fovMask)
