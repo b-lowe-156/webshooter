@@ -110,6 +110,13 @@ function init() {
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
+
+    var texture = PIXI.Texture.fromImage('http://pixijs.github.io/examples/required/assets/p2.jpeg')
+    var tilingSprite = new PIXI.extras.TilingSprite(texture, 400, 300)
+    tilingSprite.position.x = 100
+    stage.addChild(tilingSprite)
+
+
     //sprite.mask = fovMask
     //   background.mask = lightingSprite
 
