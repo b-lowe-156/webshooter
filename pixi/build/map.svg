@@ -25,11 +25,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="263.18672"
-     inkscape:cy="355.97397"
+     inkscape:zoom="1.4"
+     inkscape:cx="243.59007"
+     inkscape:cy="416.19318"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:snap-bbox="true"
      inkscape:bbox-nodes="true"
@@ -109,12 +109,63 @@
        width="260.354"
        id="rect3720"
        style="display:inline;fill:#008000;stroke:none;stroke-width:1.36243868" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="collision">
     <rect
-       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-width:1.36243868;stroke-opacity:1"
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-opacity:1"
+       id="rect4491"
+       width="281.55942"
+       height="202.97762"
+       x="176.15964"
+       y="181.39009" />
+    <rect
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-opacity:1"
+       id="rect4493"
+       width="209.59454"
+       height="65.901428"
+       x="292.54828"
+       y="115.52715"
+       ry="0" />
+    <rect
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-opacity:1"
        id="rect4499"
-       width="0.98977453"
-       height="3.8273809"
-       x="409.76663"
-       y="262.87421" />
+       width="45.138088"
+       height="284.32419"
+       x="457.71906"
+       y="181.39009" />
+    <rect
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-opacity:1"
+       id="rect4501"
+       width="91.427887"
+       height="97.73175"
+       x="502.51108"
+       y="368.12946" />
+    <rect
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-opacity:1"
+       id="rect4505"
+       width="292.54825"
+       height="80.063553"
+       x="-9.3787506e-008"
+       y="-80" />
+    <rect
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-opacity:1"
+       id="rect4507"
+       width="85.714279"
+       height="261.39005"
+       x="-85.714279"
+       y="-80" />
+    <rect
+       style="opacity:0.98999999;fill:#0000ff;fill-opacity:0.45327107;stroke:none;stroke-opacity:1"
+       id="rect4513"
+       width="40.714256"
+       height="105.71432"
+       x="-71.062645"
+       y="228.28662"
+       ry="0"
+       rx="0"
+       transform="rotate(-17.188734)" />
   </g>
 </svg>

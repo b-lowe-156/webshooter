@@ -23,7 +23,7 @@ function init() {
     // create two boxes and a ground
     var boxA = Bodies.rectangle(400, 200, 80, 80);
     var boxB = Bodies.rectangle(450, 300, 80, 80);
-  //  var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
+    //  var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
     var top = Bodies.rectangle(0, 0, 16000, 10, { isStatic: true });
@@ -34,15 +34,15 @@ function init() {
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [boxA, boxB,  playerPhysics]);
+    World.add(engine.world, [boxA, boxB, playerPhysics]);
 
-   // var render = Render.create({ element: document.body, engine: engine })
+    // var render = Render.create({ element: document.body, engine: engine })
 
     // run the engine
     Engine.run(engine);
 
     // run the renderer
-  //  Render.run(render);
+    //  Render.run(render);
 
     var renderCanvas = document.getElementById('renderCanvas')
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
@@ -111,50 +111,58 @@ function init() {
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
 
-    var texture = PIXI.Texture.fromImage('http://pixijs.github.io/examples/required/assets/p2.jpeg')
-    var tilingSprite = new PIXI.extras.TilingSprite(texture, 400, 300)
-    tilingSprite.position.x = 100
-    stage.addChild(tilingSprite)
-
+    const fliesenTexture = PIXI.Texture.fromImage('http://pixijs.github.io/examples/required/assets/p2.jpeg')
+    const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 
     //sprite.mask = fovMask
     //   background.mask = lightingSprite
 
 
-    /*
-
     $.get('map.svg').done((data) => {
         $(data)
             .find('g')
             .each((i, g) => {
+                console.log("layer", g.id)
+                const wall = g.id === 'layer2'
+
                 for (let i = 0; i < g.children.length; i++) {
                     const rect = g.children[i]
-                    console.log(rect)
-                    /*
-                    const levelBox = Bodies.rectangle(
-                        rect.x.baseVal.value + rect.width.baseVal.value / 2,
-                        rect.y.baseVal.value + rect.height.baseVal.value / 2,
-                        rect.width.baseVal.value,
-                        rect.height.baseVal.value,
-                        { isStatic: true }
-                    )
-                    World.add(engine.world, levelBox);
-*/
-/*
-                    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-                    svg.appendChild(rect.cloneNode(true))
+                    let tileTexture = fliesenTexture
+                    if (wall) {
+                        tileTexture = rockTexture
+                    }
+                    const tilingSprite = new PIXI.extras.TilingSprite(tileTexture, rect.width.baseVal.value, rect.height.baseVal.value)
+                    tilingSprite.position.x = rect.x.baseVal.value
+                    tilingSprite.position.y = rect.y.baseVal.value
+                    tilingSprite.rotation = 0.0
+                    if( rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle ) {
+                        tilingSprite.rotation = -rect.transform.baseVal[0].angle
+                    }
+                    stage.addChild(tilingSprite)
 
-                    const texture = PIXI.Texture.fromImage(
-                        'data:image/svg+xml,' + '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">' + $(svg).html() + '</svg>')
-                    stage.addChild(new PIXI.Sprite(texture))
+                    console.log(rect.transform.baseVal[0] && rect.transform.baseVal[0].angle)
+
+                    if (wall) {
+                        const levelBox = Bodies.rectangle(
+                            rect.x.baseVal.value + rect.width.baseVal.value / 2,
+                            rect.y.baseVal.value + rect.height.baseVal.value / 2,
+                            rect.width.baseVal.value,
+                            rect.height.baseVal.value,
+                            { isStatic: true }
+                        )
+                        World.add(engine.world, levelBox);
+                    }
+
+                    /*
+                                        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+                                        svg.appendChild(rect.cloneNode(true))
+                                        const texture = PIXI.Texture.fromImage(
+                                            'data:image/svg+xml,' + '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">' + $(svg).html() + '</svg>')
+                                        stage.addChild(new PIXI.Sprite(texture))
+                    */
                 }
             })
     })
-
-*/
-    const mapTexture = new PIXI.Texture.fromImage('filter.svg', undefined, undefined, 1.0)
-    const map = new PIXI.Sprite(mapTexture)
-    stage.addChild(map)
 
 
     stage.addChild(fovMask)
