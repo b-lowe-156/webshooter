@@ -138,7 +138,7 @@ function init() {
                     if( rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle ) {
                         tilingSprite.rotation = -rect.transform.baseVal[0].angle
                     }
-                    stage.addChild(tilingSprite)
+                    background.addChild(tilingSprite)
 
                     console.log(rect.transform.baseVal[0] && rect.transform.baseVal[0].angle)
 
@@ -163,7 +163,6 @@ function init() {
                 }
             })
     })
-
 
     stage.addChild(fovMask)
     // stage.addChild(lightingSprite)
