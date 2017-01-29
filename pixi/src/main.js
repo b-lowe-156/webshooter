@@ -115,7 +115,7 @@ function init() {
     const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 
     //sprite.mask = fovMask
-    //   background.mask = lightingSprite
+    background.mask = lightingSprite
 
 
     $.get('map.svg').done((data) => {
@@ -165,7 +165,7 @@ function init() {
     })
 
     stage.addChild(fovMask)
-    // stage.addChild(lightingSprite)
+    stage.addChild(lightingSprite)
 
     stage.addChild(sprite)
     stage.addChild(background)
@@ -180,7 +180,7 @@ function init() {
     boxAGrapfhic.lineTo(-40, 40);
     boxAGrapfhic.lineTo(-40, -40);
 
-    //  boxAGrapfhic.mask = fovMask
+    boxAGrapfhic.mask = fovMask
 
     var boxBGrapfhic = new PIXI.Graphics();
     container.addChild(boxBGrapfhic);
@@ -190,7 +190,7 @@ function init() {
     boxBGrapfhic.lineTo(40, 40);
     boxBGrapfhic.lineTo(-40, 40);
     boxBGrapfhic.lineTo(-40, -40);
-    //  boxBGrapfhic.mask = fovMask
+     boxBGrapfhic.mask = fovMask
 
     let player = new PIXI.Graphics();
     stage.addChild(player);
@@ -204,7 +204,7 @@ function init() {
     playerAimLine.lineStyle(1, 0xFF0000, 1);
     playerAimLine.moveTo(0, 0);
     playerAimLine.lineTo(300, 0);
-    //  playerAimLine.mask = fovMask
+    playerAimLine.mask = fovMask
 
     //background.mask = fovMask
 
