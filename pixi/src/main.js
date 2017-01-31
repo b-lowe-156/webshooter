@@ -20,10 +20,6 @@ function init() {
     var rt = new PIXI.RenderTexture(brt);
     var sprite = new PIXI.Sprite(rt);
 
-    // create two boxes and a ground
-    var boxA = Bodies.rectangle(400, 200, 80, 80);
-    var boxB = Bodies.rectangle(450, 300, 80, 80);
-    //  var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
     var top = Bodies.rectangle(0, 0, 16000, 10, { isStatic: true });
@@ -34,7 +30,7 @@ function init() {
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [boxA, boxB, playerPhysics]);
+    World.add(engine.world, [playerPhysics]);
 
     // var render = Render.create({ element: document.body, engine: engine })
 
@@ -95,7 +91,6 @@ function init() {
 
     var width = 120
     var height = 120
-    //      var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var startX = 50
     var startY = 250
 
@@ -116,7 +111,6 @@ function init() {
 
     //sprite.mask = fovMask
     background.mask = lightingSprite
-
 
     $.get('map.svg').done((data) => {
         $(data)
@@ -152,14 +146,6 @@ function init() {
                         )
                         World.add(engine.world, levelBox);
                     }
-
-                    /*
-                                        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-                                        svg.appendChild(rect.cloneNode(true))
-                                        const texture = PIXI.Texture.fromImage(
-                                            'data:image/svg+xml,' + '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">' + $(svg).html() + '</svg>')
-                                        stage.addChild(new PIXI.Sprite(texture))
-                    */
                 }
             })
     })
@@ -169,28 +155,6 @@ function init() {
 
     stage.addChild(sprite)
     stage.addChild(background)
-
-    var boxAGrapfhic = new PIXI.Graphics();
-    stage.addChild(boxAGrapfhic);
-    boxAGrapfhic.lineStyle(1, 0xFFFFFF, 1);
-
-    boxAGrapfhic.moveTo(-40, -40);
-    boxAGrapfhic.lineTo(40, -40);
-    boxAGrapfhic.lineTo(40, 40);
-    boxAGrapfhic.lineTo(-40, 40);
-    boxAGrapfhic.lineTo(-40, -40);
-
-    boxAGrapfhic.mask = fovMask
-
-    var boxBGrapfhic = new PIXI.Graphics();
-    container.addChild(boxBGrapfhic);
-    boxBGrapfhic.lineStyle(1, 0xFFFFFF, 1);
-    boxBGrapfhic.moveTo(-40, -40);
-    boxBGrapfhic.lineTo(40, -40);
-    boxBGrapfhic.lineTo(40, 40);
-    boxBGrapfhic.lineTo(-40, 40);
-    boxBGrapfhic.lineTo(-40, -40);
-     boxBGrapfhic.mask = fovMask
 
     let player = new PIXI.Graphics();
     stage.addChild(player);
@@ -263,29 +227,8 @@ function init() {
             playerAimLine.rotation = -player.rotation - 0.5 * Math.PI
         }
 
-        //background.lineStyle(2, 0xFFFFFF, 1);
-        //background.beginFill(0xFF700B, 1);
-        //background.drawRect(0, 0, 800, 600);
-
-        //background.drawRect(startX, startY, width, height)
-
-        boxAGrapfhic.position.x = boxA.position.x
-        boxAGrapfhic.position.y = boxA.position.y
-        boxAGrapfhic.rotation = boxA.angle
-
-        boxBGrapfhic.position.x = boxB.position.x
-        boxBGrapfhic.position.y = boxB.position.y
-        boxBGrapfhic.rotation = boxB.angle
-
         player.position.x = playerPhysics.position.x
         player.position.y = playerPhysics.position.y
-
-        /*
-        background.lineStyle(0);
-        background.beginFill(0xFFFF0B, 1.0);
-        background.drawCircle(playerPhysics.position.x, playerPhysics.position.y, 20);
-        background.endFill();
-        */
 
         /*
 
