@@ -1,3 +1,4 @@
+var PIXI = require('pixi.js')
 import { createLightingSprite, createLightPolygon } from './lighting'
 import { initLightSources } from './static_light'
 
@@ -12,7 +13,7 @@ var player = {
 }
 
 function init() {
-    var { Engine, World, Bodies, Render, Svg } = Matter
+    var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
 
     var container = new PIXI.Container();
@@ -20,31 +21,40 @@ function init() {
     var rt = new PIXI.RenderTexture(brt);
     var sprite = new PIXI.Sprite(rt);
 
+    // create two boxes and a ground
+    var boxA = Bodies.rectangle(400, 200, 80, 80);
+    var boxB = Bodies.rectangle(450, 50, 80, 80);
+    var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
-    var top = Bodies.rectangle(0, 0, 16000, 10, { isStatic: true });
-    var left = Bodies.rectangle(0, 0, 10, 12000, { isStatic: true });
-    var ground = Bodies.rectangle(0, 6000, 18000, 10, { isStatic: true });
-    var right = Bodies.rectangle(8000, 0, 10, 12000, { isStatic: true });
+    var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
+    var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
+    var ground = Bodies.rectangle(0, 600, 1800, 10, { isStatic: true });
+    var right = Bodies.rectangle(800, 0, 10, 1200, { isStatic: true });
 
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [playerPhysics]);
+    World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
 
-    // var render = Render.create({ element: document.body, engine: engine })
-
+    /*
+    var render = Render.create({
+        element: document.body,
+        engine: engine
+    });
+    */
+    
     // run the engine
     Engine.run(engine);
 
     // run the renderer
-    //  Render.run(render);
+    // Render.run(render);
 
     var renderCanvas = document.getElementById('renderCanvas')
     var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
     document.body.appendChild(renderer.view);
 
-    renderCanvas.onclick = function () {
+    renderCanvas.onclick = function() {
         renderCanvas.requestPointerLock();
     }
 
@@ -96,21 +106,20 @@ function init() {
 
     // set a fill and a line style again and draw a rectangle
     fovMask.beginFill(0xFFFFFF, 1);
-    // background.drawRect(startX, startY, width, height)
-
+   // background.drawRect(startX, startY, width, height)
+   
     var polygons = []
-    polygons.push([[startX, startY], [startX + width, startY], [startX + width, startY + height], [startX, startY + height]])
-    polygons.push([[-1, -1], [800 + 1, -1], [800 + 1, 600 + 1], [-1, 600 + 1]]);
+    polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
+    polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
 
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
+    sprite.mask = fovMask
+    background.mask = lightingSprite
 
     const fliesenTexture = PIXI.Texture.fromImage('http://pixijs.github.io/examples/required/assets/p2.jpeg')
     const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
-
-    //sprite.mask = fovMask
-    background.mask = lightingSprite
 
     $.get('map.svg').done((data) => {
         $(data)
@@ -150,11 +159,12 @@ function init() {
             })
     })
 
-    stage.addChild(fovMask)
-    stage.addChild(lightingSprite)
 
+    stage.addChild(fovMask)
+    container.addChild(lightingSprite)
+    
     stage.addChild(sprite)
-    stage.addChild(background)
+    container.addChild(background)
 
     let player = new PIXI.Graphics();
     stage.addChild(player);
@@ -167,7 +177,7 @@ function init() {
     stage.addChild(playerAimLine);
     playerAimLine.lineStyle(1, 0xFF0000, 1);
     playerAimLine.moveTo(0, 0);
-    playerAimLine.lineTo(300, 0);
+    playerAimLine.lineTo( 300, 0);
     playerAimLine.mask = fovMask
 
     //background.mask = fovMask
@@ -184,7 +194,7 @@ function init() {
         requestAnimationFrame(animate)
     }
 
-    function move() {
+    function move(){ 
         var moveSpeed = 0.01;
         if (controlling.forward) {
             playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
@@ -202,6 +212,8 @@ function init() {
             playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
+
+        console.log(playerPhysics.angle)
 
         { // camera
             stage.pivot.x = playerPhysics.position.x;
@@ -230,8 +242,6 @@ function init() {
         player.position.x = playerPhysics.position.x
         player.position.y = playerPhysics.position.y
 
-        /*
-
         // when the mouse is moved, we determine the new visibility polygon 	
         var visibility = createLightPolygon(polygons, playerPhysics.position.x, playerPhysics.position.y);
         // then we draw it
@@ -247,8 +257,6 @@ function init() {
             fovMask.lineTo(visibility[i%visibility.length][0],visibility[i%visibility.length][1]);		
         }
         fovMask.endFill();
-
-        */
     }
 }
 
@@ -259,7 +267,7 @@ function Controlling() {
     this.strafeRight = false;
 }
 
-Controlling.prototype.handleKeydownEvent = function (e) {
+Controlling.prototype.handleKeydownEvent = function(e) {
     var code = e.keyCode;
     switch (code) {
         case 87: //'w':
@@ -274,12 +282,12 @@ Controlling.prototype.handleKeydownEvent = function (e) {
         case 68: //'d':
             this.strafeRight = true;
             break;
-
+    	
         default:
     }
 };
 
-Controlling.prototype.handleKeyupEvent = function (e) {
+Controlling.prototype.handleKeyupEvent = function(e) {
     var code = e.keyCode;
     switch (code) {
         case 87: //'w':
@@ -299,10 +307,10 @@ Controlling.prototype.handleKeyupEvent = function (e) {
     }
 };
 
-window.addEventListener('keydown', function (e) {
+window.addEventListener('keydown', function(e) {
     controlling.handleKeydownEvent(e);
 });
 
-window.addEventListener('keyup', function (e) {
+window.addEventListener('keyup', function(e) {
     controlling.handleKeyupEvent(e);
 });
