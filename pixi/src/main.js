@@ -22,7 +22,10 @@ function init() {
     var sprite = new PIXI.Sprite(rt);
 
     // create two boxes and a ground
-    var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 1.0, frictionAir: 0.7, friction: 0 });
+    var boxA = Bodies.rectangle(400, 200, 80, 80);
+    var boxB = Bodies.rectangle(450, 50, 80, 80);
+    var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
+    var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
     var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
     var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
@@ -32,7 +35,7 @@ function init() {
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [playerPhysics, top, left, ground, right]);
+    World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
 
     /*
     var render = Render.create({
@@ -99,14 +102,16 @@ function init() {
     var width = 120
     var height = 120
     var startX = 50
-    var startY = 250.2
+    var startY = 250
 
     // set a fill and a line style again and draw a rectangle
     fovMask.beginFill(0xFFFFFF, 1);
+   // background.drawRect(startX, startY, width, height)
    
     var polygons = []
-    polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
-    polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
+    //polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]])
+    polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
+
 
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
@@ -121,8 +126,8 @@ function init() {
         $(data)
             .find('g')
             .each((i, g) => {
+                console.log("layer", g.id)
                 const wall = g.id === 'layer2'
-
                 for (let i = 0; i < g.children.length; i++) {
                     const rect = g.children[i]
                     let tileTexture = fliesenTexture
@@ -138,6 +143,7 @@ function init() {
                     }
                     background.addChild(tilingSprite)
 
+
                     if (wall) {
                         const levelBox = Bodies.rectangle(
                             rect.x.baseVal.value + rect.width.baseVal.value / 2,
@@ -147,8 +153,14 @@ function init() {
                             { isStatic: true }
                         )
                         World.add(engine.world, levelBox);
+                        
+                        polygons.push([[rect.x.baseVal.value, rect.y.baseVal.value],
+                                    [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value],
+                                    [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value],
+                                    [rect.x.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value]]);
                     }
                 }
+                polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
             })
     })
 
@@ -173,6 +185,8 @@ function init() {
     playerAimLine.lineTo( 300, 0);
     playerAimLine.mask = fovMask
 
+    //background.mask = fovMask
+
     // run the render loop
     animate();
 
@@ -185,7 +199,7 @@ function init() {
         requestAnimationFrame(animate)
     }
 
-    function move(){ 
+    function move() {
         var moveSpeed = 0.01;
         if (controlling.forward) {
             playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
@@ -203,6 +217,8 @@ function init() {
             playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
+
+        console.log(playerPhysics.angle)
 
         { // camera
             stage.pivot.x = playerPhysics.position.x;
@@ -231,7 +247,8 @@ function init() {
         player.position.x = playerPhysics.position.x
         player.position.y = playerPhysics.position.y
 
-        // when the mouse is moved, we determine the new visibility polygon 	
+        // when the mouse is moved, we determine the new visibility polygon
+        console.log(polygons) 	
         var visibility = createLightPolygon(polygons, playerPhysics.position.x, playerPhysics.position.y);
         // then we draw it
         fovMask.clear();

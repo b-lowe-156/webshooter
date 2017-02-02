@@ -1,3 +1,5 @@
 /typings
 /node_modules
 /www/build
+node_modules
+dist
