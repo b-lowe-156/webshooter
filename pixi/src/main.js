@@ -22,10 +22,7 @@ function init() {
     var sprite = new PIXI.Sprite(rt);
 
     // create two boxes and a ground
-    var boxA = Bodies.rectangle(400, 200, 80, 80);
-    var boxB = Bodies.rectangle(450, 50, 80, 80);
-    var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
-    var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
+    var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 1.0, frictionAir: 0.7, friction: 0 });
 
     var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
     var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
@@ -35,7 +32,7 @@ function init() {
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
+    World.add(engine.world, [playerPhysics, top, left, ground, right]);
 
     /*
     var render = Render.create({
@@ -102,11 +99,10 @@ function init() {
     var width = 120
     var height = 120
     var startX = 50
-    var startY = 250
+    var startY = 250.2
 
     // set a fill and a line style again and draw a rectangle
     fovMask.beginFill(0xFFFFFF, 1);
-   // background.drawRect(startX, startY, width, height)
    
     var polygons = []
     polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
@@ -125,7 +121,6 @@ function init() {
         $(data)
             .find('g')
             .each((i, g) => {
-                console.log("layer", g.id)
                 const wall = g.id === 'layer2'
 
                 for (let i = 0; i < g.children.length; i++) {
@@ -142,8 +137,6 @@ function init() {
                         tilingSprite.rotation = -rect.transform.baseVal[0].angle
                     }
                     background.addChild(tilingSprite)
-
-                    console.log(rect.transform.baseVal[0] && rect.transform.baseVal[0].angle)
 
                     if (wall) {
                         const levelBox = Bodies.rectangle(
@@ -180,8 +173,6 @@ function init() {
     playerAimLine.lineTo( 300, 0);
     playerAimLine.mask = fovMask
 
-    //background.mask = fovMask
-
     // run the render loop
     animate();
 
@@ -212,8 +203,6 @@ function init() {
             playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
-
-        console.log(playerPhysics.angle)
 
         { // camera
             stage.pivot.x = playerPhysics.position.x;
