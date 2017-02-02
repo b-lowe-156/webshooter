@@ -22,9 +22,6 @@ function init() {
     var sprite = new PIXI.Sprite(rt);
 
     // create two boxes and a ground
-    var boxA = Bodies.rectangle(400, 200, 80, 80);
-    var boxB = Bodies.rectangle(450, 50, 80, 80);
-    var boxC = Bodies.rectangle(110, 310, 120, 120, { isStatic: true });
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
     var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
@@ -35,7 +32,7 @@ function init() {
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [boxA, boxB, boxC, playerPhysics, top, left, ground, right]);
+    World.add(engine.world, [playerPhysics, top, left, ground, right]);
 
     /*
     var render = Render.create({
@@ -126,7 +123,6 @@ function init() {
         $(data)
             .find('g')
             .each((i, g) => {
-                console.log("layer", g.id)
                 const wall = g.id === 'layer2'
                 for (let i = 0; i < g.children.length; i++) {
                     const rect = g.children[i]
@@ -142,7 +138,7 @@ function init() {
                         tilingSprite.rotation = -rect.transform.baseVal[0].angle
                     }
                     background.addChild(tilingSprite)
-
+                   // fovMask.addChild(tilingSprite)
 
                     if (wall) {
                         const levelBox = Bodies.rectangle(
@@ -218,8 +214,6 @@ function init() {
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
 
-        console.log(playerPhysics.angle)
-
         { // camera
             stage.pivot.x = playerPhysics.position.x;
             stage.pivot.y = playerPhysics.position.y;
@@ -248,13 +242,13 @@ function init() {
         player.position.y = playerPhysics.position.y
 
         // when the mouse is moved, we determine the new visibility polygon
-        console.log(polygons) 	
+        	
         var visibility = createLightPolygon(polygons, playerPhysics.position.x, playerPhysics.position.y);
         // then we draw it
         fovMask.clear();
 
         fovMask.lineStyle(1, 0x333333, 1.0);
-        fovMask.drawRect(startX, startY, width, height)
+      //  fovMask.drawRect(startX, startY, width, height)
 
         fovMask.lineStyle(1, 0xFFFFFF, 1);
         fovMask.beginFill(0xFFFFFF, 1);
