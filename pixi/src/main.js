@@ -109,8 +109,9 @@ function init() {
    // background.drawRect(startX, startY, width, height)
    
     var polygons = []
-    polygons.push([[startX,startY],[startX+width,startY],[startX+width,startY+height],[startX,startY+height]])
-    polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]]);	
+    //polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]])
+    polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
+
 
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
@@ -127,7 +128,6 @@ function init() {
             .each((i, g) => {
                 console.log("layer", g.id)
                 const wall = g.id === 'layer2'
-
                 for (let i = 0; i < g.children.length; i++) {
                     const rect = g.children[i]
                     let tileTexture = fliesenTexture
@@ -143,7 +143,6 @@ function init() {
                     }
                     background.addChild(tilingSprite)
 
-                    console.log(rect.transform.baseVal[0] && rect.transform.baseVal[0].angle)
 
                     if (wall) {
                         const levelBox = Bodies.rectangle(
@@ -154,8 +153,14 @@ function init() {
                             { isStatic: true }
                         )
                         World.add(engine.world, levelBox);
+                        
+                        polygons.push([[rect.x.baseVal.value, rect.y.baseVal.value],
+                                    [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value],
+                                    [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value],
+                                    [rect.x.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value]]);
                     }
                 }
+                polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
             })
     })
 
@@ -194,7 +199,7 @@ function init() {
         requestAnimationFrame(animate)
     }
 
-    function move(){ 
+    function move() {
         var moveSpeed = 0.01;
         if (controlling.forward) {
             playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
@@ -242,7 +247,8 @@ function init() {
         player.position.x = playerPhysics.position.x
         player.position.y = playerPhysics.position.y
 
-        // when the mouse is moved, we determine the new visibility polygon 	
+        // when the mouse is moved, we determine the new visibility polygon
+        console.log(polygons) 	
         var visibility = createLightPolygon(polygons, playerPhysics.position.x, playerPhysics.position.y);
         // then we draw it
         fovMask.clear();

@@ -37,11 +37,12 @@ export function createLightingSprite(lightSources, width, height) {
 // and this is how the library generates the visibility polygon starting
 // from an array of polygons and a source point
 export function createLightPolygon(polygons, x, y){
+    //var polys = jQuery.extend(true, [], polygons);
     var segments = VisibilityPolygon.convertToSegments(polygons);
-    segments = VisibilityPolygon.breakIntersections(segments);
+    //segments = VisibilityPolygon.breakIntersections(segments);
     var position = [x, y];
-    if (VisibilityPolygon.inPolygon(position, polygons[polygons.length-1])) {
+    //if (VisibilityPolygon.inPolygon(position, polygons[polygons.length-1])) {
         return VisibilityPolygon.compute(position, segments);
-    }      
-    return null;
+    //}      
+    //return null;
 }
