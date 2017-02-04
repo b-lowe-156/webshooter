@@ -16,11 +16,6 @@ function init() {
     var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
 
-    var container = new PIXI.Container()
-    var brt = new PIXI.BaseRenderTexture(800, 600, PIXI.SCALE_MODES.LINEAR, 1)
-    var rt = new PIXI.RenderTexture(brt)
-    var sprite = new PIXI.Sprite(rt)
-
     // create two boxes and a ground
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
@@ -34,18 +29,11 @@ function init() {
     // add all of the bodies to the world
     World.add(engine.world, [playerPhysics, top, left, ground, right]);
 
-    /*
-    var render = Render.create({
-        element: document.body,
-        engine: engine
-    });
-    */
+    // var render = Render.create({ element: document.body, engine: engine})
     
-    // run the engine
-    Engine.run(engine);
+    Engine.run(engine)
 
-    // run the renderer
-    // Render.run(render);
+    // Render.run(render)
 
     var renderCanvas = document.getElementById('renderCanvas')
     var renderer = PIXI.autoDetectRenderer(800, 600, {
@@ -108,10 +96,7 @@ function init() {
     lightingSprite.position.y = playerPhysics.position.y
     lightingSprite.rotation = playerPhysics.angle
 
-
-    //sprite.mask = fovMask
     background.filters = [new PIXI.SpriteMaskFilter(lightingSprite)]
-   // backgroundInFov.filters = [new PIXI.SpriteMaskFilter(lightingSprite)]
 
      background.mask = fovMask
 
@@ -206,7 +191,6 @@ function init() {
         background.clear()
         move()
 
-        renderer.render(container, rt)
         renderer.render(stage)
         requestAnimationFrame(animate)
     }
@@ -264,7 +248,6 @@ function init() {
         fovMask.clear();
 
         fovMask.lineStyle(1, 0x333333, 1.0);
-      //  fovMask.drawRect(startX, startY, width, height)
 
         fovMask.lineStyle(1, 0xFFFFFF, 1);
         fovMask.beginFill(0xFFFFFF, 1);
