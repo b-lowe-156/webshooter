@@ -16,10 +16,10 @@ function init() {
     var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
 
-    var container = new PIXI.Container();
-    var brt = new PIXI.BaseRenderTexture(800, 600, PIXI.SCALE_MODES.LINEAR, 1);
-    var rt = new PIXI.RenderTexture(brt);
-    var sprite = new PIXI.Sprite(rt);
+    var container = new PIXI.Container()
+    var brt = new PIXI.BaseRenderTexture(800, 600, PIXI.SCALE_MODES.LINEAR, 1)
+    var rt = new PIXI.RenderTexture(brt)
+    var sprite = new PIXI.Sprite(rt)
 
     // create two boxes and a ground
     var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
@@ -104,13 +104,19 @@ function init() {
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
-    sprite.mask = fovMask
+    lightingSprite.position.x = playerPhysics.position.x
+    lightingSprite.position.y = playerPhysics.position.y
+    lightingSprite.rotation = playerPhysics.angle
+
+
+    //sprite.mask = fovMask
     background.filters = [new PIXI.SpriteMaskFilter(lightingSprite)]
    // backgroundInFov.filters = [new PIXI.SpriteMaskFilter(lightingSprite)]
 
-    // background.mask = lightingSprite
+     background.mask = fovMask
 
-    const fliesenTexture = PIXI.Texture.fromImage('http://pixijs.github.io/examples/required/assets/p2.jpeg')
+    const fliesenTexture = PIXI.Texture.fromImage('texture/fliesen-textgure.jpg')
+    const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark.jpg')
     const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 
     $.get('map.svg').done((data) => {
@@ -124,7 +130,7 @@ function init() {
                     if (wall) {
                         tileTexture = rockTexture
                     }
-                    const tilingSprite = new PIXI.extras.TilingSprite(tileTexture, rect.width.baseVal.value, rect.height.baseVal.value)
+                    const tilingSprite = new PIXI.extras.TilingSprite(fliesenTexture, rect.width.baseVal.value, rect.height.baseVal.value)
                     tilingSprite.position.x = rect.x.baseVal.value
                     tilingSprite.position.y = rect.y.baseVal.value
                     tilingSprite.rotation = 0.0
@@ -133,8 +139,17 @@ function init() {
                     }
                     background.addChild(tilingSprite)
 
+                    const tilingSprite3 = new PIXI.extras.TilingSprite(fliesenTextureDark, rect.width.baseVal.value, rect.height.baseVal.value)
+                    tilingSprite3.position.x = rect.x.baseVal.value
+                    tilingSprite3.position.y = rect.y.baseVal.value
+                    tilingSprite3.rotation = 0.0
+                    if( rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle ) {
+                        tilingSprite3.rotation = -rect.transform.baseVal[0].angle
+                    }
+                    backgroundInFov.addChild(tilingSprite3)
+
                     if (wall) {
-                        const tilingSprite2 = new PIXI.extras.TilingSprite(tileTexture, rect.width.baseVal.value, rect.height.baseVal.value)
+                        const tilingSprite2 = new PIXI.extras.TilingSprite(rockTexture, rect.width.baseVal.value, rect.height.baseVal.value)
                         tilingSprite2.position.x = rect.x.baseVal.value
                         tilingSprite2.position.y = rect.y.baseVal.value
                         tilingSprite2.rotation = 0.0
@@ -164,15 +179,11 @@ function init() {
     })
 
 
-//stage.addChild(backgroundInFov)
-
+  //  stage.addChild(sprite)
     stage.addChild(fovMask)
-   // container.addChild(lightingSprite)
-    
-    stage.addChild(sprite)
     
     stage.addChild(backgroundInFov)
-    container.addChild(background)
+    stage.addChild(background)
 
     let player = new PIXI.Graphics();
     stage.addChild(player);
