@@ -48,7 +48,11 @@ function init() {
     // Render.run(render);
 
     var renderCanvas = document.getElementById('renderCanvas')
-    var renderer = PIXI.autoDetectRenderer(800, 600, { antialias: true, view: renderCanvas });
+    var renderer = PIXI.autoDetectRenderer(800, 600, {
+        antialias: true,
+        view: renderCanvas,
+        backgroundColor : 0x000000
+    })
     document.body.appendChild(renderer.view);
 
     renderCanvas.onclick = function() {
@@ -85,36 +89,26 @@ function init() {
         }
     }
 
-    // create the root of the scene graph
     var stage = new PIXI.Container();
-
-    stage.interactive = true;
 
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
+    var backgroundInFov = new PIXI.Graphics();
 
-    // set a fill and line style
     fovMask.beginFill(0xFFFFFF);
-
-    var width = 120
-    var height = 120
-    var startX = 50
-    var startY = 250
-
-    // set a fill and a line style again and draw a rectangle
     fovMask.beginFill(0xFFFFFF, 1);
-   // background.drawRect(startX, startY, width, height)
-   
-    var polygons = []
-    //polygons.push([[-1,-1],[800+1,-1],[800+1,600+1],[-1,600+1]])
-    polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
 
+    var polygons = []
+    polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
 
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
     sprite.mask = fovMask
-    background.mask = lightingSprite
+    background.filters = [new PIXI.SpriteMaskFilter(lightingSprite)]
+   // backgroundInFov.filters = [new PIXI.SpriteMaskFilter(lightingSprite)]
+
+    // background.mask = lightingSprite
 
     const fliesenTexture = PIXI.Texture.fromImage('http://pixijs.github.io/examples/required/assets/p2.jpeg')
     const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
@@ -138,7 +132,17 @@ function init() {
                         tilingSprite.rotation = -rect.transform.baseVal[0].angle
                     }
                     background.addChild(tilingSprite)
-                   // fovMask.addChild(tilingSprite)
+
+                    if (wall) {
+                        const tilingSprite2 = new PIXI.extras.TilingSprite(tileTexture, rect.width.baseVal.value, rect.height.baseVal.value)
+                        tilingSprite2.position.x = rect.x.baseVal.value
+                        tilingSprite2.position.y = rect.y.baseVal.value
+                        tilingSprite2.rotation = 0.0
+                        if( rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle ) {
+                            tilingSprite2.rotation = -rect.transform.baseVal[0].angle
+                        }
+                        backgroundInFov.addChild(tilingSprite2)
+                    }
 
                     if (wall) {
                         const levelBox = Bodies.rectangle(
@@ -156,15 +160,18 @@ function init() {
                                     [rect.x.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value]]);
                     }
                 }
-                polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
             })
     })
 
 
+//stage.addChild(backgroundInFov)
+
     stage.addChild(fovMask)
-    container.addChild(lightingSprite)
+   // container.addChild(lightingSprite)
     
     stage.addChild(sprite)
+    
+    stage.addChild(backgroundInFov)
     container.addChild(background)
 
     let player = new PIXI.Graphics();
@@ -180,8 +187,6 @@ function init() {
     playerAimLine.moveTo(0, 0);
     playerAimLine.lineTo( 300, 0);
     playerAimLine.mask = fovMask
-
-    //background.mask = fovMask
 
     // run the render loop
     animate();
