@@ -1,3 +1,6 @@
 /typings
 /node_modules
 /www/build
+/pixi/node_modules
+/pixi/build/bundle.js.map
+/pixi/build/bundle.js
