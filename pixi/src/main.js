@@ -106,8 +106,6 @@ function init() {
     stage.addChild(sprite)
     background.filters = [new PIXI.SpriteMaskFilter(sprite)]
 
-background.mask = sprite
-
     background.mask = fovMask
 
     const fliesenTexture = PIXI.Texture.fromImage('texture/fliesen-textgure.jpg')
