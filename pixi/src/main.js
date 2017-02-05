@@ -92,13 +92,23 @@ function init() {
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
-    lightingSprite.position.x = playerPhysics.position.x
-    lightingSprite.position.y = playerPhysics.position.y
-    lightingSprite.rotation = playerPhysics.angle
+    var container = new PIXI.Container()
+    var brt = new PIXI.BaseRenderTexture(800, 600, PIXI.SCALE_MODES.LINEAR, 1)
+    var rt = new PIXI.RenderTexture(brt)
+    var sprite = new PIXI.Sprite(rt)
+    var thing = new PIXI.Graphics();
+    container.addChild(thing);
+    thing.lineStyle(0);
+    thing.beginFill(0xFFFF0B, 1.0);
+    thing.drawCircle(0, 0, 300);
+    thing.endFill();
 
-    background.filters = [new PIXI.SpriteMaskFilter(lightingSprite)]
+    stage.addChild(sprite)
+    background.filters = [new PIXI.SpriteMaskFilter(sprite)]
 
-     background.mask = fovMask
+background.mask = sprite
+
+    background.mask = fovMask
 
     const fliesenTexture = PIXI.Texture.fromImage('texture/fliesen-textgure.jpg')
     const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark.jpg')
@@ -191,6 +201,7 @@ function init() {
         background.clear()
         move()
 
+        renderer.render(container, rt)
         renderer.render(stage)
         requestAnimationFrame(animate)
     }
