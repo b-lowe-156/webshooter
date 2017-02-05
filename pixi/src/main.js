@@ -97,11 +97,6 @@ function init() {
     var rt = new PIXI.RenderTexture(brt)
     var sprite = new PIXI.Sprite(rt)
     var thing = new PIXI.Graphics();
-    container.addChild(thing);
-    thing.lineStyle(0);
-    thing.beginFill(0xFFFF0B, 1.0);
-    thing.drawCircle(0, 0, 300);
-    thing.endFill();
 
     stage.addChild(sprite)
     background.filters = [new PIXI.SpriteMaskFilter(sprite)]
@@ -111,6 +106,33 @@ function init() {
     const fliesenTexture = PIXI.Texture.fromImage('texture/fliesen-textgure.jpg')
     const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark.jpg')
     const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
+
+
+    const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
+
+    const light1 = new PIXI.Sprite(radiaLtexture)
+    light1.scale.x = 3
+    light1.scale.y = 3
+    light1.x = 120
+    light1.y = 120
+    light1.anchor.set(0.5)
+    container.addChild(light1)
+
+    const light2 = new PIXI.Sprite(radiaLtexture)
+    light2.scale.x = 3
+    light2.scale.y = 3
+    light2.x = 280
+    light2.y = 480
+    light2.anchor.set(0.5)
+    container.addChild(light2)
+
+    const light3= new PIXI.Sprite(radiaLtexture)
+    light3.scale.x = 3
+    light3.scale.y = 3
+    light3.x = 600
+    light3.y = 200
+    light3.anchor.set(0.5)
+    container.addChild(light3)
 
     $.get('map.svg').done((data) => {
         $(data)
