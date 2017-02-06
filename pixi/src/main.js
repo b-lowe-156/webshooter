@@ -1,23 +1,22 @@
 var PIXI = require('pixi.js')
-import { createLightingSprite, createLightPolygon } from './lighting'
+import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
+import store from './store'
 
 window.onload = init
 
 var controlling = new Controlling();
 
-var player = {
-    x: 40,
-    y: 40,
-    rotation: 0,
-}
+let state
+store.subscribe(() => {
+	state = store.getState()
+
+})
 
 function init() {
+
     var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
-
-    // create two boxes and a ground
-    var playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
 
     var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
     var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
@@ -27,10 +26,10 @@ function init() {
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [playerPhysics, top, left, ground, right]);
+    World.add(engine.world, [top, left, ground, right]);
 
     // var render = Render.create({ element: document.body, engine: engine})
-    
+
     Engine.run(engine)
 
     // Render.run(render)
@@ -39,11 +38,11 @@ function init() {
     var renderer = PIXI.autoDetectRenderer(800, 600, {
         antialias: true,
         view: renderCanvas,
-        backgroundColor : 0x000000
+        backgroundColor: 0x000000
     })
     document.body.appendChild(renderer.view);
 
-    renderCanvas.onclick = function() {
+    renderCanvas.onclick = function () {
         renderCanvas.requestPointerLock();
     }
 
@@ -87,7 +86,7 @@ function init() {
     fovMask.beginFill(0xFFFFFF, 1);
 
     var polygons = []
-    polygons.push([[-100,-100],[800+1,-100],[800+1,600+1],[-100,600+1]])	
+    polygons.push([[-100, -100], [800 + 1, -100], [800 + 1, 600 + 1], [-100, 600 + 1]])
 
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
@@ -126,7 +125,7 @@ function init() {
     light2.anchor.set(0.5)
     container.addChild(light2)
 
-    const light3= new PIXI.Sprite(radiaLtexture)
+    const light3 = new PIXI.Sprite(radiaLtexture)
     light3.scale.x = 3
     light3.scale.y = 3
     light3.x = 600
@@ -149,7 +148,7 @@ function init() {
                     tilingSprite.position.x = rect.x.baseVal.value
                     tilingSprite.position.y = rect.y.baseVal.value
                     tilingSprite.rotation = 0.0
-                    if( rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle ) {
+                    if (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) {
                         tilingSprite.rotation = -rect.transform.baseVal[0].angle
                     }
                     background.addChild(tilingSprite)
@@ -158,7 +157,7 @@ function init() {
                     tilingSprite3.position.x = rect.x.baseVal.value
                     tilingSprite3.position.y = rect.y.baseVal.value
                     tilingSprite3.rotation = 0.0
-                    if( rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle ) {
+                    if (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) {
                         tilingSprite3.rotation = -rect.transform.baseVal[0].angle
                     }
                     backgroundInFov.addChild(tilingSprite3)
@@ -168,7 +167,7 @@ function init() {
                         tilingSprite2.position.x = rect.x.baseVal.value
                         tilingSprite2.position.y = rect.y.baseVal.value
                         tilingSprite2.rotation = 0.0
-                        if( rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle ) {
+                        if (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) {
                             tilingSprite2.rotation = -rect.transform.baseVal[0].angle
                         }
                         backgroundInFov.addChild(tilingSprite2)
@@ -183,50 +182,86 @@ function init() {
                             { isStatic: true }
                         )
                         World.add(engine.world, levelBox);
-                        
+
                         polygons.push([[rect.x.baseVal.value, rect.y.baseVal.value],
-                                    [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value],
-                                    [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value],
-                                    [rect.x.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value]]);
+                        [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value],
+                        [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value],
+                        [rect.x.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value]]);
                     }
                 }
             })
     })
 
 
-  //  stage.addChild(sprite)
+    //  stage.addChild(sprite)
     stage.addChild(fovMask)
-    
+
     stage.addChild(backgroundInFov)
     stage.addChild(background)
 
-    let player = new PIXI.Graphics();
+    const playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
+    World.add(engine.world, playerPhysics);
+
+    const player = new PIXI.Graphics();
     stage.addChild(player);
     player.lineStyle(0);
     player.beginFill(0xFFFF0B, 1.0);
     player.drawCircle(0, 0, 20);
     player.endFill();
 
-    var playerAimLine = new PIXI.Graphics();
+    const playerAimLine = new PIXI.Graphics();
     stage.addChild(playerAimLine);
     playerAimLine.lineStyle(1, 0xFF0000, 1);
     playerAimLine.moveTo(0, 0);
-    playerAimLine.lineTo( 300, 0);
+    playerAimLine.lineTo(300, 0);
     playerAimLine.mask = fovMask
+
+    store.dispatch({
+        type: 'SPAWN_PLAYER', payload: {
+            id: 1,
+            name: 'Threlgor',
+            team: 'blue',
+            physics: playerPhysics,
+            graphics: player,
+            aimLine: playerAimLine,
+        }
+    })
+
+
+/*
+    store.dispatch({
+        type: 'SPAWN_PLAYER', payload: {
+            id: 2,
+            name: 'Nucleon',
+            team: 'red',
+        }
+    })
+*/
+    store.dispatch({
+        type: 'CONTROLE_PLAYER', payload: 0
+    })
+
 
     // run the render loop
     animate();
 
     function animate() {
         background.clear()
-        move()
-
+        
+        if (state) {
+            const currentPlayer = state.player[state.controlledPlayer]
+            if (currentPlayer) {
+                move(currentPlayer.physics)
+                updateFov(fovMask, polygons, currentPlayer.physics.position.x, currentPlayer.physics.position.y)
+            }
+        }
+ 
         renderer.render(container, rt)
         renderer.render(stage)
         requestAnimationFrame(animate)
     }
 
-    function move() {
+    function move(physics) {
         var moveSpeed = 0.01;
         if (controlling.forward) {
             playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
@@ -271,22 +306,6 @@ function init() {
 
         player.position.x = playerPhysics.position.x
         player.position.y = playerPhysics.position.y
-
-        // when the mouse is moved, we determine the new visibility polygon
-        	
-        var visibility = createLightPolygon(polygons, playerPhysics.position.x, playerPhysics.position.y);
-        // then we draw it
-        fovMask.clear();
-
-        fovMask.lineStyle(1, 0x333333, 1.0);
-
-        fovMask.lineStyle(1, 0xFFFFFF, 1);
-        fovMask.beginFill(0xFFFFFF, 1);
-        fovMask.moveTo(visibility[0][0],visibility[0][1]);	
-        for(var i=1;i<=visibility.length;i++){
-            fovMask.lineTo(visibility[i%visibility.length][0],visibility[i%visibility.length][1]);		
-        }
-        fovMask.endFill();
     }
 }
 
@@ -297,7 +316,7 @@ function Controlling() {
     this.strafeRight = false;
 }
 
-Controlling.prototype.handleKeydownEvent = function(e) {
+Controlling.prototype.handleKeydownEvent = function (e) {
     var code = e.keyCode;
     switch (code) {
         case 87: //'w':
@@ -312,12 +331,12 @@ Controlling.prototype.handleKeydownEvent = function(e) {
         case 68: //'d':
             this.strafeRight = true;
             break;
-    	
+
         default:
     }
 };
 
-Controlling.prototype.handleKeyupEvent = function(e) {
+Controlling.prototype.handleKeyupEvent = function (e) {
     var code = e.keyCode;
     switch (code) {
         case 87: //'w':
@@ -337,10 +356,10 @@ Controlling.prototype.handleKeyupEvent = function(e) {
     }
 };
 
-window.addEventListener('keydown', function(e) {
+window.addEventListener('keydown', function (e) {
     controlling.handleKeydownEvent(e);
 });
 
-window.addEventListener('keyup', function(e) {
+window.addEventListener('keyup', function (e) {
     controlling.handleKeyupEvent(e);
 });

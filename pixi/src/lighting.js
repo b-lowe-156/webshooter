@@ -34,6 +34,19 @@ export function createLightingSprite(lightSources, width, height) {
     return new PIXI.Sprite(new PIXI.Texture(new PIXI.BaseTexture(canvas)))
 }
 
+export const updateFov = (fovMask, polygons, x, y) => {
+    const visibility = createLightPolygon(polygons, x, y);
+    fovMask.clear();
+    fovMask.lineStyle(1, 0x333333, 1.0);
+    fovMask.lineStyle(1, 0xFFFFFF, 1);
+    fovMask.beginFill(0xFFFFFF, 1);
+    fovMask.moveTo(visibility[0][0], visibility[0][1]);
+    for (var i = 1; i <= visibility.length; i++) {
+        fovMask.lineTo(visibility[i % visibility.length][0], visibility[i % visibility.length][1]);
+    }
+    fovMask.endFill();
+}
+
 // and this is how the library generates the visibility polygon starting
 // from an array of polygons and a source point
 export function createLightPolygon(polygons, x, y){
