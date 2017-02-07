@@ -1,6 +1,7 @@
-import { createStore } from 'redux'
+import { combineReducers, createStore, compose } from 'redux'
+import DevTools from './DevTools'
 
-const reducer = (state = {
+const playerReducer = (state = {
 	player: [],
 	controlledPlayer: -1,
 }, action) => {
@@ -22,7 +23,53 @@ const reducer = (state = {
 	}
 }
 
-const store = createStore(reducer)
+const inputReducer = (state = {
+	forward: false,
+	backward: false,
+	strafeLeft: false,
+	strafeRight: false,
+}, action) => {
+	if (action.type !== 'keydown' || action.type !== 'keyup') {
+		return state
+	}
+	let down = true
+	if (action.type === 'keydown') {
+		down = false
+	}
+	switch (action.payload) {
+		case 87: //'w':
+			return {
+				...state,
+				forward: down,
+			}
+		case 65: //'a':
+			return {
+				...state,
+				strafeLeft: down,
+			}
+		case 83: //'s':
+			return {
+				...state,
+				backward: down,
+			}
+		case 68: //'d':
+			return {
+				...state,
+				strafeRight: down,
+			}
+	}
+	return state
+}
+
+const enhancer = compose(
+    DevTools.instrument()
+)
+
+const reducers = combineReducers({
+	player: playerReducer,
+	input: inputReducer,
+})
+const store = createStore(reducers, {}, enhancer)
 
 store.subscribe(() => {
 	console.log(store.getState())

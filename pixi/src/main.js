@@ -1,7 +1,13 @@
-var PIXI = require('pixi.js')
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import { Provider } from 'react-redux'
+import DevTools from './DevTools'
+
 import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
 import store from './store'
+
 
 window.onload = init
 
@@ -34,13 +40,16 @@ function init() {
 
     // Render.run(render)
 
-    var renderCanvas = document.getElementById('renderCanvas')
-    var renderer = PIXI.autoDetectRenderer(800, 600, {
+    const renderCanvas = document.getElementById('renderCanvas')
+    const renderer = PIXI.autoDetectRenderer(800, 600, {
         antialias: true,
         view: renderCanvas,
         backgroundColor: 0x000000
     })
     document.body.appendChild(renderer.view);
+
+    const app = document.getElementById('app')
+    ReactDOM.render(<Provider store={store}><DevTools /></Provider>, app)
 
     renderCanvas.onclick = function () {
         renderCanvas.requestPointerLock();
@@ -249,7 +258,7 @@ function init() {
         background.clear()
         
         if (state) {
-            const currentPlayer = state.player[state.controlledPlayer]
+            const currentPlayer = state.player.player[state.player.controlledPlayer]
             if (currentPlayer) {
                 move(currentPlayer.physics)
                 updateFov(fovMask, polygons, currentPlayer.physics.position.x, currentPlayer.physics.position.y)
