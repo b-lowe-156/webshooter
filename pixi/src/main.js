@@ -7,17 +7,13 @@ import DevTools from './DevTools'
 import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
 import store from './store'
+import scene from './scene'
 
 window.onload = init
 
 let state
-store.subscribe(() => {
-	state = store.getState()
-
-})
 
 function init() {
-
     var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
 
@@ -58,10 +54,8 @@ function init() {
     function lockChangeAlert() {
         if (document.pointerLockElement === renderCanvas ||
             document.mozPointerLockElement === renderCanvas) {
-            console.log('The pointer lock status is now locked');
             document.addEventListener("mousemove", canvasLoop, false);
         } else {
-            console.log('The pointer lock status is now unlocked');
             document.removeEventListener("mousemove", canvasLoop, false);
         }
     }
@@ -83,10 +77,14 @@ function init() {
     }
 
     var stage = new PIXI.Container();
-
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
     var backgroundInFov = new PIXI.Graphics();
+
+    store.subscribe(() => {
+        state = store.getState()
+        scene.render(state, stage)
+    })
 
     fovMask.beginFill(0xFFFFFF);
     fovMask.beginFill(0xFFFFFF, 1);
@@ -316,6 +314,18 @@ function init() {
 }
 
 window.addEventListener('keydown', function (e) {
+    if (state.input.forward && e.keyCode === 87) {
+        return
+    }
+    else if (state.input.strafeLeft && e.keyCode === 65) {
+        return
+    }
+    else if (state.input.backward && e.keyCode === 83) {
+        return
+    }
+    else if (state.input.strafeRight && e.keyCode === 68) {
+        return
+    }
     store.dispatch({ type: 'keydown', payload: e.keyCode })
 });
 
