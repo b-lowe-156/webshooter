@@ -8,10 +8,7 @@ import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
 import store from './store'
 
-
 window.onload = init
-
-var controlling = new Controlling();
 
 let state
 store.subscribe(() => {
@@ -260,7 +257,7 @@ function init() {
         if (state) {
             const currentPlayer = state.player.player[state.player.controlledPlayer]
             if (currentPlayer) {
-                move(currentPlayer.physics)
+                move(currentPlayer.physic, state.input)
                 updateFov(fovMask, polygons, currentPlayer.physics.position.x, currentPlayer.physics.position.y)
             }
         }
@@ -270,21 +267,21 @@ function init() {
         requestAnimationFrame(animate)
     }
 
-    function move(physics) {
+    function move(physics, input) {
         var moveSpeed = 0.01;
-        if (controlling.forward) {
+        if (input.forward) {
             playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
             playerPhysics.force.y -= Math.cos(player.rotation) * moveSpeed;
         }
-        if (controlling.backward) {
+        if (input.backward) {
             playerPhysics.force.x += Math.sin(player.rotation) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation) * moveSpeed;
         }
-        if (controlling.strafeLeft) {
+        if (input.strafeLeft) {
             playerPhysics.force.x -= Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
-        if (controlling.strafeRight) {
+        if (input.strafeRight) {
             playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
             playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
         }
@@ -318,57 +315,10 @@ function init() {
     }
 }
 
-function Controlling() {
-    this.forward = false;
-    this.backward = false;
-    this.strafeLeft = false;
-    this.strafeRight = false;
-}
-
-Controlling.prototype.handleKeydownEvent = function (e) {
-    var code = e.keyCode;
-    switch (code) {
-        case 87: //'w':
-            this.forward = true;
-            break;
-        case 65: //'a':
-            this.strafeLeft = true;
-            break;
-        case 83: //'s':
-            this.backward = true;
-            break;
-        case 68: //'d':
-            this.strafeRight = true;
-            break;
-
-        default:
-    }
-};
-
-Controlling.prototype.handleKeyupEvent = function (e) {
-    var code = e.keyCode;
-    switch (code) {
-        case 87: //'w':
-            this.forward = false;
-            break;
-        case 65: //'a':
-            this.strafeLeft = false;
-            break;
-        case 83: //'s':
-            this.backward = false;
-            break;
-        case 68: //'d':
-            this.strafeRight = false;
-            break;
-
-        default:
-    }
-};
-
 window.addEventListener('keydown', function (e) {
-    controlling.handleKeydownEvent(e);
+    store.dispatch({ type: 'keydown', payload: e.keyCode })
 });
 
 window.addEventListener('keyup', function (e) {
-    controlling.handleKeyupEvent(e);
+    store.dispatch({ type: 'keyup', payload: e.keyCode })
 });
