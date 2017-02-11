@@ -17,15 +17,10 @@ function init() {
     var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
 
-    var top = Bodies.rectangle(0, 0, 1600, 10, { isStatic: true });
-    var left = Bodies.rectangle(0, 0, 10, 1200, { isStatic: true });
-    var ground = Bodies.rectangle(0, 600, 1800, 10, { isStatic: true });
-    var right = Bodies.rectangle(800, 0, 10, 1200, { isStatic: true });
-
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
     // add all of the bodies to the world
-    World.add(engine.world, [top, left, ground, right]);
+    World.add(engine.world, []);
 
     // var render = Render.create({ element: document.body, engine: engine})
 
@@ -54,37 +49,21 @@ function init() {
     function lockChangeAlert() {
         if (document.pointerLockElement === renderCanvas ||
             document.mozPointerLockElement === renderCanvas) {
-            document.addEventListener("mousemove", canvasLoop, false);
+            document.addEventListener("mousemove", mousemove, false);
         } else {
-            document.removeEventListener("mousemove", canvasLoop, false);
+            document.removeEventListener("mousemove", mousemove, false);
         }
     }
 
-    function canvasLoop(e) {
+    function mousemove(e) {
         let x = e.movementX || e.mozMovementX || 0
-
-        var diff = player.rotation - playerPhysics.angle
-        let diffToHeight = false
-        if (diff > (0.5 * Math.PI)) {
-            diffToHeight = true
-        }
-        else if (diff < -(0.5 * Math.PI)) {
-            diffToHeight = true
-        }
-        if (x < 100 && x > -100 && !diffToHeight) {
-            player.rotation -= 0.001 * x
-        }
+        scene.updateRotation(state, x)
     }
 
     var stage = new PIXI.Container();
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
     var backgroundInFov = new PIXI.Graphics();
-
-    store.subscribe(() => {
-        state = store.getState()
-        scene.render(state, stage)
-    })
 
     fovMask.beginFill(0xFFFFFF);
     fovMask.beginFill(0xFFFFFF, 1);
@@ -203,7 +182,7 @@ function init() {
     stage.addChild(backgroundInFov)
     stage.addChild(background)
 
-    const playerPhysics = Bodies.circle(40, 40, 20, { restitution: 0.01, frictionAir: 0.5 });
+    const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 });
     World.add(engine.world, playerPhysics);
 
     const player = new PIXI.Graphics();
@@ -231,85 +210,27 @@ function init() {
         }
     })
 
-
-/*
-    store.dispatch({
-        type: 'SPAWN_PLAYER', payload: {
-            id: 2,
-            name: 'Nucleon',
-            team: 'red',
-        }
-    })
-*/
     store.dispatch({
         type: 'CONTROLE_PLAYER', payload: 0
     })
 
+    store.subscribe(() => {
+        state = store.getState()
+        scene.updateScene(state, stage, fovMask, engine)
+    })
 
-    // run the render loop
-    animate();
+    animate()
 
     function animate() {
         background.clear()
         
         if (state) {
-            const currentPlayer = state.player.player[state.player.controlledPlayer]
-            if (currentPlayer) {
-                move(currentPlayer.physic, state.input)
-                updateFov(fovMask, polygons, currentPlayer.physics.position.x, currentPlayer.physics.position.y)
-            }
+           scene.tick(state, stage, renderer, fovMask, polygons)
         }
  
         renderer.render(container, rt)
         renderer.render(stage)
         requestAnimationFrame(animate)
-    }
-
-    function move(physics, input) {
-        var moveSpeed = 0.01;
-        if (input.forward) {
-            playerPhysics.force.x -= Math.sin(player.rotation) * moveSpeed;
-            playerPhysics.force.y -= Math.cos(player.rotation) * moveSpeed;
-        }
-        if (input.backward) {
-            playerPhysics.force.x += Math.sin(player.rotation) * moveSpeed;
-            playerPhysics.force.y += Math.cos(player.rotation) * moveSpeed;
-        }
-        if (input.strafeLeft) {
-            playerPhysics.force.x -= Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
-            playerPhysics.force.y -= Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
-        }
-        if (input.strafeRight) {
-            playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
-            playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
-        }
-
-        { // camera
-            stage.pivot.x = playerPhysics.position.x;
-            stage.pivot.y = playerPhysics.position.y;
-            stage.position.x = renderer.width / 2;
-            stage.position.y = renderer.height / 2 + 260;
-
-            let diff = player.rotation - playerPhysics.angle
-            const rotSpeed = 0.03
-            if (diff > rotSpeed) {
-                playerPhysics.torque = rotSpeed
-            }
-            else if (diff < -rotSpeed) {
-                playerPhysics.torque = -rotSpeed
-            }
-            else {
-                playerPhysics.torque = 0
-            }
-            stage.rotation = playerPhysics.angle
-
-            playerAimLine.position.x = playerPhysics.position.x
-            playerAimLine.position.y = playerPhysics.position.y
-            playerAimLine.rotation = -player.rotation - 0.5 * Math.PI
-        }
-
-        player.position.x = playerPhysics.position.x
-        player.position.y = playerPhysics.position.y
     }
 }
 
