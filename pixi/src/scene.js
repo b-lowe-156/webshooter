@@ -2,13 +2,19 @@ import { createLightPolygon } from './lighting'
 
 const { Engine, World, Bodies, Render } = Matter
 
+const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
+
 const scene = () => {
 	let activePlayers = []
-	let player
+	let lastPlayerState
+
+	let activeStaticLights = []
+	let lastLightState
 	return {
-		updateScene: (state, stage, fovMask, engine) => {
-			if (player !== state.player.player) {
-				state.player.player.map(p => {
+		updateScene: (state, stage, container, fovMask, engine) => {
+			// players
+			if (lastPlayerState !== state.player) {
+				state.player.players.map(p => {
 					if (!activePlayers[p.id]) {
 						const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 });
 						World.add(engine.world, playerPhysics);
@@ -16,7 +22,7 @@ const scene = () => {
 						const player = new PIXI.Graphics();
 						stage.addChild(player);
 						player.lineStyle(0);
-						player.beginFill(0xFF0000, 1.0);
+						player.beginFill(0xFFFF0B, 1.0);
 						player.drawCircle(0, 0, 20);
 						player.endFill();
 
@@ -34,12 +40,27 @@ const scene = () => {
 						}
 					}
 				})
-				console.log(state.player.player)
 			}
-			player = state.player.player
+			lastPlayerState = state.player
+			// lights
+			if (lastLightState !== state.light) {
+				state.light.staticLights.map(l => {
+					if (!activeStaticLights[l.id]) {
+						const light = new PIXI.Sprite(radiaLtexture)
+						light.scale.x = 3
+						light.scale.y = 3
+						light.x = l.x
+						light.y = l.y
+						light.anchor.set(0.5)
+						container.addChild(light)
+						activeStaticLights[l.id] = light
+					}
+				})
+			}
+			lastLightState = state.light
 		},
     tick: (state, stage, renderer, fovMask, polygons) => {
-			const currentPlayer = state.player.player[state.player.controlledPlayer]
+			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer) {
 				
 				const moveSpeed = 0.01
@@ -94,7 +115,7 @@ const scene = () => {
 				fovMask.lineStyle(1, 0xFFFFFF, 1)
 				fovMask.beginFill(0xFFFFFF, 1)
 				fovMask.moveTo(visibility[0][0], visibility[0][1])
-				for (var i = 1; i <= visibility.length; i++) {
+				for (let i = 1; i <= visibility.length; i++) {
 						fovMask.lineTo(visibility[i % visibility.length][0], visibility[i % visibility.length][1])
 				}
 				fovMask.endFill()
@@ -102,10 +123,10 @@ const scene = () => {
 			}
 		},
 		updateRotation: (state, x) => {
-			const currentPlayer = state.player.player[state.player.controlledPlayer]
+			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer) {
 				const { playerPhysics, player } = activePlayers[currentPlayer.id]
-				var diff = player.rotation - playerPhysics.angle
+				const diff = player.rotation - playerPhysics.angle
 				let diffToHeight = false
 				if (diff > (0.5 * Math.PI)) {
 						diffToHeight = true

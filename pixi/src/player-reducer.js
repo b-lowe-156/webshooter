@@ -1,15 +1,15 @@
 
 export default function playerReducer(state = {
-	player: [],
+	players: [],
 	controlledPlayer: -1,
 }, action) {
 	switch (action.type) {
 		case 'SPAWN_PLAYER':
-			const newPlayers = [...state.player]
+			const newPlayers = [...state.players]
 			newPlayers.push(action.payload)
 			return {
 				...state,
-				player: newPlayers,
+				players: newPlayers,
 			}
 		case 'CONTROLE_PLAYER':
 			return {

@@ -92,29 +92,18 @@ function init() {
 
     const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
 
-    const light1 = new PIXI.Sprite(radiaLtexture)
-    light1.scale.x = 3
-    light1.scale.y = 3
-    light1.x = 120
-    light1.y = 120
-    light1.anchor.set(0.5)
-    container.addChild(light1)
-
-    const light2 = new PIXI.Sprite(radiaLtexture)
-    light2.scale.x = 3
-    light2.scale.y = 3
-    light2.x = 280
-    light2.y = 480
-    light2.anchor.set(0.5)
-    container.addChild(light2)
-
-    const light3 = new PIXI.Sprite(radiaLtexture)
-    light3.scale.x = 3
-    light3.scale.y = 3
-    light3.x = 600
-    light3.y = 200
-    light3.anchor.set(0.5)
-    container.addChild(light3)
+    store.dispatch({
+        type: 'ADD_STATIC_LIGHT',
+        payload: { id: 1, x: 120, y: 120, }
+    })
+    store.dispatch({
+        type: 'ADD_STATIC_LIGHT',
+        payload: { id: 2, x: 280, y: 480, }
+    })
+    store.dispatch({
+        type: 'ADD_STATIC_LIGHT',
+        payload: { id: 3, x: 600, y: 200, }
+    })   
 
     $.get('map.svg').done((data) => {
         $(data)
@@ -182,41 +171,19 @@ function init() {
     stage.addChild(backgroundInFov)
     stage.addChild(background)
 
-    const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 });
-    World.add(engine.world, playerPhysics);
-
-    const player = new PIXI.Graphics();
-    stage.addChild(player);
-    player.lineStyle(0);
-    player.beginFill(0xFFFF0B, 1.0);
-    player.drawCircle(0, 0, 20);
-    player.endFill();
-
-    const playerAimLine = new PIXI.Graphics();
-    stage.addChild(playerAimLine);
-    playerAimLine.lineStyle(1, 0xFF0000, 1);
-    playerAimLine.moveTo(0, 0);
-    playerAimLine.lineTo(300, 0);
-    playerAimLine.mask = fovMask
-
     store.dispatch({
-        type: 'SPAWN_PLAYER', payload: {
-            id: 1,
-            name: 'Threlgor',
-            team: 'blue',
-            physics: playerPhysics,
-            graphics: player,
-            aimLine: playerAimLine,
-        }
+        type: 'SPAWN_PLAYER',
+        payload: { id: 1, name: 'Threlgor', team: 'blue', }
     })
 
     store.dispatch({
-        type: 'CONTROLE_PLAYER', payload: 0
+        type: 'CONTROLE_PLAYER',
+        payload: 0
     })
 
     store.subscribe(() => {
         state = store.getState()
-        scene.updateScene(state, stage, fovMask, engine)
+        scene.updateScene(state, stage, container, fovMask, engine)
     })
 
     animate()
