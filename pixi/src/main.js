@@ -110,12 +110,23 @@ function init() {
             .find('g')
             .each((i, g) => {
                 const wall = g.id === 'layer2'
+                const type = ( g.id === 'layer2' && 'ADD_FLOOR_RECT' ) || 'ADD_WALL_RECT'
                 for (let i = 0; i < g.children.length; i++) {
                     const rect = g.children[i]
                     let tileTexture = fliesenTexture
                     if (wall) {
                         tileTexture = rockTexture
                     }
+                    store.dispatch({
+                        type: type,
+                        payload: {
+                            x: rect.x.baseVal.value,
+                            y: rect.y.baseVal.value,
+                            width: rect.width.baseVal.value,
+                            height: rect.height.baseVal.value,
+                            rotation: (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) || 0
+                        },
+                    })
                     const tilingSprite = new PIXI.extras.TilingSprite(fliesenTexture, rect.width.baseVal.value, rect.height.baseVal.value)
                     tilingSprite.position.x = rect.x.baseVal.value
                     tilingSprite.position.y = rect.y.baseVal.value
@@ -143,9 +154,7 @@ function init() {
                             tilingSprite2.rotation = -rect.transform.baseVal[0].angle
                         }
                         backgroundInFov.addChild(tilingSprite2)
-                    }
 
-                    if (wall) {
                         const levelBox = Bodies.rectangle(
                             rect.x.baseVal.value + rect.width.baseVal.value / 2,
                             rect.y.baseVal.value + rect.height.baseVal.value / 2,

@@ -9,7 +9,7 @@ const scene = () => {
 	let lastPlayerState
 
 	let activeStaticLights = []
-	let lastLightState
+	let lastMapState
 	return {
 		updateScene: (state, stage, container, fovMask, engine) => {
 			// players
@@ -43,8 +43,8 @@ const scene = () => {
 			}
 			lastPlayerState = state.player
 			// lights
-			if (lastLightState !== state.light) {
-				state.light.staticLights.map(l => {
+			if (lastMapState !== state.map) {
+				state.map.staticLights.map(l => {
 					if (!activeStaticLights[l.id]) {
 						const light = new PIXI.Sprite(radiaLtexture)
 						light.scale.x = 3
@@ -57,7 +57,7 @@ const scene = () => {
 					}
 				})
 			}
-			lastLightState = state.light
+			lastMapState = state.map
 		},
     tick: (state, stage, renderer, fovMask, polygons) => {
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
