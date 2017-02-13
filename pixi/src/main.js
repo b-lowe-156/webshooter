@@ -110,16 +110,14 @@ function init() {
             .find('g')
             .each((i, g) => {
                 const wall = g.id === 'layer2'
-                const type = ( g.id === 'layer2' && 'ADD_FLOOR_RECT' ) || 'ADD_WALL_RECT'
+                const type = wall && 'ADD_WALL_RECT' || 'ADD_FLOOR_RECT'
                 for (let i = 0; i < g.children.length; i++) {
                     const rect = g.children[i]
-                    let tileTexture = fliesenTexture
-                    if (wall) {
-                        tileTexture = rockTexture
-                    }
+
                     store.dispatch({
                         type: type,
                         payload: {
+                            id: i,
                             x: rect.x.baseVal.value,
                             y: rect.y.baseVal.value,
                             width: rect.width.baseVal.value,
@@ -127,43 +125,7 @@ function init() {
                             rotation: (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) || 0
                         },
                     })
-                    const tilingSprite = new PIXI.extras.TilingSprite(fliesenTexture, rect.width.baseVal.value, rect.height.baseVal.value)
-                    tilingSprite.position.x = rect.x.baseVal.value
-                    tilingSprite.position.y = rect.y.baseVal.value
-                    tilingSprite.rotation = 0.0
-                    if (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) {
-                        tilingSprite.rotation = -rect.transform.baseVal[0].angle
-                    }
-                    background.addChild(tilingSprite)
-
-                    const tilingSprite3 = new PIXI.extras.TilingSprite(fliesenTextureDark, rect.width.baseVal.value, rect.height.baseVal.value)
-                    tilingSprite3.position.x = rect.x.baseVal.value
-                    tilingSprite3.position.y = rect.y.baseVal.value
-                    tilingSprite3.rotation = 0.0
-                    if (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) {
-                        tilingSprite3.rotation = -rect.transform.baseVal[0].angle
-                    }
-                    backgroundInFov.addChild(tilingSprite3)
-
                     if (wall) {
-                        const tilingSprite2 = new PIXI.extras.TilingSprite(rockTexture, rect.width.baseVal.value, rect.height.baseVal.value)
-                        tilingSprite2.position.x = rect.x.baseVal.value
-                        tilingSprite2.position.y = rect.y.baseVal.value
-                        tilingSprite2.rotation = 0.0
-                        if (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) {
-                            tilingSprite2.rotation = -rect.transform.baseVal[0].angle
-                        }
-                        backgroundInFov.addChild(tilingSprite2)
-
-                        const levelBox = Bodies.rectangle(
-                            rect.x.baseVal.value + rect.width.baseVal.value / 2,
-                            rect.y.baseVal.value + rect.height.baseVal.value / 2,
-                            rect.width.baseVal.value,
-                            rect.height.baseVal.value,
-                            { isStatic: true }
-                        )
-                        World.add(engine.world, levelBox);
-
                         polygons.push([[rect.x.baseVal.value, rect.y.baseVal.value],
                         [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value],
                         [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value],
@@ -192,7 +154,7 @@ function init() {
 
     store.subscribe(() => {
         state = store.getState()
-        scene.updateScene(state, stage, container, fovMask, engine)
+        scene.updateScene(state, stage, background, backgroundInFov, container, fovMask, engine)
     })
 
     animate()

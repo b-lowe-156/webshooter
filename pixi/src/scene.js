@@ -2,19 +2,25 @@ import { createLightPolygon } from './lighting'
 
 const { Engine, World, Bodies, Render } = Matter
 
+const fliesenTexture = PIXI.Texture.fromImage('texture/fliesen-textgure.jpg')
+const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark.jpg')
+const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
 
 const scene = () => {
-	let activePlayers = []
 	let lastPlayerState
+	let activePlayers = []
 
-	let activeStaticLights = []
 	let lastMapState
+	let activeFloorRects = []
+	let activeWallRects = []
+	let activeStaticLights = []
+
 	return {
-		updateScene: (state, stage, container, fovMask, engine) => {
+		updateScene: (state, stage, background, backgroundInFov, container, fovMask, engine) => {
 			// players
 			if (lastPlayerState !== state.player) {
-				state.player.players.map(p => {
+				state.player.players.forEach(p => {
 					if (!activePlayers[p.id]) {
 						const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 });
 						World.add(engine.world, playerPhysics);
@@ -42,9 +48,45 @@ const scene = () => {
 				})
 			}
 			lastPlayerState = state.player
-			// lights
+			// map
 			if (lastMapState !== state.map) {
-				state.map.staticLights.map(l => {
+				state.map.floorRects.forEach(f => {
+					if (!activeFloorRects[f.id]) {
+						const floorSprite = new PIXI.extras.TilingSprite(fliesenTexture, f.width, f.height)
+						floorSprite.position.x = f.x
+						floorSprite.position.y = f.y
+						floorSprite.rotation = 0.0
+						background.addChild(floorSprite)
+
+						const floorSpriteInFov = new PIXI.extras.TilingSprite(fliesenTextureDark, f.width, f.height)
+						floorSpriteInFov.position.x = f.x
+						floorSpriteInFov.position.y = f.y
+						floorSpriteInFov.rotation = 0.0
+						backgroundInFov.addChild(floorSpriteInFov)
+
+						activeFloorRects[f.id] = { floorSprite, floorSpriteInFov }
+					}
+				})
+				state.map.wallRects.forEach(w => {
+					if (!activeWallRects[w.id]) {
+						const wallSprite = new PIXI.extras.TilingSprite(rockTexture, w.width, w.height)
+						wallSprite.position.x = w.x
+						wallSprite.position.y = w.y
+						wallSprite.rotation = 0.0
+						backgroundInFov.addChild(wallSprite)
+						const levelBox = Bodies.rectangle(
+								w.x + w.width / 2,
+								w.y + w.height / 2,
+								w.width,
+								w.height,
+								{ isStatic: true }
+						)
+						World.add(engine.world, levelBox);
+
+						activeWallRects[w.id] = { wallSprite, levelBox }
+					}
+				})
+				state.map.staticLights.forEach(l => {
 					if (!activeStaticLights[l.id]) {
 						const light = new PIXI.Sprite(radiaLtexture)
 						light.scale.x = 3
@@ -56,6 +98,8 @@ const scene = () => {
 						activeStaticLights[l.id] = light
 					}
 				})
+
+
 			}
 			lastMapState = state.map
 		},
