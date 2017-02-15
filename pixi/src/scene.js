@@ -151,7 +151,7 @@ const scene = () => {
 						playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
 				}
 				if (input.leftMouseDown) {
-					Matter.Body.setPosition(bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y })
+					Matter.Body.applyForce(bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y }, { x: 0.001, y: 0.0005 })
 				//	bulletBox.position.x = playerPhysics.position.x
 				//	bulletBox.position.y = playerPhysics.position.y
 				//	bulletBox.angle = playerPhysics.angle
