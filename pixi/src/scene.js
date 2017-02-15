@@ -7,6 +7,8 @@ const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark
 const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
 
+let init = false
+
 const scene = () => {
 	let lastPlayerState
 	let activePlayers = []
@@ -16,8 +18,30 @@ const scene = () => {
 	let activeWallRects = []
 	let activeStaticLights = []
 
+	let bullet
+	let bulletBox
+
 	return {
 		updateScene: (state, stage, background, backgroundInFov, container, fovMask, engine) => {
+			if (!init) {
+
+				bullet = PIXI.Sprite.fromImage('http://pixijs.github.io/examples/required/assets/basics/bunny.png')
+				bullet.anchor.set(0.5);
+				stage.addChild(bullet);
+				bullet.x = 40
+				bullet.y = 40
+				
+
+				init = true
+
+				bulletBox = Bodies.rectangle(
+					bullet.x,
+					bullet.y,
+					20,
+					40,
+				)
+				World.add(engine.world, bulletBox);
+			}
 			// players
 			if (lastPlayerState !== state.player) {
 				state.player.players.forEach(p => {
@@ -98,12 +122,11 @@ const scene = () => {
 						activeStaticLights[l.id] = light
 					}
 				})
-
-
 			}
 			lastMapState = state.map
 		},
     tick: (state, stage, renderer, fovMask, polygons) => {
+			state.game.gameTime++
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer) {
 				
@@ -126,6 +149,12 @@ const scene = () => {
 				if (input.strafeRight) {
 						playerPhysics.force.x += Math.sin(player.rotation + Math.PI / 2) * moveSpeed;
 						playerPhysics.force.y += Math.cos(player.rotation + Math.PI / 2) * moveSpeed;
+				}
+				if (input.leftMouseDown) {
+					Matter.Body.setPosition(bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y })
+				//	bulletBox.position.x = playerPhysics.position.x
+				//	bulletBox.position.y = playerPhysics.position.y
+				//	bulletBox.angle = playerPhysics.angle
 				}
 				
 				stage.pivot.x = playerPhysics.position.x;
@@ -152,6 +181,12 @@ const scene = () => {
 
 				player.position.x = playerPhysics.position.x
         player.position.y = playerPhysics.position.y
+
+				if (bullet && bulletBox) {
+					bullet.rotation = bulletBox.angle
+					bullet.position.x = bulletBox.position.x
+					bullet.position.y = bulletBox.position.y
+				}
 
 		    const visibility = createLightPolygon(polygons, player.position.x, player.position.y)
 				fovMask.clear()

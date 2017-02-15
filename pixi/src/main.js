@@ -22,11 +22,11 @@ function init() {
     // add all of the bodies to the world
     World.add(engine.world, []);
 
-    // var render = Render.create({ element: document.body, engine: engine})
+    const render = Render.create({ element: document.body, engine: engine})
 
     Engine.run(engine)
 
-    // Render.run(render)
+    Render.run(render)
 
     const renderCanvas = document.getElementById('renderCanvas')
     const renderer = PIXI.autoDetectRenderer(800, 600, {
@@ -39,7 +39,18 @@ function init() {
     const app = document.getElementById('app')
     ReactDOM.render(<Provider store={store}><DevTools /></Provider>, app)
 
-    renderCanvas.onclick = function () {
+    renderCanvas.onmousedown = (e) => {
+        store.dispatch({
+            type: 'LEFT_MOUSE_DOWN',
+        })
+    }
+    renderCanvas.onmouseup = (e) => {
+        store.dispatch({
+            type: 'LEFT_MOUSE_UP',
+        })
+    }
+
+    renderCanvas.onclick = (e) => {
         renderCanvas.requestPointerLock();
     }
 

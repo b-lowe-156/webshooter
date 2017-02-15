@@ -1,38 +1,52 @@
 
 export default function inputReducer(state = {
+	gameTime: 0,
 	forward: false,
 	backward: false,
 	strafeLeft: false,
 	strafeRight: false,
+	leftMouseDown: false,
 }, action) {
-	if (action.type !== 'keydown' && action.type !== 'keyup') {
-		return state
+	switch (action.type) {
+		case 'keydown':
+		case 'keyup': {
+			const down = action.type === 'keydown'
+			switch (action.payload) {
+				case 87: //'w':
+					return {
+						...state,
+						forward: down,
+					}
+				case 65: //'a':
+					return {
+						...state,
+						strafeLeft: down,
+					}
+				case 83: //'s':
+					return {
+						...state,
+						backward: down,
+					}
+				case 68: //'d':
+					return {
+						...state,
+						strafeRight: down,
+					}
+			}
+		}
+		case 'LEFT_MOUSE_DOWN': {
+			return {
+				...state,
+				leftMouseDown: true,
+			}
+		}
+		case 'LEFT_MOUSE_UP': {
+			return {
+				...state,
+				leftMouseDown: false,
+			}
+		}
 	}
-	let down = false
-	if (action.type === 'keydown') {
-		down = true
-	}
-	switch (action.payload) {
-		case 87: //'w':
-			return {
-				...state,
-				forward: down,
-			}
-		case 65: //'a':
-			return {
-				...state,
-				strafeLeft: down,
-			}
-		case 83: //'s':
-			return {
-				...state,
-				backward: down,
-			}
-		case 68: //'d':
-			return {
-				...state,
-				strafeRight: down,
-			}
-	}
+
 	return state
 }
