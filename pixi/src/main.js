@@ -22,11 +22,9 @@ function init() {
     // add all of the bodies to the world
     World.add(engine.world, []);
 
-    // const render = Render.create({ element: document.body, engine: engine})
-
+//    const render = Render.create({ element: document.body, engine: engine})
     Engine.run(engine)
-
-    // Render.run(render)
+//    Render.run(render)
 
     const renderCanvas = document.getElementById('renderCanvas')
     const renderer = PIXI.autoDetectRenderer(800, 600, {

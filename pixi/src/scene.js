@@ -22,14 +22,18 @@ const scene = () => {
 		initScene: (stage, engine) => {
 			Events.on(engine, 'collisionStart', (event) => {
 				//	console.log('collisionStart', event)
-					const b = bulletContainer.find(b => b.bulletBox === event.pairs[0].bodyB)
+				event.pairs.forEach(p => {
+					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
 						stage.removeChild(b.bullet)
+						World.remove(engine.world, b.bulletBox)
 					}
-					const a = bulletContainer.find(b => b.bulletBox === event.pairs[0].bodyA)
+					const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
 					if(a && a.bullet) {
 						stage.removeChild(a.bullet)
+						World.remove(engine.world, a.bulletBox)
 					}
+				})
 			})
 		},
 		updateScene: (state, stage, background, backgroundInFov, container, fovMask, engine) => {
