@@ -22,11 +22,11 @@ function init() {
     // add all of the bodies to the world
     World.add(engine.world, []);
 
-    const render = Render.create({ element: document.body, engine: engine})
+    // const render = Render.create({ element: document.body, engine: engine})
 
     Engine.run(engine)
 
-    Render.run(render)
+    // Render.run(render)
 
     const renderCanvas = document.getElementById('renderCanvas')
     const renderer = PIXI.autoDetectRenderer(800, 600, {
@@ -72,6 +72,9 @@ function init() {
     }
 
     var stage = new PIXI.Container();
+
+    scene.initScene(stage, engine)
+
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
     var backgroundInFov = new PIXI.Graphics();
@@ -174,7 +177,7 @@ function init() {
         background.clear()
         
         if (state) {
-           scene.tick(state, stage, renderer, fovMask, polygons)
+           scene.tick(state, stage, renderer, fovMask, polygons, engine)
         }
  
         renderer.render(container, rt)
