@@ -14,6 +14,18 @@ window.onload = init
 let state
 
 function init() {
+
+    function updateStats(memuse) {
+        console.log(memuse)
+      }
+
+      var host = window.document.location.host.replace(/:.*/, '')
+      var ws = new WebSocket('ws://' + host + ':8000')
+      ws.onmessage = function (event) {
+        updateStats(JSON.parse(event.data))
+      }
+
+
     var { Engine, World, Bodies, Render } = Matter
     var engine = Engine.create();
 

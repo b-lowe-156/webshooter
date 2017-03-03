@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "serve": "webpack-dev-server"
+    "serve": "webpack-dev-server",
+    "server": "server.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,7 +21,8 @@
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",
     "redux": "^3.6.0",
-    "transform-loader": "^0.2.3"
+    "transform-loader": "^0.2.3",
+    "ws": "^2.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.21.0",

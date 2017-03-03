@@ -7,6 +7,9 @@ const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark
 const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
 
+
+const doubler = (n => b * 2)
+
 const scene = () => {
 	let lastPlayerState
 	let activePlayers = []
@@ -25,13 +28,13 @@ const scene = () => {
 				event.pairs.forEach(p => {
 					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
-						stage.removeChild(b.bullet)
-						World.remove(engine.world, b.bulletBox)
+					//	stage.removeChild(b.bullet)
+					//	World.remove(engine.world, b.bulletBox)
 					}
 					const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
 					if(a && a.bullet) {
-						stage.removeChild(a.bullet)
-						World.remove(engine.world, a.bulletBox)
+					//	stage.removeChild(a.bullet)
+					//	World.remove(engine.world, a.bulletBox)
 					}
 				})
 			})
@@ -163,8 +166,8 @@ const scene = () => {
 					)
 					bulletBox.collisionFilter.group = -5
 					bulletBox.force = {
-						x: 0.02 * Math.cos(dir),
-						y: 0.02 * Math.sin(dir),
+						x: 0.05 * Math.cos(dir),
+						y: 0.05 * Math.sin(dir),
 					}
 					// Matter.Body.applyForce(bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y }, { x: 0.001, y: 0.0005 })
 					World.add(engine.world, bulletBox)
