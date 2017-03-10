@@ -1,4 +1,6 @@
-import { Engine, World, Bodies, Render } from 'matter-js'
+const Matters = require('matter-js')
+
+const { Engine, World, Bodies, Render } = Matters;
 
 test('', () => {
 	const engine = Engine.create()
@@ -11,5 +13,4 @@ test('', () => {
 	console.log(playerPhysics.position)
 	Engine.update(engine, 16.666)
 	console.log(playerPhysics.position)
-
 })
