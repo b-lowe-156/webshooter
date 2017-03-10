@@ -28,13 +28,13 @@ const scene = () => {
 				event.pairs.forEach(p => {
 					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
-					//	stage.removeChild(b.bullet)
-					//	World.remove(engine.world, b.bulletBox)
+						stage.removeChild(b.bullet)
+						World.remove(engine.world, b.bulletBox)
 					}
 					const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
 					if(a && a.bullet) {
-					//	stage.removeChild(a.bullet)
-					//	World.remove(engine.world, a.bulletBox)
+						stage.removeChild(a.bullet)
+						World.remove(engine.world, a.bulletBox)
 					}
 				})
 			})
