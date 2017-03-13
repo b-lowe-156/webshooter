@@ -7,9 +7,6 @@ const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark
 const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
 
-
-const doubler = (n => b * 2)
-
 const scene = () => {
 	let lastPlayerState
 	let activePlayers = []
@@ -20,6 +17,7 @@ const scene = () => {
 	let activeStaticLights = []
 
 	const bulletContainer = []
+	const entityContainer = []
 
 	return {
 		initScene: (stage, engine) => {
@@ -124,8 +122,9 @@ const scene = () => {
 			}
 			lastMapState = state.map
 		},
-    tick: (state, stage, renderer, fovMask, polygons, engine) => {
+    tick: (state, stage, renderer, fovMask, polygons, engine, ws) => {
 			state.game.gameTime++
+
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer) {
 				
@@ -169,20 +168,27 @@ const scene = () => {
 						x: 0.05 * Math.cos(dir),
 						y: 0.05 * Math.sin(dir),
 					}
-					// Matter.Body.applyForce(bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y }, { x: 0.001, y: 0.0005 })
 					World.add(engine.world, bulletBox)
-
 					bulletContainer.push({ bullet, bulletBox })
-					//	Matter.Body.applyForce(bulletContainer[0].bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y }, { x: 0.001, y: 0.0005 })
-					//	bulletBox.position.x = playerPhysics.position.x
-					//	bulletBox.position.y = playerPhysics.position.y
-					//	bulletBox.angle = playerPhysics.angle
+					ws.send(JSON.stringify({
+						type: 'bullet',
+						x: playerPhysics.position.x,
+						y: playerPhysics.position.y,
+						dir: dir,
+					}))
 				}
 				
 				stage.pivot.x = playerPhysics.position.x;
 				stage.pivot.y = playerPhysics.position.y;
 				stage.position.x = renderer.width / 2;
 				stage.position.y = renderer.height / 2 + 260;
+
+				ws.send(JSON.stringify({
+					type: 'player',
+					x: playerPhysics.position.x,
+					y: playerPhysics.position.y,
+					angle: playerPhysics.angle
+				}))
 
 				let diff = player.rotation - playerPhysics.angle
 				const rotSpeed = 0.03
@@ -239,7 +245,44 @@ const scene = () => {
 						player.rotation += 0.001 * x
 				}
 			}
-		}
+		},
+		updateRemoteEntities: (stage, engine, data) => {
+			if (data.type === 'player') {
+				if (!entityContainer[data.id]) {
+					const player = new PIXI.Graphics()
+					stage.addChild(player)
+					player.lineStyle(0)
+					player.beginFill(0xFFFF0B, 1.0)
+					player.drawCircle(0, 0, 20)
+					player.endFill()
+					entityContainer[data.id] = player
+				} else {
+					entityContainer[data.id].position.x = data.x
+					entityContainer[data.id].position.y = data.y
+					entityContainer[data.id].rotation = data.angle
+				}
+			} else if (data.type === 'bullet'){
+				const bullet = PIXI.Sprite.fromImage('http://pixijs.github.io/examples/required/assets/basics/bunny.png')
+				bullet.anchor.set(0.5)
+				stage.addChild(bullet)
+				bullet.x = data.x
+				bullet.y = data.y
+				const bulletBox = Bodies.rectangle(
+					bullet.x,
+					bullet.y,
+					10,
+					32,
+					{ angle: data.dir + Math.PI * 0.5, }
+				)
+				bulletBox.collisionFilter.group = -5
+				bulletBox.force = {
+					x: 0.05 * Math.cos(data.dir),
+					y: 0.05 * Math.sin(data.dir),
+				}
+				World.add(engine.world, bulletBox)
+				bulletContainer.push({ bullet, bulletBox })
+			}
+		},
 	}
 }
 

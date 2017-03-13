@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import { Provider } from 'react-redux'
-import DevTools from './DevTools'
 
 import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
@@ -11,23 +10,12 @@ import scene from './scene'
 
 window.onload = init
 
+const { Engine, World, Bodies, Render } = Matter
+const engine = Engine.create();
+
 let state
 
 function init() {
-
-    function updateStats(memuse) {
-        console.log(memuse)
-      }
-
-      var host = window.document.location.host.replace(/:.*/, '')
-      var ws = new WebSocket('ws://' + host + ':8000')
-      ws.onmessage = function (event) {
-        updateStats(JSON.parse(event.data))
-      }
-
-
-    var { Engine, World, Bodies, Render } = Matter
-    var engine = Engine.create();
 
     engine.world.gravity.x = 0.0
     engine.world.gravity.y = 0.0
@@ -47,7 +35,7 @@ function init() {
     document.body.appendChild(renderer.view);
 
     const app = document.getElementById('app')
-    ReactDOM.render(<Provider store={store}><DevTools /></Provider>, app)
+    ReactDOM.render(<Provider store={store}><div></div></Provider>, app)
 
     renderCanvas.onmousedown = (e) => {
         store.dispatch({
@@ -181,13 +169,23 @@ function init() {
         scene.updateScene(state, stage, background, backgroundInFov, container, fovMask, engine)
     })
 
+    function updateStats(memuse) {
+        console.log(memuse)
+    }
+
+    const ws = new WebSocket('ws://' + window.document.location.host.replace(/:.*/, '') + ':8000')
+        ws.onmessage = (event) => {
+        scene.updateRemoteEntities(stage, engine, JSON.parse(event.data))
+        updateStats(JSON.parse(event.data))
+    }
+
     animate()
 
     function animate() {
         background.clear()
         
         if (state) {
-           scene.tick(state, stage, renderer, fovMask, polygons, engine)
+           scene.tick(state, stage, renderer, fovMask, polygons, engine, ws)
         }
  
         renderer.render(container, rt)
