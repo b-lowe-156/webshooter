@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "serve": "webpack-dev-server",
-    "server": "server.js"
+    "client": "webpack-dev-server",
+    "websocket": "app.js"
   },
   "author": "",
   "license": "ISC",

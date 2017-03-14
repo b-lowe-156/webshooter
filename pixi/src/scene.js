@@ -22,7 +22,6 @@ const scene = () => {
 	return {
 		initScene: (stage, engine) => {
 			Events.on(engine, 'collisionStart', (event) => {
-				//	console.log('collisionStart', event)
 				event.pairs.forEach(p => {
 					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
@@ -38,6 +37,7 @@ const scene = () => {
 			})
 		},
 		updateScene: (state, stage, background, backgroundInFov, container, fovMask, engine) => {
+			console.log('updateScene')
 			// players
 			if (lastPlayerState !== state.player) {
 				state.player.players.forEach(p => {
@@ -256,6 +256,9 @@ const scene = () => {
 					player.drawCircle(0, 0, 20)
 					player.endFill()
 					entityContainer[data.id] = player
+					entityContainer[data.id].position.x = data.x
+					entityContainer[data.id].position.y = data.y
+					entityContainer[data.id].rotation = data.angle
 				} else {
 					entityContainer[data.id].position.x = data.x
 					entityContainer[data.id].position.y = data.y

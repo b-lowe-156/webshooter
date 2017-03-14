@@ -11,9 +11,10 @@ import scene from './scene'
 window.onload = init
 
 const { Engine, World, Bodies, Render } = Matter
-const engine = Engine.create();
+const engine = Engine.create()
 
 let state
+const mutableState = {}
 
 function init() {
 
@@ -170,7 +171,7 @@ function init() {
     })
 
     function updateStats(memuse) {
-        console.log(memuse)
+        //console.log(memuse)
     }
 
     const ws = new WebSocket('ws://' + window.document.location.host.replace(/:.*/, '') + ':8000')
