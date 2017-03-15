@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import { Provider } from 'react-redux'
+import DevTools from './DevTools'
 
 import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
@@ -36,7 +37,7 @@ function init() {
     document.body.appendChild(renderer.view);
 
     const app = document.getElementById('app')
-    ReactDOM.render(<Provider store={store}><div></div></Provider>, app)
+    ReactDOM.render(<Provider store={store}><DevTools /></Provider>, app)
 
     renderCanvas.onmousedown = (e) => {
         store.dispatch({
@@ -81,9 +82,8 @@ function init() {
     fovMask.beginFill(0xFFFFFF);
     fovMask.beginFill(0xFFFFFF, 1);
 
-    var polygons = []
-    polygons.push([[-100, -100], [800 + 1, -100], [800 + 1, 600 + 1], [-100, 600 + 1]])
-
+    var polygons = [[[-100, -100], [800 + 1, -100], [800 + 1, 600 + 1], [-100, 600 + 1]]]
+ 
     var lightSources = initLightSources(polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
@@ -97,11 +97,6 @@ function init() {
     background.filters = [new PIXI.SpriteMaskFilter(sprite)]
 
     background.mask = fovMask
-
-    const fliesenTexture = PIXI.Texture.fromImage('texture/fliesen-textgure.jpg')
-    const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark.jpg')
-    const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
-
 
     const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
 
@@ -119,35 +114,11 @@ function init() {
     })   
 
     $.get('map.svg').done((data) => {
-        $(data)
-            .find('g')
-            .each((i, g) => {
-                const wall = g.id === 'layer2'
-                const type = wall && 'ADD_WALL_RECT' || 'ADD_FLOOR_RECT'
-                for (let i = 0; i < g.children.length; i++) {
-                    const rect = g.children[i]
-
-                    store.dispatch({
-                        type: type,
-                        payload: {
-                            id: i,
-                            x: rect.x.baseVal.value,
-                            y: rect.y.baseVal.value,
-                            width: rect.width.baseVal.value,
-                            height: rect.height.baseVal.value,
-                            rotation: (rect.transform && rect.transform.baseVal[0] && rect.transform.baseVal[0].angle) || 0
-                        },
-                    })
-                    if (wall) {
-                        polygons.push([[rect.x.baseVal.value, rect.y.baseVal.value],
-                        [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value],
-                        [rect.x.baseVal.value + rect.width.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value],
-                        [rect.x.baseVal.value, rect.y.baseVal.value + rect.height.baseVal.value]]);
-                    }
-                }
-            })
+        store.dispatch({
+            type: 'MAP_LOADED',
+            payload: data,
+        })
     })
-
 
     //  stage.addChild(sprite)
     stage.addChild(fovMask)
