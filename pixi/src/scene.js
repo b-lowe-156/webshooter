@@ -176,10 +176,10 @@ const scene = () => {
 					}))
 				}
 				
-				stage.pivot.x = playerPhysics.position.x;
-				stage.pivot.y = playerPhysics.position.y;
-				stage.position.x = renderer.width / 2;
-				stage.position.y = renderer.height / 2 + 260;
+				stage.pivot.x = playerPhysics.position.x
+				stage.pivot.y = playerPhysics.position.y
+				stage.position.x = renderer.width / 2
+				stage.position.y = renderer.height / 2 + 260
 
 				ws.send(JSON.stringify({
 					type: 'player',
@@ -230,13 +230,13 @@ const scene = () => {
 		updateRotation: (state, x) => {
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer) {
-				const { playerPhysics, player } = activePlayers[currentPlayer.id]
+				const { player, playerPhysics } = activePlayers[currentPlayer.id]
 				const diff = player.rotation - playerPhysics.angle
 				let diffToHeight = false
-				if (diff > (0.5 * Math.PI)) {
+				if (diff > (0.3 * Math.PI)) {
 						diffToHeight = true
 				}
-				else if (diff < -(0.5 * Math.PI)) {
+				else if (diff < -(0.3 * Math.PI)) {
 						diffToHeight = true
 				}
 				if (x < 100 && x > -100 && !diffToHeight) {

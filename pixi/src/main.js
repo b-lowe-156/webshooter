@@ -24,8 +24,7 @@ function init() {
     })
     document.body.appendChild(renderer.view);
 
-    const app = document.getElementById('app')
-    ReactDOM.render(<Provider store={store}><DevTools /></Provider>, app)
+    ReactDOM.render(<Provider store={store}><DevTools /></Provider>, document.getElementById('app'))
 
     renderCanvas.onmousedown = (e) => {
         mutableStore.dispatch({
