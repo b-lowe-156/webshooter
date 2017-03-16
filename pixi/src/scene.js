@@ -20,23 +20,23 @@ const scene = () => {
 	const entityContainer = []
 
 	return {
-		initScene: (stage, engine) => {
-			Events.on(engine, 'collisionStart', (event) => {
+		initScene: (stage, physicEngine) => {
+			Events.on(physicEngine, 'collisionStart', (event) => {
 				event.pairs.forEach(p => {
 					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
 						stage.removeChild(b.bullet)
-						World.remove(engine.world, b.bulletBox)
+						World.remove(physicEngine.world, b.bulletBox)
 					}
 					const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
 					if(a && a.bullet) {
 						stage.removeChild(a.bullet)
-						World.remove(engine.world, a.bulletBox)
+						World.remove(physicEngine.world, a.bulletBox)
 					}
 				})
 			})
 		},
-		updateScene: (state, stage, background, backgroundInFov, container, fovMask, engine) => {
+		updateScene: (state, stage, background, backgroundInFov, container, fovMask, physicEngine) => {
 			console.log('updateScene')
 			// players
 			if (lastPlayerState !== state.player) {
@@ -44,7 +44,7 @@ const scene = () => {
 					if (!activePlayers[p.id]) {
 						const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 })
 						playerPhysics.collisionFilter.group = -5
-						World.add(engine.world, playerPhysics)
+						World.add(physicEngine.world, playerPhysics)
 
 						const player = new PIXI.Graphics();
 						stage.addChild(player);
@@ -102,7 +102,7 @@ const scene = () => {
 								w.height,
 								{ isStatic: true }
 						)
-						World.add(engine.world, levelBox);
+						World.add(physicEngine.world, levelBox);
 
 						activeWallRects[w.id] = { wallSprite, levelBox }
 					}
@@ -122,16 +122,14 @@ const scene = () => {
 			}
 			lastMapState = state.map
 		},
-    tick: (state, stage, renderer, fovMask, polygons, engine, ws) => {
-			state.game.gameTime++
-
+    tick: (state, mutableState, stage, renderer, fovMask, physicEngine, ws) => {
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
-			if (currentPlayer) {
+			if (currentPlayer && activePlayers[currentPlayer.id]) {
 				
 				const moveSpeed = 0.01
 				const { playerPhysics, player, playerAimLine } = activePlayers[currentPlayer.id]
 
-				const input = state.input
+				const input = mutableState.input
 				if (input.forward) {
 						playerPhysics.force.x -= Math.sin(-player.rotation) * moveSpeed;
 						playerPhysics.force.y -= Math.cos(-player.rotation) * moveSpeed;
@@ -168,7 +166,7 @@ const scene = () => {
 						x: 0.05 * Math.cos(dir),
 						y: 0.05 * Math.sin(dir),
 					}
-					World.add(engine.world, bulletBox)
+					World.add(physicEngine.world, bulletBox)
 					bulletContainer.push({ bullet, bulletBox })
 					ws.send(JSON.stringify({
 						type: 'bullet',
@@ -216,7 +214,7 @@ const scene = () => {
 					e.bullet.position.y = e.bulletBox.position.y
 				})
 
-		    const visibility = createLightPolygon(polygons, player.position.x, player.position.y)
+		    const visibility = createLightPolygon(state.map.polygons, player.position.x, player.position.y)
 				fovMask.clear()
 				fovMask.lineStyle(1, 0x333333, 1.0)
 				fovMask.lineStyle(1, 0xFFFFFF, 1)
@@ -246,7 +244,7 @@ const scene = () => {
 				}
 			}
 		},
-		updateRemoteEntities: (stage, engine, data) => {
+		updateRemoteEntities: (stage, physicEngine, data) => {
 			if (data.type === 'player') {
 				if (!entityContainer[data.id]) {
 					const player = new PIXI.Graphics()
@@ -282,7 +280,7 @@ const scene = () => {
 					x: 0.05 * Math.cos(data.dir),
 					y: 0.05 * Math.sin(data.dir),
 				}
-				World.add(engine.world, bulletBox)
+				World.add(physicEngine.world, bulletBox)
 				bulletContainer.push({ bullet, bulletBox })
 			}
 		},

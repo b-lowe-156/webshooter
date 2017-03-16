@@ -8,25 +8,13 @@ import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
 import store from './store'
 import scene from './scene'
+import mutableStore from './mutable-store'
+import { createPhysics } from './physics'
 
 window.onload = init
 
-const { Engine, World, Bodies, Render } = Matter
-const engine = Engine.create()
-
-let state
-const mutableState = {}
-
 function init() {
-
-    engine.world.gravity.x = 0.0
-    engine.world.gravity.y = 0.0
-    // add all of the bodies to the world
-    World.add(engine.world, []);
-
-//    const render = Render.create({ element: document.body, engine: engine})
-    Engine.run(engine)
-//    Render.run(render)
+    const physicEngine = createPhysics()
 
     const renderCanvas = document.getElementById('renderCanvas')
     const renderer = PIXI.autoDetectRenderer(800, 600, {
@@ -40,12 +28,12 @@ function init() {
     ReactDOM.render(<Provider store={store}><DevTools /></Provider>, app)
 
     renderCanvas.onmousedown = (e) => {
-        store.dispatch({
+        mutableStore.dispatch({
             type: 'LEFT_MOUSE_DOWN',
         })
     }
     renderCanvas.onmouseup = (e) => {
-        store.dispatch({
+        mutableStore.dispatch({
             type: 'LEFT_MOUSE_UP',
         })
     }
@@ -54,7 +42,6 @@ function init() {
         renderCanvas.requestPointerLock();
     }
 
-    // Hook pointer lock state change events for different browsers
     document.addEventListener('pointerlockchange', lockChangeAlert, false);
     document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
     function lockChangeAlert() {
@@ -68,12 +55,12 @@ function init() {
 
     function mousemove(e) {
         let x = e.movementX || e.mozMovementX || 0
-        scene.updateRotation(state, x)
+        scene.updateRotation(store.getState(), x)
     }
 
     var stage = new PIXI.Container();
 
-    scene.initScene(stage, engine)
+    scene.initScene(stage, physicEngine)
 
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
@@ -81,24 +68,20 @@ function init() {
 
     fovMask.beginFill(0xFFFFFF);
     fovMask.beginFill(0xFFFFFF, 1);
-
-    var polygons = [[[-100, -100], [800 + 1, -100], [800 + 1, 600 + 1], [-100, 600 + 1]]]
  
-    var lightSources = initLightSources(polygons)
+    var lightSources = initLightSources(store.getState().map.polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
     var container = new PIXI.Container()
-    var brt = new PIXI.BaseRenderTexture(800, 600, PIXI.SCALE_MODES.LINEAR, 1)
-    var rt = new PIXI.RenderTexture(brt)
+    var rt = new PIXI.RenderTexture(new PIXI.BaseRenderTexture(800, 600, PIXI.SCALE_MODES.LINEAR, 1))
     var sprite = new PIXI.Sprite(rt)
-    var thing = new PIXI.Graphics();
 
     stage.addChild(sprite)
     background.filters = [new PIXI.SpriteMaskFilter(sprite)]
-
     background.mask = fovMask
-
-    const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
+    stage.addChild(fovMask)
+    stage.addChild(backgroundInFov)
+    stage.addChild(background)
 
     store.dispatch({
         type: 'ADD_STATIC_LIGHT',
@@ -120,12 +103,6 @@ function init() {
         })
     })
 
-    //  stage.addChild(sprite)
-    stage.addChild(fovMask)
-
-    stage.addChild(backgroundInFov)
-    stage.addChild(background)
-
     store.dispatch({
         type: 'SPAWN_PLAYER',
         payload: { id: 1, name: 'Threlgor', team: 'blue', }
@@ -137,18 +114,12 @@ function init() {
     })
 
     store.subscribe(() => {
-        state = store.getState()
-        scene.updateScene(state, stage, background, backgroundInFov, container, fovMask, engine)
+        scene.updateScene(store.getState(), stage, background, backgroundInFov, container, fovMask, physicEngine)
     })
-
-    function updateStats(memuse) {
-        //console.log(memuse)
-    }
 
     const ws = new WebSocket('ws://' + window.document.location.host.replace(/:.*/, '') + ':8000')
         ws.onmessage = (event) => {
-        scene.updateRemoteEntities(stage, engine, JSON.parse(event.data))
-        updateStats(JSON.parse(event.data))
+        scene.updateRemoteEntities(stage, physicEngine, JSON.parse(event.data))
     }
 
     animate()
@@ -156,9 +127,7 @@ function init() {
     function animate() {
         background.clear()
         
-        if (state) {
-           scene.tick(state, stage, renderer, fovMask, polygons, engine, ws)
-        }
+        scene.tick(store.getState(), mutableStore.getState(), stage, renderer, fovMask, physicEngine, ws)
  
         renderer.render(container, rt)
         renderer.render(stage)
@@ -167,21 +136,9 @@ function init() {
 }
 
 window.addEventListener('keydown', function (e) {
-    if (state.input.forward && e.keyCode === 87) {
-        return
-    }
-    else if (state.input.strafeLeft && e.keyCode === 65) {
-        return
-    }
-    else if (state.input.backward && e.keyCode === 83) {
-        return
-    }
-    else if (state.input.strafeRight && e.keyCode === 68) {
-        return
-    }
-    store.dispatch({ type: 'keydown', payload: e.keyCode })
-});
+    mutableStore.dispatch({ type: 'keydown', payload: e.keyCode })
+})
 
 window.addEventListener('keyup', function (e) {
-    store.dispatch({ type: 'keyup', payload: e.keyCode })
-});
+    mutableStore.dispatch({ type: 'keyup', payload: e.keyCode })
+})
