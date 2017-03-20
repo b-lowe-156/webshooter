@@ -5,7 +5,7 @@ import playerReducer from './player-reducer'
 import mapReducer from './map-reducer'
 
 const enhancer = compose(
-   DevTools.instrument()
+  // DevTools.instrument()
 )
 
 const reducers = combineReducers({

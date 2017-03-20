@@ -37,27 +37,16 @@ const scene = () => {
 			})
 		},
 		updateScene: (state, stage, background, backgroundInFov, container, fovMask, physicEngine) => {
-			console.log('updateScene')
 			// players
 			if (lastPlayerState !== state.player) {
 				state.player.players.forEach(p => {
 					if (!activePlayers[p.id]) {
-						const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 })
-						playerPhysics.collisionFilter.group = -5
+						const playerPhysics = state.player.playerPhysics
 						World.add(physicEngine.world, playerPhysics)
-
-						const player = new PIXI.Graphics();
-						stage.addChild(player);
-						player.lineStyle(0);
-						player.beginFill(0xFFFF0B, 1.0);
-						player.drawCircle(0, 0, 20);
-						player.endFill();
-
-						const playerAimLine = new PIXI.Graphics();
-						stage.addChild(playerAimLine);
-						playerAimLine.lineStyle(1, 0xFF0000, 1);
-						playerAimLine.moveTo(0, 0);
-						playerAimLine.lineTo(300, 0);
+						const player = state.player.player
+						stage.addChild(player)
+						const playerAimLine = state.player.playerAimLine
+						stage.addChild(playerAimLine)
 						playerAimLine.mask = fovMask
 
 						activePlayers[p.id] = {

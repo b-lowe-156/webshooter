@@ -10,6 +10,9 @@ import store from './store'
 import scene from './scene'
 import mutableStore from './mutable-store'
 import { createPhysics } from './physics'
+import JSONTree from 'react-json-tree'
+
+const { Engine } = Matter
 
 window.onload = init
 
@@ -24,7 +27,11 @@ function init() {
     })
     document.body.appendChild(renderer.view);
 
-    ReactDOM.render(<Provider store={store}><DevTools /></Provider>, document.getElementById('app'))
+    ReactDOM.render(
+      <Provider store={store}>
+        <JSONTree data={store.getState()} />
+      </Provider>, document.getElementById('app')
+    )
 
     renderCanvas.onmousedown = (e) => {
         mutableStore.dispatch({
@@ -54,7 +61,12 @@ function init() {
 
     function mousemove(e) {
         let x = e.movementX || e.mozMovementX || 0
-        scene.updateRotation(store.getState(), x)
+        //scene.updateRotation(store.getState(), x)
+
+        store.dispatch({
+            type: 'UPDATE_ROTATION',
+            payload: x,
+        })
     }
 
     var stage = new PIXI.Container();
@@ -67,7 +79,7 @@ function init() {
 
     fovMask.beginFill(0xFFFFFF);
     fovMask.beginFill(0xFFFFFF, 1);
- 
+
     var lightSources = initLightSources(store.getState().map.polygons)
     var lightingSprite = createLightingSprite(lightSources, 800, 600)
 
@@ -93,7 +105,7 @@ function init() {
     store.dispatch({
         type: 'ADD_STATIC_LIGHT',
         payload: { id: 3, x: 600, y: 200, }
-    })   
+    })
 
     $.get('map.svg').done((data) => {
         store.dispatch({
@@ -109,7 +121,7 @@ function init() {
 
     store.dispatch({
         type: 'CONTROLE_PLAYER',
-        payload: 0
+        payload: 0,
     })
 
     store.subscribe(() => {
@@ -117,7 +129,7 @@ function init() {
     })
 
     const ws = new WebSocket('ws://' + window.document.location.host.replace(/:.*/, '') + ':8000')
-        ws.onmessage = (event) => {
+    ws.onmessage = (event) => {
         scene.updateRemoteEntities(stage, physicEngine, JSON.parse(event.data))
     }
 
@@ -125,9 +137,10 @@ function init() {
 
     function animate() {
         background.clear()
-        
+
+        Engine.update(physicEngine, 16.666)
         scene.tick(store.getState(), mutableStore.getState(), stage, renderer, fovMask, physicEngine, ws)
- 
+
         renderer.render(container, rt)
         renderer.render(stage)
         requestAnimationFrame(animate)

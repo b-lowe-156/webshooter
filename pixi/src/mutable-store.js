@@ -1,4 +1,6 @@
 
+const { Engine, World, Bodies, Render, Events } = Matter
+
 const MutableStore = () => {
 	const state = {
 		input: {
@@ -7,39 +9,29 @@ const MutableStore = () => {
 			strafeLeft: false,
 			strafeRight: false,
 			leftMouseDown: false,
+		},
+		currentPlayer: {
+			rotation: 0,
 		}
 	}
 	return {
 		getState: () => (state),
 		dispatch: (action) => {
-			switch (action.type) {
-				case 'keydown':
-				case 'keyup': {
-					const down = action.type === 'keydown'
-					switch (action.payload) {
-						case 87: //'w':
-							state.input.forward = down
-							break
-						case 65: //'a':
-							state.input.strafeLeft = down
-							break
-					case 83: //'s':
-							state.input.backward = down
-							break
-						case 68: //'d':
-							state.input.strafeRight = down
-							break
-					}
+			if (action.type === 'keydown' || action.type === 'keyup') {
+				const down = action.type === 'keydown'
+				if (action.payload === 87) { //'w'
+					state.input.forward = down
+				} else if (action.payload === 65) { //'a'
+					state.input.strafeLeft = down
+				} else if (action.payload === 83) { //'s'
+					state.input.backward = down
+				} else if (action.payload === 68) { //'d'
+					state.input.strafeRight = down
 				}
-					break
-				case 'LEFT_MOUSE_DOWN': {
-					state.input.leftMouseDown = true
-					break
-				}
-				case 'LEFT_MOUSE_UP': {
-					state.input.leftMouseDown = false
-					break
-				}
+			} else if (action.type === 'LEFT_MOUSE_DOWN') {
+				state.input.leftMouseDown = true
+			} else if (action.type === 'LEFT_MOUSE_UP') {
+				state.input.leftMouseDown = false
 			}
 		},
 	}

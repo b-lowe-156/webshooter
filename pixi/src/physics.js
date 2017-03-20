@@ -10,7 +10,7 @@ export function createPhysics(withRenderer=false) {
 	if (withRenderer) {
 		render = Render.create({ element: document.body, engine: engine})
 	} 
-	Engine.run(engine)
+//	Engine.run(engine)
 	if (render) {
 		Render.run(render)
 	}
