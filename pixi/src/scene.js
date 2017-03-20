@@ -7,9 +7,6 @@ const fliesenTextureDark = PIXI.Texture.fromImage('texture/fliesen-textgure-dark
 const rockTexture = PIXI.Texture.fromImage('texture/rock-texture.jpg')
 const radiaLtexture = PIXI.Texture.fromImage('texture/radial-gradient.png')
 
-
-const doubler = (n => b * 2)
-
 const scene = () => {
 	let lastPlayerState
 	let activePlayers = []
@@ -20,46 +17,36 @@ const scene = () => {
 	let activeStaticLights = []
 
 	const bulletContainer = []
+	const entityContainer = []
 
 	return {
-		initScene: (stage, engine) => {
-			Events.on(engine, 'collisionStart', (event) => {
-				//	console.log('collisionStart', event)
+		initScene: (stage, physicEngine) => {
+			Events.on(physicEngine, 'collisionStart', (event) => {
 				event.pairs.forEach(p => {
 					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
 						stage.removeChild(b.bullet)
-						World.remove(engine.world, b.bulletBox)
+						World.remove(physicEngine.world, b.bulletBox)
 					}
 					const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
 					if(a && a.bullet) {
 						stage.removeChild(a.bullet)
-						World.remove(engine.world, a.bulletBox)
+						World.remove(physicEngine.world, a.bulletBox)
 					}
 				})
 			})
 		},
-		updateScene: (state, stage, background, backgroundInFov, container, fovMask, engine) => {
+		updateScene: (state, stage, background, backgroundInFov, container, fovMask, physicEngine) => {
 			// players
 			if (lastPlayerState !== state.player) {
 				state.player.players.forEach(p => {
 					if (!activePlayers[p.id]) {
-						const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 })
-						playerPhysics.collisionFilter.group = -5
-						World.add(engine.world, playerPhysics)
-
-						const player = new PIXI.Graphics();
-						stage.addChild(player);
-						player.lineStyle(0);
-						player.beginFill(0xFFFF0B, 1.0);
-						player.drawCircle(0, 0, 20);
-						player.endFill();
-
-						const playerAimLine = new PIXI.Graphics();
-						stage.addChild(playerAimLine);
-						playerAimLine.lineStyle(1, 0xFF0000, 1);
-						playerAimLine.moveTo(0, 0);
-						playerAimLine.lineTo(300, 0);
+						const playerPhysics = state.player.playerPhysics
+						World.add(physicEngine.world, playerPhysics)
+						const player = state.player.player
+						stage.addChild(player)
+						const playerAimLine = state.player.playerAimLine
+						stage.addChild(playerAimLine)
 						playerAimLine.mask = fovMask
 
 						activePlayers[p.id] = {
@@ -104,7 +91,7 @@ const scene = () => {
 								w.height,
 								{ isStatic: true }
 						)
-						World.add(engine.world, levelBox);
+						World.add(physicEngine.world, levelBox);
 
 						activeWallRects[w.id] = { wallSprite, levelBox }
 					}
@@ -124,15 +111,14 @@ const scene = () => {
 			}
 			lastMapState = state.map
 		},
-    tick: (state, stage, renderer, fovMask, polygons, engine) => {
-			state.game.gameTime++
+    tick: (state, mutableState, stage, renderer, fovMask, physicEngine, ws) => {
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
-			if (currentPlayer) {
+			if (currentPlayer && activePlayers[currentPlayer.id]) {
 				
 				const moveSpeed = 0.01
 				const { playerPhysics, player, playerAimLine } = activePlayers[currentPlayer.id]
 
-				const input = state.input
+				const input = mutableState.input
 				if (input.forward) {
 						playerPhysics.force.x -= Math.sin(-player.rotation) * moveSpeed;
 						playerPhysics.force.y -= Math.cos(-player.rotation) * moveSpeed;
@@ -169,20 +155,27 @@ const scene = () => {
 						x: 0.05 * Math.cos(dir),
 						y: 0.05 * Math.sin(dir),
 					}
-					// Matter.Body.applyForce(bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y }, { x: 0.001, y: 0.0005 })
-					World.add(engine.world, bulletBox)
-
+					World.add(physicEngine.world, bulletBox)
 					bulletContainer.push({ bullet, bulletBox })
-					//	Matter.Body.applyForce(bulletContainer[0].bulletBox, { x: playerPhysics.position.x, y: playerPhysics.position.y }, { x: 0.001, y: 0.0005 })
-					//	bulletBox.position.x = playerPhysics.position.x
-					//	bulletBox.position.y = playerPhysics.position.y
-					//	bulletBox.angle = playerPhysics.angle
+					ws.send(JSON.stringify({
+						type: 'bullet',
+						x: playerPhysics.position.x,
+						y: playerPhysics.position.y,
+						dir: dir,
+					}))
 				}
 				
-				stage.pivot.x = playerPhysics.position.x;
-				stage.pivot.y = playerPhysics.position.y;
-				stage.position.x = renderer.width / 2;
-				stage.position.y = renderer.height / 2 + 260;
+				stage.pivot.x = playerPhysics.position.x
+				stage.pivot.y = playerPhysics.position.y
+				stage.position.x = renderer.width / 2
+				stage.position.y = renderer.height / 2 + 260
+
+				ws.send(JSON.stringify({
+					type: 'player',
+					x: playerPhysics.position.x,
+					y: playerPhysics.position.y,
+					angle: playerPhysics.angle
+				}))
 
 				let diff = player.rotation - playerPhysics.angle
 				const rotSpeed = 0.03
@@ -210,7 +203,7 @@ const scene = () => {
 					e.bullet.position.y = e.bulletBox.position.y
 				})
 
-		    const visibility = createLightPolygon(polygons, player.position.x, player.position.y)
+		    const visibility = createLightPolygon(state.map.polygons, player.position.x, player.position.y)
 				fovMask.clear()
 				fovMask.lineStyle(1, 0x333333, 1.0)
 				fovMask.lineStyle(1, 0xFFFFFF, 1)
@@ -226,20 +219,60 @@ const scene = () => {
 		updateRotation: (state, x) => {
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer) {
-				const { playerPhysics, player } = activePlayers[currentPlayer.id]
+				const { player, playerPhysics } = activePlayers[currentPlayer.id]
 				const diff = player.rotation - playerPhysics.angle
 				let diffToHeight = false
-				if (diff > (0.5 * Math.PI)) {
+				if (diff > (0.3 * Math.PI)) {
 						diffToHeight = true
 				}
-				else if (diff < -(0.5 * Math.PI)) {
+				else if (diff < -(0.3 * Math.PI)) {
 						diffToHeight = true
 				}
 				if (x < 100 && x > -100 && !diffToHeight) {
 						player.rotation += 0.001 * x
 				}
 			}
-		}
+		},
+		updateRemoteEntities: (stage, physicEngine, data) => {
+			if (data.type === 'player') {
+				if (!entityContainer[data.id]) {
+					const player = new PIXI.Graphics()
+					stage.addChild(player)
+					player.lineStyle(0)
+					player.beginFill(0xFFFF0B, 1.0)
+					player.drawCircle(0, 0, 20)
+					player.endFill()
+					entityContainer[data.id] = player
+					entityContainer[data.id].position.x = data.x
+					entityContainer[data.id].position.y = data.y
+					entityContainer[data.id].rotation = data.angle
+				} else {
+					entityContainer[data.id].position.x = data.x
+					entityContainer[data.id].position.y = data.y
+					entityContainer[data.id].rotation = data.angle
+				}
+			} else if (data.type === 'bullet'){
+				const bullet = PIXI.Sprite.fromImage('http://pixijs.github.io/examples/required/assets/basics/bunny.png')
+				bullet.anchor.set(0.5)
+				stage.addChild(bullet)
+				bullet.x = data.x
+				bullet.y = data.y
+				const bulletBox = Bodies.rectangle(
+					bullet.x,
+					bullet.y,
+					10,
+					32,
+					{ angle: data.dir + Math.PI * 0.5, }
+				)
+				bulletBox.collisionFilter.group = -5
+				bulletBox.force = {
+					x: 0.05 * Math.cos(data.dir),
+					y: 0.05 * Math.sin(data.dir),
+				}
+				World.add(physicEngine.world, bulletBox)
+				bulletContainer.push({ bullet, bulletBox })
+			}
+		},
 	}
 }
 

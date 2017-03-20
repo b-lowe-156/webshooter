@@ -1,21 +1,36 @@
-var WebSocketServer = require('ws').Server
-  , http = require('http')
-  , express = require('express')
-  , app = express();
+const WebSocket = require('ws')
+const http = require('http')
+const express = require('express')
+const app = express()
 
-app.use(express.static(__dirname + '/build'));
+app.use(express.static(__dirname + '/build'))
 
-var server = http.createServer(app);
-server.listen(8000);
+var server = http.createServer(app)
+server.listen(8000)
 
-var wss = new WebSocketServer({server: server});
-wss.on('connection', function(ws) {
-  var id = setInterval(function() {
-    ws.send(JSON.stringify(process.memoryUsage()), function() { /* ignore errors */ });
-  }, 1000);
-  console.log('started client interval');
-  ws.on('close', function() {
-    console.log('stopping client interval');
-    clearInterval(id);
-  });
-});
+let id = 0
+
+var wss = new WebSocket.Server({server: server})
+wss.on('connection', (ws) => {
+  //console.log('started client interval')
+  ws.id = id++
+
+  ws.on('message', (data) => {
+   // console.log(ws)
+
+    wss.clients.forEach(function each(client) {
+      //console.log('wss.clients', client !== ws)
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        const dataToSend = JSON.parse(data)
+        dataToSend.id = client.id
+        client.send(JSON.stringify(dataToSend))
+      }
+    })
+  })
+
+  ws.on('close', () => {
+    console.log('stopping client interval')
+  })
+})
+
+
