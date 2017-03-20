@@ -16,6 +16,8 @@ const { Engine } = Matter
 
 window.onload = init
 
+let visible = false
+
 function init() {
     const physicEngine = createPhysics()
 
@@ -27,11 +29,13 @@ function init() {
     })
     document.body.appendChild(renderer.view);
 
-    ReactDOM.render(
-      <Provider store={store}>
-        <JSONTree data={store.getState()} />
-      </Provider>, document.getElementById('app')
-    )
+    store.subscribe(() => {
+        ReactDOM.render(
+          <Provider store={store}>
+            <JSONTree data={store.getState()} />
+          </Provider>, document.getElementById('app')
+        )
+    })
 
     renderCanvas.onmousedown = (e) => {
         mutableStore.dispatch({
@@ -60,9 +64,7 @@ function init() {
     }
 
     function mousemove(e) {
-        let x = e.movementX || e.mozMovementX || 0
-        //scene.updateRotation(store.getState(), x)
-
+        const x = e.movementX || e.mozMovementX || 0
         store.dispatch({
             type: 'UPDATE_ROTATION',
             payload: x,
