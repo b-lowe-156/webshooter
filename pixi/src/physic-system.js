@@ -20,6 +20,8 @@ function createPhysics(withRenderer=false) {
 
 const physicSystem = (withRenderer=false) => {
 	let lastMapState
+	let activeWallRects = []
+
 	const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 })
 	const engine = createPhysics(withRenderer)
 	World.add(engine.world, playerPhysics)
@@ -29,11 +31,6 @@ const physicSystem = (withRenderer=false) => {
 				lastMapState = state.map
 				state.map.wallRects.forEach(w => {
 					if (!activeWallRects[w.id]) {
-						const wallSprite = new PIXI.extras.TilingSprite(rockTexture, w.width, w.height)
-						wallSprite.position.x = w.x
-						wallSprite.position.y = w.y
-						wallSprite.rotation = 0.0
-						backgroundInFov.addChild(wallSprite)
 						const levelBox = Bodies.rectangle(
 								w.x + w.width / 2,
 								w.y + w.height / 2,
@@ -41,9 +38,8 @@ const physicSystem = (withRenderer=false) => {
 								w.height,
 								{ isStatic: true }
 						)
-						World.add(physicEngine.world, levelBox);
-
-						activeWallRects[w.id] = { wallSprite, levelBox }
+						World.add(engine.world, levelBox);
+						activeWallRects[w.id] = levelBox
 					}
 				})
 			}

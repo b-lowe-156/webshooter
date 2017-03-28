@@ -135,6 +135,7 @@ function init() {
 
     store.subscribe(() => {
         scene.updateScene(store.getState(), stage, background, backgroundInFov, container, fovMask, physicEngine)
+        physicSystem.update(store.getState())
     })
 
     const ws = new WebSocket('ws://' + window.document.location.host.replace(/:.*/, '') + ':8000')

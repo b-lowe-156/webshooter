@@ -42,7 +42,6 @@ const scene = () => {
 				state.player.players.forEach(p => {
 					if (!activePlayers[p.id]) {
 						const playerPhysics = state.player.playerPhysics
-						World.add(physicEngine.world, playerPhysics)
 						const player = state.player.player
 						stage.addChild(player)
 						const playerAimLine = state.player.playerAimLine
