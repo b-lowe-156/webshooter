@@ -134,7 +134,7 @@ function init() {
     })
 
     store.subscribe(() => {
-        scene.updateScene(store.getState(), stage, background, backgroundInFov, container, fovMask, physicEngine)
+        scene.updateScene(store.getState(), stage, background, backgroundInFov, container, fovMask)
         physicSystem.update(store.getState())
     })
 

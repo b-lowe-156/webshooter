@@ -36,7 +36,7 @@ const scene = () => {
 				})
 			})
 		},
-		updateScene: (state, stage, background, backgroundInFov, container, fovMask, physicEngine) => {
+		updateScene: (state, stage, background, backgroundInFov, container, fovMask) => {
 			// players
 			if (lastPlayerState !== state.player) {
 				state.player.players.forEach(p => {
