@@ -1,4 +1,4 @@
-const { Engine, Render } = Matter
+const { Engine, World, Render } = Matter
 
 export function createPhysics(withRenderer=false) {
 	const engine = Engine.create()

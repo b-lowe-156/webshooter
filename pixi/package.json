@@ -7,7 +7,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "client": "webpack-dev-server",
-    "websocket": "node app.js"
+    "server": "node app.js"
   },
   "author": "",
   "license": "ISC",

@@ -7,7 +7,10 @@ export default function playerReducer(state = {
 	player: undefined,
 	playerAimLine: undefined,
 	playerPhysics: undefined,
-	playerRotation: 0,
+	x: 0,
+	y: 0,
+	cameraRot: 0,
+	rot: 0,
 }, action) {
 	switch (action.type) {
 		case 'SPAWN_PLAYER':
@@ -19,7 +22,6 @@ export default function playerReducer(state = {
 			}
 		case 'CONTROLE_PLAYER':
 			const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 })
-			playerPhysics.collisionFilter.group = -5
 
 			const player = new PIXI.Graphics();
 			player.lineStyle(0);
@@ -40,8 +42,7 @@ export default function playerReducer(state = {
 				playerPhysics: playerPhysics,
 			}
 		case 'UPDATE_ROTATION':
-			const currentPlayer = state.players[state.controlledPlayer]
-			if (currentPlayer) {
+			if (state.players[state.controlledPlayer]) {
 				const { player, playerPhysics } = state
 				const diff = player.rotation - playerPhysics.angle
 				let diffToHeight = false
@@ -53,8 +54,32 @@ export default function playerReducer(state = {
 				}
 				if (action.payload < 100 && action.payload > -100 && !diffToHeight) {
 						player.rotation += 0.001 * action.payload
-
-						state.playerRotation = player.rotation
+						state.rot = player.rotation
+				}
+			}
+		case 'UPDATE_POS':
+			return {
+				...state,
+				x: action.payload.x,
+				y: action.payload.y,
+			}
+		case 'TICK':
+			if (state.players[state.controlledPlayer]) {
+				const { player, playerPhysics } = state
+				const diff = player.rotation - playerPhysics.angle
+				const rotSpeed = 0.03
+				if (diff > rotSpeed) {
+						playerPhysics.torque = rotSpeed
+				}
+				else if (diff < -rotSpeed) {
+						playerPhysics.torque = -rotSpeed
+				}
+				else {
+						playerPhysics.torque = 0
+				}
+				return {
+					...state,
+					cameraRot: -playerPhysics.angle,
 				}
 			}
 		default:

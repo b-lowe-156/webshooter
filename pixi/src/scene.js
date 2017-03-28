@@ -118,31 +118,13 @@ const scene = () => {
 				const moveSpeed = 0.01
 				const { playerPhysics, player, playerAimLine } = activePlayers[currentPlayer.id]
 
-				const input = mutableState.input
-				if (input.forward) {
-						playerPhysics.force.x -= Math.sin(-player.rotation) * moveSpeed;
-						playerPhysics.force.y -= Math.cos(-player.rotation) * moveSpeed;
-				}
-				if (input.backward) {
-						playerPhysics.force.x += Math.sin(-player.rotation) * moveSpeed;
-						playerPhysics.force.y += Math.cos(-player.rotation) * moveSpeed;
-				}
-				if (input.strafeLeft) {
-						playerPhysics.force.x -= Math.sin(-player.rotation + Math.PI / 2) * moveSpeed;
-						playerPhysics.force.y -= Math.cos(-player.rotation + Math.PI / 2) * moveSpeed;
-				}
-				if (input.strafeRight) {
-						playerPhysics.force.x += Math.sin(-player.rotation + Math.PI / 2) * moveSpeed;
-						playerPhysics.force.y += Math.cos(-player.rotation + Math.PI / 2) * moveSpeed;
-				}
-
-				if (input.leftMouseDown) {
+				if (state.input.leftMouseDown) {
 					const bullet = PIXI.Sprite.fromImage('http://pixijs.github.io/examples/required/assets/basics/bunny.png')
 					bullet.anchor.set(0.5)
 					stage.addChild(bullet)
-					bullet.x = playerPhysics.position.x
-					bullet.y = playerPhysics.position.y
-					const dir = (Math.random() - 0.5) * 0.1 + player.rotation - Math.PI * 0.5
+					bullet.x = state.player.x
+					bullet.y = state.player.y
+					const dir = (Math.random() - 0.5) * 0.1 + state.player.rot - Math.PI * 0.5
 					const bulletBox = Bodies.rectangle(
 						bullet.x,
 						bullet.y,
@@ -157,45 +139,38 @@ const scene = () => {
 					}
 					World.add(physicEngine.world, bulletBox)
 					bulletContainer.push({ bullet, bulletBox })
-					ws.send(JSON.stringify({
-						type: 'bullet',
-						x: playerPhysics.position.x,
-						y: playerPhysics.position.y,
-						dir: dir,
-					}))
+
+					if (ws.readyState === 1) {
+						ws.send(JSON.stringify({
+							type: 'bullet',
+							x: state.player.x,
+							y: state.player.y,
+							dir: dir,
+						}))
+					}
 				}
 				
-				stage.pivot.x = playerPhysics.position.x
-				stage.pivot.y = playerPhysics.position.y
+				stage.pivot.x = state.player.x
+				stage.pivot.y = state.player.y
 				stage.position.x = renderer.width / 2
 				stage.position.y = renderer.height / 2 + 260
+				stage.rotation = state.player.cameraRot
 
-				ws.send(JSON.stringify({
-					type: 'player',
-					x: playerPhysics.position.x,
-					y: playerPhysics.position.y,
-					angle: playerPhysics.angle
-				}))
-
-				let diff = player.rotation - playerPhysics.angle
-				const rotSpeed = 0.03
-				if (diff > rotSpeed) {
-						playerPhysics.torque = rotSpeed
+				if (ws.readyState === 1) {
+					ws.send(JSON.stringify({
+						type: 'player',
+						x: state.player.x,
+						y: state.player.y,
+						angle: state.player.rot
+					}))
 				}
-				else if (diff < -rotSpeed) {
-						playerPhysics.torque = -rotSpeed
-				}
-				else {
-						playerPhysics.torque = 0
-				}
-				stage.rotation = -playerPhysics.angle
 
-				playerAimLine.position.x = playerPhysics.position.x
-				playerAimLine.position.y = playerPhysics.position.y
-				playerAimLine.rotation = player.rotation - 0.5 * Math.PI
+				playerAimLine.position.x = state.player.x
+				playerAimLine.position.y = state.player.y
+				playerAimLine.rotation = state.player.rot - 0.5 * Math.PI
 
-				player.position.x = playerPhysics.position.x
-        player.position.y = playerPhysics.position.y
+				player.position.x = state.player.x
+        player.position.y = state.player.y
 
 				bulletContainer.forEach(e => {
 					e.bullet.rotation = e.bulletBox.angle
@@ -203,7 +178,7 @@ const scene = () => {
 					e.bullet.position.y = e.bulletBox.position.y
 				})
 
-		    const visibility = createLightPolygon(state.map.polygons, player.position.x, player.position.y)
+		    const visibility = createLightPolygon(state.map.polygons, state.player.x, state.player.y)
 				fovMask.clear()
 				fovMask.lineStyle(1, 0x333333, 1.0)
 				fovMask.lineStyle(1, 0xFFFFFF, 1)

@@ -8,6 +8,7 @@ import { createLightingSprite, updateFov } from './lighting'
 import { initLightSources } from './static_light'
 import store from './store'
 import scene from './scene'
+import physicSystem from './physic-system'
 import mutableStore from './mutable-store'
 import { createPhysics } from './physics'
 import JSONTree from 'react-json-tree'
@@ -38,11 +39,17 @@ function init() {
     })
 
     renderCanvas.onmousedown = (e) => {
+        store.dispatch({
+            type: 'LEFT_MOUSE_DOWN',
+        })
         mutableStore.dispatch({
             type: 'LEFT_MOUSE_DOWN',
         })
     }
     renderCanvas.onmouseup = (e) => {
+        store.dispatch({
+            type: 'LEFT_MOUSE_UP',
+        })
         mutableStore.dispatch({
             type: 'LEFT_MOUSE_UP',
         })
@@ -141,6 +148,11 @@ function init() {
         background.clear()
 
         Engine.update(physicEngine, 16.666)
+
+        physicSystem.tick(store.getState(), store.dispatch)
+
+        store.dispatch({type: 'TICK'})
+
         scene.tick(store.getState(), mutableStore.getState(), stage, renderer, fovMask, physicEngine, ws)
 
         renderer.render(container, rt)
@@ -150,9 +162,11 @@ function init() {
 }
 
 window.addEventListener('keydown', function (e) {
+    store.dispatch({ type: 'keydown', payload: e.keyCode })
     mutableStore.dispatch({ type: 'keydown', payload: e.keyCode })
 })
 
 window.addEventListener('keyup', function (e) {
+    store.dispatch({ type: 'keyup', payload: e.keyCode })
     mutableStore.dispatch({ type: 'keyup', payload: e.keyCode })
 })

@@ -1,16 +1,13 @@
 import { combineReducers, createStore, compose } from 'redux'
 
-import DevTools from './DevTools'
-import playerReducer from './player-reducer'
+import inputReducer from './input-reducer'
 import mapReducer from './map-reducer'
-
-const enhancer = compose(
-  // DevTools.instrument()
-)
+import playerReducer from './player-reducer'
 
 const reducers = combineReducers({
-	player: playerReducer,
+	input: inputReducer,
 	map: mapReducer,
+	player: playerReducer,
 })
 
-export default createStore(reducers, {}, enhancer)
+export default createStore(reducers, {})
