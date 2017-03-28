@@ -41,7 +41,6 @@ const scene = () => {
 			if (lastPlayerState !== state.player) {
 				state.player.players.forEach(p => {
 					if (!activePlayers[p.id]) {
-						const playerPhysics = state.player.playerPhysics
 						const player = state.player.player
 						stage.addChild(player)
 						const playerAimLine = state.player.playerAimLine
@@ -49,7 +48,6 @@ const scene = () => {
 						playerAimLine.mask = fovMask
 
 						activePlayers[p.id] = {
-							playerPhysics,
 							player,
 							playerAimLine,
 						}
@@ -83,16 +81,7 @@ const scene = () => {
 						wallSprite.position.y = w.y
 						wallSprite.rotation = 0.0
 						backgroundInFov.addChild(wallSprite)
-						const levelBox = Bodies.rectangle(
-								w.x + w.width / 2,
-								w.y + w.height / 2,
-								w.width,
-								w.height,
-								{ isStatic: true }
-						)
-						World.add(physicEngine.world, levelBox);
-
-						activeWallRects[w.id] = { wallSprite, levelBox }
+						activeWallRects[w.id] = wallSprite
 					}
 				})
 				state.map.staticLights.forEach(l => {
@@ -115,7 +104,7 @@ const scene = () => {
 			if (currentPlayer && activePlayers[currentPlayer.id]) {
 				
 				const moveSpeed = 0.01
-				const { playerPhysics, player, playerAimLine } = activePlayers[currentPlayer.id]
+				const { player, playerAimLine } = activePlayers[currentPlayer.id]
 
 				if (state.input.leftMouseDown) {
 					const bullet = PIXI.Sprite.fromImage('http://pixijs.github.io/examples/required/assets/basics/bunny.png')
@@ -149,11 +138,12 @@ const scene = () => {
 					}
 				}
 				
+				player.rotation = state.player.rot
 				stage.pivot.x = state.player.x
 				stage.pivot.y = state.player.y
 				stage.position.x = renderer.width / 2
 				stage.position.y = renderer.height / 2 + 260
-				stage.rotation = state.player.cameraRot
+				stage.rotation = -state.player.bodyRot
 
 				if (ws.readyState === 1) {
 					ws.send(JSON.stringify({
@@ -188,23 +178,6 @@ const scene = () => {
 				}
 				fovMask.endFill()
 
-			}
-		},
-		updateRotation: (state, x) => {
-			const currentPlayer = state.player.players[state.player.controlledPlayer]
-			if (currentPlayer) {
-				const { player, playerPhysics } = activePlayers[currentPlayer.id]
-				const diff = player.rotation - playerPhysics.angle
-				let diffToHeight = false
-				if (diff > (0.3 * Math.PI)) {
-						diffToHeight = true
-				}
-				else if (diff < -(0.3 * Math.PI)) {
-						diffToHeight = true
-				}
-				if (x < 100 && x > -100 && !diffToHeight) {
-						player.rotation += 0.001 * x
-				}
 			}
 		},
 		updateRemoteEntities: (stage, physicEngine, data) => {

@@ -63,10 +63,27 @@ const physicSystem = (withRenderer=false) => {
 						playerPhysics.force.x += Math.sin(-player.rot + Math.PI / 2) * moveSpeed;
 						playerPhysics.force.y += Math.cos(-player.rot + Math.PI / 2) * moveSpeed;
 				}
+
+				const diff = player.rot - playerPhysics.angle
+				const rotSpeed = 0.03
+				if (diff > rotSpeed) {
+						playerPhysics.torque = rotSpeed
+				}
+				else if (diff < -rotSpeed) {
+						playerPhysics.torque = -rotSpeed
+				}
+				else {
+						playerPhysics.torque = 0
+				}
+
  				Engine.update(engine, 16.666)
 			dispatch({
-				type: 'UPDATE_POS',
-				payload: { x: playerPhysics.position.x, y: playerPhysics.position.y },
+				type: 'UPDATE_PHYSICS',
+				payload: {
+					x: playerPhysics.position.x,
+					y: playerPhysics.position.y,
+					rot: playerPhysics.angle,
+				},
 			})
 		},
 	}

@@ -152,8 +152,6 @@ function init() {
 
         physicSystem.tick(store.getState(), store.dispatch)
 
-        store.dispatch({type: 'TICK'})
-
         scene.tick(store.getState(), mutableStore.getState(), stage, renderer, fovMask, physicEngine, ws)
 
         renderer.render(container, rt)
