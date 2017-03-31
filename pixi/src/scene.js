@@ -99,7 +99,7 @@ const scene = () => {
 			}
 			lastMapState = state.map
 		},
-    tick: (state, mutableState, stage, renderer, fovMask, physicEngine, ws) => {
+    tick: (state, stage, renderer, fovMask, physicEngine, ws) => {
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer && activePlayers[currentPlayer.id]) {
 				

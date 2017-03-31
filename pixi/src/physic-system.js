@@ -1,6 +1,6 @@
-const { Engine, World, Render, Bodies } = Matter
+const { Engine, World, Render, Bodies, Events } = Matter
 
-function createPhysics(withRenderer=false) {
+const createPhysics = withRenderer => {
 	const engine = Engine.create()
 
 	engine.world.gravity.x = 0.0
@@ -18,12 +18,33 @@ function createPhysics(withRenderer=false) {
 	return engine
 }
 
-const physicSystem = (withRenderer=false) => {
+const initScene = physicEngine => {
+	Events.on(physicEngine, 'collisionStart', (event) => {
+		event.pairs.forEach(p => {
+			const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
+			if(b && b.bullet) {
+				// stage.removeChild(b.bullet)
+				World.remove(physicEngine.world, b.bulletBox)
+			}
+			const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
+			if(a && a.bullet) {
+				// stage.removeChild(a.bullet)
+				World.remove(physicEngine.world, a.bulletBox)
+			}
+		})
+	})
+}
+
+const physicSystem = (withRenderer=true) => {
 	let lastMapState
 	let activeWallRects = []
+	let id = 0
 
 	const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 })
 	const engine = createPhysics(withRenderer)
+
+	let bullet = []
+
 	World.add(engine.world, playerPhysics)
 	return {
 		update: (state) => {
@@ -62,6 +83,33 @@ const physicSystem = (withRenderer=false) => {
 				if (input.strafeRight) {
 						playerPhysics.force.x += Math.sin(-player.rot + Math.PI / 2) * moveSpeed;
 						playerPhysics.force.y += Math.cos(-player.rot + Math.PI / 2) * moveSpeed;
+				}
+
+				if (state.input.leftMouseDown) {
+					id++
+					const dir = (Math.random() - 0.5) * 0.1 + state.player.rot - Math.PI * 0.5
+					const bulletBox = Bodies.rectangle(
+						bullet.x,
+						bullet.y,
+						10,
+						32,
+						{ angle: dir + Math.PI * 0.5, }
+					)
+					bulletBox.collisionFilter.group = -5
+					bulletBox.force = {
+						x: 0.05 * Math.cos(dir),
+						y: 0.05 * Math.sin(dir),
+					}
+					dispatch({
+						type: 'ADD_BULLET',
+						payload: {
+							id: id,
+							x: state.player.x,
+							y: state.player.y,
+							dir: dir,
+						}
+					})
+					bullet[id] = bulletBox
 				}
 
 				const diff = player.rot - playerPhysics.angle
