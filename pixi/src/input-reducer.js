@@ -31,15 +31,19 @@ export default function inputReducer(state = {
 						...state,
 						strafeRight: down,
 					}
+				default:
+					return state
 			}
 		}
 		case 'LEFT_MOUSE_DOWN': {
+			console.log('LEFT_MOUSE_DOWN', action.type)
 			return {
 				...state,
 				leftMouseDown: true,
 			}
 		}
 		case 'LEFT_MOUSE_UP': {
+			console.log('LEFT_MOUSE_UP', action.type)
 			return {
 				...state,
 				leftMouseDown: false,
