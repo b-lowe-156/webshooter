@@ -47,6 +47,20 @@ const physicSystem = (withRenderer=true) => {
 
 	World.add(engine.world, playerPhysics)
 	return {
+		init: (store) => {
+			Events.on(engine, 'collisionStart', (event) => {
+				event.pairs.forEach(p => {
+					const found = store.getState().bullet.bullets.find(b => b === p.bodyA || b === p.bodyB)
+					if (found) {
+							store.dispatch({
+							type: 'REMOVE_BULLET',
+							payload: found,
+						})
+						World.remove(engine.world, found)
+					}
+				})
+			})
+		},
 		update: (state) => {
 			if (lastMapState !== state.map) {
 				lastMapState = state.map

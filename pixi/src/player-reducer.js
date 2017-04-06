@@ -40,6 +40,7 @@ export default function playerReducer(state = {
 		case 'UPDATE_ROTATION':
 			if (state.players[state.controlledPlayer]) {
 				const diff = state.rot - state.bodyRot
+			
 				let diffToHeight = false
 				if (diff > (0.3 * Math.PI)) {
 						diffToHeight = true
@@ -52,6 +53,8 @@ export default function playerReducer(state = {
 						...state,
 						rot: state.rot + 0.001 * action.payload,
 					}
+				} else {
+					return state
 				}
 			}
 		case 'UPDATE_PHYSICS':
