@@ -18,23 +18,6 @@ const createPhysics = withRenderer => {
 	return engine
 }
 
-const initScene = physicEngine => {
-	Events.on(physicEngine, 'collisionStart', (event) => {
-		event.pairs.forEach(p => {
-			const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
-			if(b && b.bullet) {
-				// stage.removeChild(b.bullet)
-				World.remove(physicEngine.world, b.bulletBox)
-			}
-			const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
-			if(a && a.bullet) {
-				// stage.removeChild(a.bullet)
-				World.remove(physicEngine.world, a.bulletBox)
-			}
-		})
-	})
-}
-
 const physicSystem = (withRenderer=true) => {
 	let lastMapState
 	let activeWallRects = []
@@ -114,6 +97,7 @@ const physicSystem = (withRenderer=true) => {
 						x: 0.05 * Math.cos(dir),
 						y: 0.05 * Math.sin(dir),
 					}
+					bulletBox.entityId = id
 					dispatch({
 						type: 'ADD_BULLET',
 						payload: {
