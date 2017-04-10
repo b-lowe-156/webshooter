@@ -19,6 +19,8 @@ window.onload = init
 let visible = false
 
 function init() {
+    let meter = new FPSMeter(document.getElementById('fps'))
+    
     const physicEngine = createPhysics()
 
     const renderCanvas = document.getElementById('renderCanvas')
@@ -32,7 +34,10 @@ function init() {
     store.subscribe(() => {
         ReactDOM.render(
           <Provider store={store}>
-            <JSONTree data={store.getState()} />
+              <div>asdas</div>
+            { /*
+              <JSONTree data={store.getState()} />
+             */ }
           </Provider>, document.getElementById('app')
         )
     })
@@ -140,6 +145,7 @@ function init() {
     animate()
 
     function animate() {
+        meter.tick()
         background.clear()
 
         Engine.update(physicEngine, 16.666)

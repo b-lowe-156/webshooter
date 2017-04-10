@@ -19,34 +19,36 @@ const createPhysics = withRenderer => {
 }
 
 const physicSystem = (withRenderer=true) => {
-	let lastMapState
+	let lastStates = []
+
 	let activeWallRects = []
 	let id = 0
 
 	const playerPhysics = Bodies.circle(80, 80, 20, { restitution: 0.01, frictionAir: 0.5 })
 	const engine = createPhysics(withRenderer)
 
-	let bullet = []
+	let activeBullets = []
 
 	World.add(engine.world, playerPhysics)
 	return {
 		init: (store) => {
 			Events.on(engine, 'collisionStart', (event) => {
 				event.pairs.forEach(p => {
-					const found = store.getState().bullet.bullets.find(b => b === p.bodyA || b === p.bodyB)
+					const found = store.getState().bullet.bullets.find(b => b.id === p.bodyA.entityId || b.id === p.bodyB.entityId)
 					if (found) {
 							store.dispatch({
 							type: 'REMOVE_BULLET',
 							payload: found,
 						})
 						World.remove(engine.world, found)
+						delete activeBullets[found.id]
 					}
 				})
 			})
 		},
 		update: (state) => {
-			if (lastMapState !== state.map) {
-				lastMapState = state.map
+			if (lastStates['map'] !== state.map) {
+				lastStates['map'] = state.map
 				state.map.wallRects.forEach(w => {
 					if (!activeWallRects[w.id]) {
 						const levelBox = Bodies.rectangle(
@@ -56,8 +58,31 @@ const physicSystem = (withRenderer=true) => {
 								w.height,
 								{ isStatic: true }
 						)
-						World.add(engine.world, levelBox);
+						World.add(engine.world, levelBox)
 						activeWallRects[w.id] = levelBox
+					}
+				})
+			}
+			if (lastStates['bullet'] !== state.bullet) {
+				lastStates['bullet'] = state.bullet
+				console.log('update bullets')
+				state.bullet.bullets.forEach(b => {
+					if (!activeBullets[b.id]) {
+						const bulletBox = Bodies.rectangle(
+							b.x,
+							b.y,
+							10,
+							32,
+							{ angle: b.dir + Math.PI * 0.5, }
+						)
+						bulletBox.collisionFilter.group = -5
+						bulletBox.force = {
+							x: 0.05 * Math.cos(b.dir),
+							y: 0.05 * Math.sin(b.dir),
+						}
+						bulletBox.entityId = b.id
+						activeBullets[b.id] = bulletBox
+						World.add(engine.world, bulletBox)
 					}
 				})
 			}
@@ -82,22 +107,10 @@ const physicSystem = (withRenderer=true) => {
 						playerPhysics.force.y += Math.cos(-player.rot + Math.PI / 2) * moveSpeed;
 				}
 
+				/*
 				if (state.input.leftMouseDown) {
 					id++
 					const dir = (Math.random() - 0.5) * 0.1 + state.player.rot - Math.PI * 0.5
-					const bulletBox = Bodies.rectangle(
-						bullet.x,
-						bullet.y,
-						10,
-						32,
-						{ angle: dir + Math.PI * 0.5, }
-					)
-					bulletBox.collisionFilter.group = -5
-					bulletBox.force = {
-						x: 0.05 * Math.cos(dir),
-						y: 0.05 * Math.sin(dir),
-					}
-					bulletBox.entityId = id
 					dispatch({
 						type: 'ADD_BULLET',
 						payload: {
@@ -107,8 +120,8 @@ const physicSystem = (withRenderer=true) => {
 							dir: dir,
 						}
 					})
-					bullet[id] = bulletBox
 				}
+				*/
 
 				const diff = player.rot - playerPhysics.angle
 				const rotSpeed = 0.03
