@@ -31,16 +31,6 @@ function init() {
     })
     document.body.appendChild(renderer.view);
 
-    store.subscribe(() => {
-        ReactDOM.render(
-          <Provider store={store}>
-            {
-              <JSONTree data={store.getState()} />
-            }
-          </Provider>, document.getElementById('app')
-        )
-    })
-
     renderCanvas.onmousedown = (e) => {
         store.dispatch({
             type: 'LEFT_MOUSE_DOWN',
@@ -77,9 +67,8 @@ function init() {
 
     var stage = new PIXI.Container();
 
-    scene.initScene(stage, physicEngine)
-    physicSystem.init(store)
-
+    scene.initScene(stage, physicEngine, store)
+    
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
     var backgroundInFov = new PIXI.Graphics();
@@ -144,6 +133,18 @@ function init() {
     animate()
 
     function animate() {
+        ReactDOM.render(
+          <Provider store={store}>
+            {
+              <JSONTree data={store.getState()} />
+            }
+          </Provider>, document.getElementById('app')
+        )
+
+        store.dispatch({
+            type: 'TICK',
+        })
+
         meter.tick()
         background.clear()
 
@@ -151,7 +152,7 @@ function init() {
 
         physicSystem.tick(store.getState(), store.dispatch)
 
-        scene.tick(store.getState(), stage, renderer, fovMask, physicEngine, ws)
+        scene.tick(store.getState(), stage, renderer, fovMask, physicEngine, ws, store.dispatch)
 
         renderer.render(container, rt)
         renderer.render(stage)

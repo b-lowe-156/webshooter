@@ -31,21 +31,6 @@ const physicSystem = (withRenderer=true) => {
 
 	World.add(engine.world, playerPhysics)
 	return {
-		init: (store) => {
-			Events.on(engine, 'collisionStart', (event) => {
-				event.pairs.forEach(p => {
-					const found = store.getState().bullet.bullets.find(b => b.id === p.bodyA.entityId || b.id === p.bodyB.entityId)
-					if (found) {
-							store.dispatch({
-							type: 'REMOVE_BULLET',
-							payload: found,
-						})
-						World.remove(engine.world, found)
-						delete activeBullets[found.id]
-					}
-				})
-			})
-		},
 		update: (state) => {
 			if (lastStates['map'] !== state.map) {
 				lastStates['map'] = state.map
@@ -60,29 +45,6 @@ const physicSystem = (withRenderer=true) => {
 						)
 						World.add(engine.world, levelBox)
 						activeWallRects[w.id] = levelBox
-					}
-				})
-			}
-			if (lastStates['bullet'] !== state.bullet) {
-				lastStates['bullet'] = state.bullet
-				console.log('update bullets')
-				state.bullet.bullets.forEach(b => {
-					if (!activeBullets[b.id]) {
-						const bulletBox = Bodies.rectangle(
-							b.x,
-							b.y,
-							10,
-							32,
-							{ angle: b.dir + Math.PI * 0.5, }
-						)
-						bulletBox.collisionFilter.group = -5
-						bulletBox.force = {
-							x: 0.05 * Math.cos(b.dir),
-							y: 0.05 * Math.sin(b.dir),
-						}
-						bulletBox.entityId = b.id
-						activeBullets[b.id] = bulletBox
-						World.add(engine.world, bulletBox)
 					}
 				})
 			}

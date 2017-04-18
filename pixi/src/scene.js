@@ -16,22 +16,23 @@ const scene = () => {
 	let activeWallRects = []
 	let activeStaticLights = []
 
-	const bulletContainer = []
 	const entityContainer = []
 
 	return {
-		initScene: (stage, physicEngine) => {
+		initScene: (stage, physicEngine, store) => {
 			Events.on(physicEngine, 'collisionStart', event => {
+				const state = store.getState()
 				event.pairs.forEach(p => {
-					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
-					if(b && b.bullet) {
-						stage.removeChild(b.bullet)
-						World.remove(physicEngine.world, b.bulletBox)
-					}
-					const a = bulletContainer.find(b => b.bulletBox === p.bodyA)
-					if(a && a.bullet) {
-						stage.removeChild(a.bullet)
-						World.remove(physicEngine.world, a.bulletBox)
+					const found = state.bullet.bulletContainer.find(b => b.bulletBox === p.bodyB || b.bulletBox === p.bodyA)
+					if(found && found.bullet) {
+						stage.removeChild(found.bullet)
+						World.remove(physicEngine.world, found.bulletBox)
+						//const i = state.bullet.bulletContainer.indexOf(found)
+						//state.bullet.bulletContainer.splice(i, 1)
+						store.dispatch({
+							type: 'REMOVE_BULLET',
+							payload: found,
+						})
 					}
 				})
 			})
@@ -107,7 +108,7 @@ const scene = () => {
 			}
 			lastMapState = state.map
 		},
-    tick: (state, stage, renderer, fovMask, physicEngine, ws) => {
+    tick: (state, stage, renderer, fovMask, physicEngine, ws, dispatch) => {
 			const currentPlayer = state.player.players[state.player.controlledPlayer]
 			if (currentPlayer && activePlayers[currentPlayer.id]) {
 				
@@ -134,7 +135,11 @@ const scene = () => {
 						y: 0.05 * Math.sin(dir),
 					}
 					World.add(physicEngine.world, bulletBox)
-					bulletContainer.push({ bullet, bulletBox })
+					dispatch({
+						type: 'ADD_BULLET',
+						payload: { bullet, bulletBox } 
+					})
+					//state.bullet.bulletContainer.push({ bullet, bulletBox })
 
 					if (ws.readyState === 1) {
 						ws.send(JSON.stringify({
@@ -168,12 +173,6 @@ const scene = () => {
 
 				player.position.x = state.player.x
         player.position.y = state.player.y
-
-				bulletContainer.forEach(e => {
-					e.bullet.rotation = e.bulletBox.angle
-					e.bullet.position.x = e.bulletBox.position.x
-					e.bullet.position.y = e.bulletBox.position.y
-				})
 
 		    const visibility = createLightPolygon(state.map.polygons, state.player.x, state.player.y)
 				fovMask.clear()
