@@ -34,10 +34,9 @@ function init() {
     store.subscribe(() => {
         ReactDOM.render(
           <Provider store={store}>
-              <div>asdas</div>
-            { /*
+            {
               <JSONTree data={store.getState()} />
-             */ }
+            }
           </Provider>, document.getElementById('app')
         )
     })
@@ -133,7 +132,7 @@ function init() {
     })
 
     store.subscribe(() => {
-        scene.updateScene(store.getState(), stage, background, backgroundInFov, container, fovMask)
+        scene.updateScene(store.getState(), stage, background, backgroundInFov, container, fovMask, physicEngine)
         physicSystem.update(store.getState())
     })
 

@@ -21,7 +21,8 @@ const scene = () => {
 
 	return {
 		initScene: (stage, physicEngine) => {
-			Events.on(physicEngine, 'collisionStart', (event) => {
+			Events.on(physicEngine, 'collisionStart', event => {
+				console.log('collisionStart', event)
 				event.pairs.forEach(p => {
 					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
@@ -36,7 +37,7 @@ const scene = () => {
 				})
 			})
 		},
-		updateScene: (state, stage, background, backgroundInFov, container, fovMask) => {
+		updateScene: (state, stage, background, backgroundInFov, container, fovMask, physicEngine) => {
 			// players
 			if (lastPlayerState !== state.player) {
 				state.player.players.forEach(p => {
@@ -81,7 +82,15 @@ const scene = () => {
 						wallSprite.position.y = w.y
 						wallSprite.rotation = 0.0
 						backgroundInFov.addChild(wallSprite)
-						activeWallRects[w.id] = wallSprite
+						const levelBox = Bodies.rectangle(
+								w.x + w.width / 2,
+								w.y + w.height / 2,
+								w.width,
+								w.height,
+								{ isStatic: true }
+						)
+						World.add(physicEngine.world, levelBox);
+						activeWallRects[w.id] = { wallSprite, levelBox }
 					}
 				})
 				state.map.staticLights.forEach(l => {
