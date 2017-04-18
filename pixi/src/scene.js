@@ -22,7 +22,6 @@ const scene = () => {
 	return {
 		initScene: (stage, physicEngine) => {
 			Events.on(physicEngine, 'collisionStart', event => {
-				console.log('collisionStart', event)
 				event.pairs.forEach(p => {
 					const b = bulletContainer.find(b => b.bulletBox === p.bodyB)
 					if(b && b.bullet) {
