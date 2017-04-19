@@ -31,21 +31,6 @@ const physicSystem = (withRenderer=true) => {
 
 	World.add(engine.world, playerPhysics)
 	return {
-		init: (store) => {
-			Events.on(engine, 'collisionStart', (event) => {
-				event.pairs.forEach(p => {
-					const found = store.getState().bullet.bullets.find(b => b.id === p.bodyA.entityId || b.id === p.bodyB.entityId)
-					if (found) {
-							store.dispatch({
-							type: 'REMOVE_BULLET',
-							payload: found,
-						})
-						World.remove(engine.world, found)
-						delete activeBullets[found.id]
-					}
-				})
-			})
-		},
 		update: (state) => {
 			if (lastStates['map'] !== state.map) {
 				lastStates['map'] = state.map
@@ -106,22 +91,6 @@ const physicSystem = (withRenderer=true) => {
 						playerPhysics.force.x += Math.sin(-player.rot + Math.PI / 2) * moveSpeed;
 						playerPhysics.force.y += Math.cos(-player.rot + Math.PI / 2) * moveSpeed;
 				}
-
-				/*
-				if (state.input.leftMouseDown) {
-					id++
-					const dir = (Math.random() - 0.5) * 0.1 + state.player.rot - Math.PI * 0.5
-					dispatch({
-						type: 'ADD_BULLET',
-						payload: {
-							id: id,
-							x: state.player.x,
-							y: state.player.y,
-							dir: dir,
-						}
-					})
-				}
-				*/
 
 				const diff = player.rot - playerPhysics.angle
 				const rotSpeed = 0.03

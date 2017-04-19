@@ -78,7 +78,6 @@ function init() {
     var stage = new PIXI.Container();
 
     scene.initScene(stage, physicEngine)
-    physicSystem.init(store)
 
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
