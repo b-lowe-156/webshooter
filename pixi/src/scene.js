@@ -70,7 +70,7 @@ const scene = () => {
 						floorSpriteInFov.position.x = f.x
 						floorSpriteInFov.position.y = f.y
 						floorSpriteInFov.rotation = 0.0
-						backgroundInFov.addChild(floorSpriteInFov)
+					  backgroundInFov.addChild(floorSpriteInFov)
 
 						activeFloorRects[f.id] = { floorSprite, floorSpriteInFov }
 					}
@@ -81,7 +81,7 @@ const scene = () => {
 						wallSprite.position.x = w.x
 						wallSprite.position.y = w.y
 						wallSprite.rotation = 0.0
-						backgroundInFov.addChild(wallSprite)
+					  backgroundInFov.addChild(wallSprite)
 						const levelBox = Bodies.rectangle(
 								w.x + w.width / 2,
 								w.y + w.height / 2,
@@ -184,7 +184,6 @@ const scene = () => {
 						fovMask.lineTo(visibility[i % visibility.length][0], visibility[i % visibility.length][1])
 				}
 				fovMask.endFill()
-
 			}
 		},
 		updateRemoteEntities: (stage, physicEngine, data) => {

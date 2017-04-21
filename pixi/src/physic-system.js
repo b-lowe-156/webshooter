@@ -69,22 +69,6 @@ const physicSystem = (withRenderer=true) => {
 						playerPhysics.force.y += Math.cos(-player.rot + Math.PI / 2) * moveSpeed;
 				}
 
-				/*
-				if (state.input.leftMouseDown) {
-					id++
-					const dir = (Math.random() - 0.5) * 0.1 + state.player.rot - Math.PI * 0.5
-					dispatch({
-						type: 'ADD_BULLET',
-						payload: {
-							id: id,
-							x: state.player.x,
-							y: state.player.y,
-							dir: dir,
-						}
-					})
-				}
-				*/
-
 				const diff = player.rot - playerPhysics.angle
 				const rotSpeed = 0.03
 				if (diff > rotSpeed) {

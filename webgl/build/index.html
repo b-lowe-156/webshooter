@@ -1,33 +1,32 @@
-<canvas id="c"></canvas>
+<canvas id="canvas"></canvas>
   
-<!-- you can and should delete this script. it is only used on the site to help with errors -->
-<script id="2d-vertex-shader" type="notjs">
+<!-- vertex shader -->
+<script id="drawImage-vertex-shader" type="x-shader/x-vertex">
+attribute vec4 a_position;
+attribute vec2 a_texcoord;
 
-  // an attribute will receive data from a buffer
-  attribute vec4 a_position;
+uniform mat4 u_matrix;
+uniform mat4 u_textureMatrix;
 
-  // all shaders have a main function
-  void main() {
+varying vec2 v_texcoord;
 
-    // gl_Position is a special variable a vertex shader
-    // is responsible for setting
-    gl_Position = a_position;
-  }
-
+void main() {
+   gl_Position = u_matrix * a_position;
+   v_texcoord = (u_textureMatrix * vec4(a_texcoord, 0, 1)).xy;
+}
 </script>
-<script id="2d-fragment-shader" type="notjs">
+<script id="drawImage-fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
 
-  // fragment shaders don't have a default precision so we need
-  // to pick one. mediump is a good default
-  precision mediump float;
+varying vec2 v_texcoord;
 
-  void main() {
-    // gl_FragColor is a special variable a fragment shader
-    // is responsible for setting
-    gl_FragColor = vec4(1, 0, 0.5, 1); // return redish-purple
-  }
+uniform sampler2D u_texture;
 
+void main() {
+   gl_FragColor = texture2D(u_texture, v_texcoord);
+}
 </script>
+
 <!--
 for most samples webgl-utils only provides shader compiling/linking and
 canvas resizing because why clutter the examples with code that's the same in every sample.
@@ -37,17 +36,14 @@ for webgl-utils, m3, m4, and webgl-lessons-ui.
 -->
 <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
 <script src="https://webglfundamentals.org/webgl/resources/webgl-lessons-helper.js"></script>
+<!-- you can and should delete this script. it is only used on the site to help with errors -->
+<script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fpsmeter/0.3.1/fpsmeter.min.js"></script> 
+
 
 <script src="assets/bundle.js"></script>
 
-<style>
-@import url("https://webglfundamentals.org/webgl/resources/webgl-tutorials.css");
-body {
-  margin: 0;
-}
-canvas {
-  width: 100vw;
-  height: 100vh;
-  display: block;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="main.css" media="screen" />
+
+<div id="fps"></div>
