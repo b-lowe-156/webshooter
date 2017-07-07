@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
     <title>Babylon - Getting Started</title>
-    <script src="http://cdn.babylonjs.com/2-5/babylon.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/2.5.0/babylon.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.12.0/matter.js"></script>
     <style>
         html,
@@ -46,7 +46,7 @@
                         
                         const matterEngine = Matter.Engine.create()
                         Matter.World.add(matterEngine.world, [
-                            Matter.Bodies.rectangle(90, 40, 200, 80, { isStatic: true })
+                            Matter.Bodies.rectangle(300, 380, 600, 10, { isStatic: true })
                           //  Matter.Bodies.rectangle(400, 600, 800, 50.5, { isStatic: true }),
                           //  Matter.Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
                           //  Matter.Bodies.rectangle(0, 300, 50, 600, { isStatic: true })
