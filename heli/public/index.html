@@ -25,6 +25,16 @@
 <body>
     <canvas id="renderCanvas"></canvas>
     <script>
+        const currentDate = new Date(document.lastModified)
+        console.log('currentDate', currentDate)
+
+        fetch('./index.html')
+        .then(res => res.headers.get('Last-Modified'))
+        .then(data => {
+            const serverDate = new Date(data)
+            console.log('serverDate', serverDate)
+        })
+
         const inputState = {
             forward: false,
             backward: false,
