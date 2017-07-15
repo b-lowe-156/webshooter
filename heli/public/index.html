@@ -6,6 +6,7 @@
     <title>Babylon - Getting Started</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/2.5.0/babylon.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.12.0/matter.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/5.4.2/Rx.js"></script>
     <style>
         html,
         body {
@@ -25,15 +26,29 @@
 <body>
     <canvas id="renderCanvas"></canvas>
     <script>
-        const currentDate = new Date(document.lastModified)
-        console.log('currentDate', currentDate)
+        let havaToUpdate = false
+        const checkForUpdate = () => {
+            const options = {
+                method: 'HEAD',
+                headers: new Headers(),
+                mode: 'cors',
+                cache: 'default'
+            }
+            console.log('checking for update')
+            const currentDate = new Date(document.lastModified)
+            fetch('./index.html', options)
+            .then(res => res.headers.get('Last-Modified'))
+            .then(data => {
+                const serverDate = new Date(data)
+                const havaToUpdate = currentDate < serverDate
+                console.log('have to update', havaToUpdate)
+                if (havaToUpdate) {
+                    confirm("Press a button!")
+                }
+            })
+        }
+        const checkForUpdateInterval = setInterval(checkForUpdate, 2 * 1000)
 
-        fetch('./index.html')
-        .then(res => res.headers.get('Last-Modified'))
-        .then(data => {
-            const serverDate = new Date(data)
-            console.log('serverDate', serverDate)
-        })
 
         const inputState = {
             forward: false,
@@ -107,7 +122,6 @@
                 } 
                 let helicopter = globalScene.meshes.find(m => m.id === 'helicopter')
                 helicopter.position.y += 0.1
-                console.log('helicopter', helicopter)
             })
         })
     </script>
