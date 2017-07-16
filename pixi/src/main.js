@@ -67,13 +67,9 @@ function init() {
 
     var stage = new PIXI.Container();
 
-<<<<<<< .mine
     scene.initScene(stage, physicEngine, store)
-    
-=======
-    scene.initScene(stage, physicEngine)
 
->>>>>>> .theirs
+
     var background = new PIXI.Graphics();
     var fovMask = new PIXI.Graphics();
     var backgroundInFov = new PIXI.Graphics();
