@@ -26,29 +26,53 @@
 <body>
     <canvas id="renderCanvas"></canvas>
     <script>
-        let havaToUpdate = false
-        const checkForUpdate = () => {
-            const options = {
-                method: 'HEAD',
-                headers: new Headers(),
-                mode: 'cors',
-                cache: 'default'
-            }
-            console.log('checking for update')
-            const currentDate = new Date(document.lastModified)
-            fetch('./index.html', options)
-            .then(res => res.headers.get('Last-Modified'))
-            .then(data => {
-                const serverDate = new Date(data)
-                const havaToUpdate = currentDate < serverDate
-                console.log('have to update', havaToUpdate)
-                if (havaToUpdate) {
-                    confirm("Press a button!")
-                }
-            })
-        }
-        const checkForUpdateInterval = setInterval(checkForUpdate, 2 * 1000)
 
+Rx.Observable.interval(1000)
+.flatMap(() => Rx.Observable.fromPromise(
+    fetch('./index.html', {
+        method: 'HEAD',
+    }))
+    .catch(() => {
+        console.log('server nicht erreichbar!')
+        return Rx.Observable.empty()
+    })
+    .map(res => res.headers.get('Last-Modified'))
+    .map(serverDate => new Date(serverDate))
+)
+.takeWhile(serverDate => new Date(document.lastModified) >= serverDate)
+.subscribe(
+    () => console.log('checking for new version'),
+    error => console.error(error),
+    () => console.log('have to update')
+)
+
+/*
+// procedial
+let havaToUpdate = false
+const checkForUpdate = () => {
+    const options = {
+        method: 'HEAD',
+        headers: new Headers(),
+        mode: 'cors',
+        cache: 'default'
+    }
+    // console.log('checking for update')
+    const currentDate = new Date(document.lastModified)
+    fetch('./index.html', options)
+    .then(res => res.headers.get('Last-Modified'))
+    .then(data => {
+        const serverDate = new Date(data)
+        const haveToUpdate = currentDate < serverDate
+        if (haveToUpdate) {
+            console.log('unsubscribe')
+            subscription.unsubscribe()
+        }
+        // console.log('have to update', havaToUpdate)
+    })
+}
+const checkForUpdateInterval = setInterval(checkForUpdate, 2 * 1000)
+*/
+/*
 
         const inputState = {
             forward: false,
@@ -124,6 +148,7 @@
                 helicopter.position.y += 0.1
             })
         })
+        */
     </script>
 </body>
 
