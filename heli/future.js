@@ -8,6 +8,6 @@ const getPackageName = file =>
 		.chain(encase(JSON.parse))
 		.map(x => x.name);
 
-getPackageName('package.json')
+getPackageName('./files/file1.json')
 	.fork(console.error, console.log);
 //> "fluture"
