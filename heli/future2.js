@@ -11,15 +11,15 @@ const pool = new Pool({
 	port: 5432,
 })
 
+/*
 pool.query('SELECT * FROM article', (err, result) => {
 	if (err) {
 		return console.error('Error executing query', err.stack)
 	}
-	console.log(result.rows[0])
+//	console.log(result.rows[0])
 	process.exit()
 })
 
-/*
 pool.connect()
 	.then(client => {
 		return client.query('SELECT * FROM users WHERE id = $1', [1])
@@ -29,16 +29,30 @@ pool.connect()
 			})
 			.catch(e => {
 				client.release()
-				//console.log(err.stack)
+				console.log(err.stack)
 			})
 	})
 */
 
-const connect = Future.encaseP(pool.connect)
-const query = Future.encaseP(pool.query)
+
+//const connect = Future.encaseP(pool.connect)
+const connect = () => Future((rej, res) => {
+	pool.connect().then(client => {
+		console.log('connection established')
+		res(client)
+	})
+  .catch(e => {
+		console.log('connection konnte nicht aufgebaut werden')
+    client.release()
+		rej()
+  })
+})
+
+// const query = Future.encaseP(pool.query)
+const query = Future.of(2)
 
 const disconnect = client => {
-	console.log('release connection ', connection)
+	console.log('disconnect connection')
 	client.release()
 }
 
@@ -48,12 +62,17 @@ const withConnection = Future.hook(
 )
 
 
-/*
+
 withConnection(
-  client => query('SELECT * FROM article')
+  client => {
+		console.log('withConnection', client)
+//		query('SELECT * FROM article')
+	}
 )
 .fork(console.error, console.log);
 
+
+/*
 const getPackageName = file =>
 	node(done => {
 		readFile(file, 'utf8', done)
@@ -64,4 +83,5 @@ const getPackageName = file =>
 getPackageName('./files/file1.json')
 	.fork(console.error, console.log);
 //> "fluture"
+
 */
