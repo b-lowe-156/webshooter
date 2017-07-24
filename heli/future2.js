@@ -15,11 +15,11 @@ pool.query('SELECT * FROM article', (err, result) => {
 	if (err) {
 		return console.error('Error executing query', err.stack)
 	}
-	//console.log(result.rows[0])
+	console.log(result.rows[0])
 	process.exit()
 })
 
-
+/*
 pool.connect()
 	.then(client => {
 		return client.query('SELECT * FROM users WHERE id = $1', [1])
@@ -32,8 +32,10 @@ pool.connect()
 				//console.log(err.stack)
 			})
 	})
+*/
 
 const connect = Future.encaseP(pool.connect)
+const query = Future.encaseP(pool.query)
 
 const disconnect = client => {
 	console.log('release connection ', connection)
@@ -46,12 +48,12 @@ const withConnection = Future.hook(
 )
 
 
+/*
 withConnection(
-  client => client.query('SELECT * FROM article')
+  client => query('SELECT * FROM article')
 )
 .fork(console.error, console.log);
 
-/*
 const getPackageName = file =>
 	node(done => {
 		readFile(file, 'utf8', done)
