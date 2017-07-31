@@ -40,12 +40,15 @@ const openConnection = () => Future((reject, resolve) => {
 	return () => release()
 })
 
+const getStatement = client => client.errorOccured ? 'rollback' : 'commit'
+
 const closeConnection = client => Future((reject, resolve) => {
-	client.query('commit', (err, result) => {
+	const statement = getStatement(client)
+	client.query(statement, (err, result) => {
 		if (err) {
-			console.log('error in commiting transaction')
+			console.log(`error in ${statement} transaction`)
 		} else {
-			console.log('transaction commit done')
+			console.log(`transaction ${statement} done`)
 			client.release()
 			resolve()
 		}
