@@ -12,7 +12,6 @@ const pool = new Pool({
 const query = (client, query) => Future((reject, resolve) => {
 	client.query(query, (err, result) => {
 		if (err) {
-			client.errorOccured = true
 			reject('error in query')
 		} else {
 			resolve(result.rows[0])
@@ -23,53 +22,42 @@ const query = (client, query) => Future((reject, resolve) => {
 })
 
 const openConnection = () => Future((reject, resolve) => {
-	console.log('open connection')
+	console.log('arquire connection')
 	pool.connect((err, client, release) => {
 		if (err) {
 			reject('Error acquiring client')
-		}
-		client.query('begin', (err, result) => {
-			console.log('begin transaction')
-			if (err) {
-				reject('error in beginning the transaction', err)
-			}
+		} else {
+			console.log('connection open')
 			resolve(client)
-		})
+		}
 	})
 	// Cancellation:
 	return () => release()
 })
 
-const getStatement = client => client.errorOccured ? 'rollback' : 'commit'
-
 const closeConnection = client => Future((reject, resolve) => {
-	const statement = getStatement(client)
-	client.query(statement, (err, result) => {
-		if (err) {
-			console.log(`error in ${statement} transaction`)
-		} else {
-			console.log(`transaction ${statement} done`)
-			client.release()
-			resolve()
-		}
-	})
-	//Cancellation:
+	console.log(`connection release`)
+	client.release()
+	// Cancellation:
 	return () => client.release()
 })
 
-const withTransaction = Future.hook(
+const withConnection = Future.hook(
 	openConnection(),
 	closeConnection
 )
 
-withTransaction(
-	tx =>
-		query(tx, 'SELECT * FROM article')
-		.map(e => e.name.s.t)
+const qc = client =>
+		query(client, 'SELECT * FROM article')
+		.map(e => e.name)
 		.map(e => e)
-		.chain(n => query(tx, 'SELECT * FROM article'))
+		.chain(n => query(client, 'SELECT * FROM article'))
 		.map(e => e)
-)
+
+const tryQc = Future.try(qc)
+
+
+withConnection(qc)
 .fork(
 	err => {
 		console.log('error')
