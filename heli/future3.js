@@ -57,6 +57,21 @@ const qc = client =>
 const tryQc = Future.try(qc)
 
 
+const txDecorator = client => Future((reject, resolve) => {
+	console.log('arquire connection')
+	pool.connect((err, client, release) => {
+		if (err) {
+			reject('Error acquiring client')
+		} else {
+			console.log('connection open')
+			resolve(client)
+		}
+	})
+	// Cancellation:
+	return () => release()
+})
+
+
 withConnection(qc)
 .fork(
 	err => {
