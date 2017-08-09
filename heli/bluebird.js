@@ -1,7 +1,7 @@
-const pg = require("pg")
+const pg = require("pg").Pool
 const Promise = require("bluebird")
 
-const pool = new pg.Pool({
+const pool = new Pool({
 	user: 'postgres',
 	host: 'localhost',
 	database: 'postgres',
