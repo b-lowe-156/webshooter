@@ -3,40 +3,42 @@ const Promise = require("bluebird")
 Promise.promisifyAll(Pool)
 
 const pool = new Pool({
-	user: 'postgres',
-	host: 'localhost',
-	database: 'postgres',
-	password: 'start123',
-	port: 5432,
+    user: 'postgres',
+    host: 'localhost',
+    database: 'postgres',
+    password: 'start123',
+    port: 5432,
 })
 
 const getSqlConnection = () => {
-	var close;
-	return pool.connectAsync().spread((client, done) => {
-		close = done
-		return client
-	}).disposer(() => {
-		if (close) {
-			close()
-		}
-	})
+    let close;
+    return pool.connectAsync().spread((client, done) => {
+        close = done
+        return client
+    }).disposer(() => {
+        if (close) {
+            close()
+        }
+    })
 }
 
-const withTransaction = fn => {
-	return Promise.using(pool.acquireConnection(), connection => {
-		var tx = connection.beginTransaction()
-		return Promise
-			.try(fn, tx)
-			.then( res => {
-				return connection.commit().thenReturn(res)
-			},
-			function (err) {
-				return connection.rollback()
-					.catch(function (e) {/* maybe add the rollback error to err */ })
-					.thenThrow(err)
-			})
-	})
-}
+const withTransaction = fn =>
+    Promise.using(getSqlConnection(), client =>
+        client.queryAsync("BEGIN")
+            .then(() =>
+                fn(client)
+            )
+            .then(
+            result =>
+                client.queryAsync("COMMIT").
+                    thenReturn(result)
+            ,
+            err =>
+                client.queryAsync("ROLLBACK")["catch"](err => console.log("Error rollbacking transaction", err))
+                    .thenThrow(err)
+            )
+    )
+
 
 /*
 
