@@ -11,7 +11,7 @@ const pool = new Pool({
 })
 
 const getSqlConnection = () => {
-    let close;
+    let close
     return pool.connectAsync().spread((client, done) => {
         close = done
         return client
@@ -22,23 +22,26 @@ const getSqlConnection = () => {
     })
 }
 
-const withTransaction = fn =>
+const withTx = fn =>
     Promise.using(getSqlConnection(), client =>
         client.queryAsync("BEGIN")
-            .then(() =>
-                fn(client)
-            )
-            .then(
-            result =>
-                client.queryAsync("COMMIT").
-                    thenReturn(result)
-            ,
+        .then(() => fn(client))
+        .then(
+            result => client.queryAsync("COMMIT").thenReturn(result),
             err =>
-                client.queryAsync("ROLLBACK")["catch"](err => console.log("Error rollbacking transaction", err))
-                    .thenThrow(err)
+                client.queryAsync("ROLLBACK")["catch"](
+                    err => console.log("Error rollbacking transaction", err)
+                )
+                .thenThrow(err)
             )
     )
 
+withTx(
+    tx =>
+        tx.queryAsync('SELECT $1::int AS number', ['1'])
+        .then(res => result.rows)
+        .then(res => console.log('res', res))
+)
 
 /*
 
