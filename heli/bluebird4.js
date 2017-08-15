@@ -40,7 +40,7 @@ const withConnection = queryChain =>
 withTransaction(
     tx =>
         tx.queryAsync('SELECT * FROM article')
-        .then(res => res[0].rowss.s)
+        .then(res => res[0].rows)
         .then(() => tx.queryAsync('SELECT * FROM article where id = 1'))
         .then(res => res[0].rows)
         .then(row => {
