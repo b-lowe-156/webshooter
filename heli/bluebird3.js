@@ -12,27 +12,25 @@ const pool = new Pool({
     database: 'postgres',
     password: 'start123',
     port: 5432,
-    Promise : require("bluebird")
+    Promise: require("bluebird")
 })
 
 const withTransaction = fn =>
-    Promise.using(pool.connect(), connection =>
+    Promise.using(pool.connect(), con =>
         Promise.try(() => 
-            connection.queryAsync('BEGIN')
-            .then(() => fn(connection))
+            con.queryAsync('BEGIN')
+            .then(() => fn(con))
+        ).then(res =>
+            con.queryAsync('COMMIT').then(() => {
+                con.release()
+                return res
+            })
+        ).catch(err =>
+            con.queryAsync('ROLLBACK').then(() => {
+                con.release()
+                throw err
+            })
         )
-            .then(function (res) {
-                return connection.queryAsync('COMMIT').then(() => {
-                    connection.release()
-                    return res
-                })
-            })
-            .catch(function (err) {
-                return connection.queryAsync('ROLLBACK').then(() => {
-                    connection.release()
-                    throw err
-                })
-            })
     )
 
 withTransaction(
