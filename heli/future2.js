@@ -65,7 +65,7 @@ const withTransaction = Future.hook(
 withTransaction(
 	tx =>
 		query(tx, 'SELECT * FROM article')
-		.map(e => e.name.s.t)
+		.map(e => e.name)
 		.map(e => e)
 		.chain(n => query(tx, 'SELECT * FROM article'))
 		.map(e => e)

@@ -2,7 +2,7 @@ const pg = require("pg")
 const Pool = require("pg").Pool
 
 const Promise = require("bluebird")
-Promise.promisifyAll(pg, { multiArgs: true })
+Promise.promisifyAll(pg, { multiArgs: false })
 Promise.promisifyAll(Pool, { multiArgs: true })
 
 const pool = new Pool({
@@ -39,26 +39,21 @@ const withConnection = queryChain =>
 
 withTransaction(
     tx =>
-        tx.queryAsync('SELECT * FROM article')
-        .then(res => res[0].rows)
-        .then(() => tx.queryAsync('SELECT * FROM article where id = 1'))
-        .then(res => res[0].rows)
-        .then(row => {
-            console.log('rows', row)
+        Promise.all([
+            tx.queryAsync('SELECT * FROM article where id = 1'),
+            tx.queryAsync('SELECT * FROM article where id = 2'),
+            tx.queryAsync('SELECT * FROM article where id = 3')
+        ])
+        .spread((a1, a2, a3) => {
+            console.log('a1, a2, a3', a1.rows[0], a2.rows[0], a3.rows[0])
+            return undefined
         })
-        .catch(err => {
-            console.log('err', err)
-        })
-)
-
-withConnection(
-    connection =>
-        connection.queryAsync('SELECT * FROM article')
-        .then(res => res[0].rows)
-        .then(() => connection.queryAsync('SELECT * FROM article where id = 1'))
-        .then(res => res[0].rows)
-        .then(row => {
-            console.log('rows', row)
+        .then(() => tx.queryAsync('SELECT * FROM article'))
+        .then(res => res.rows)
+        .then(beIgnored => tx.queryAsync('SELECT * FROM article where id = 1'))
+        .then(res => res.rows[0])
+        .then(result => {
+            console.log('result', result)
         })
         .catch(err => {
             console.log('err', err)
