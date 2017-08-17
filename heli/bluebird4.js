@@ -42,10 +42,10 @@ withTransaction(
         Promise.all([
             tx.queryAsync('SELECT * FROM article where id = 1'),
             tx.queryAsync('SELECT * FROM article where id = 2'),
-            tx.queryAsync('SELECT * FROM article where id = 3')
+            tx.queryAsync('SELECT * FROM article')
         ])
         .spread((a1, a2, a3) => {
-            console.log('a1, a2, a3', a1.rows[0], a2.rows[0], a3.rows[0])
+            console.log('a1, a2, a3', a1.rows[0].id, a2.rows[0], a3.rows[0])
             return undefined
         })
         .then(() => tx.queryAsync('SELECT * FROM article'))
@@ -53,7 +53,7 @@ withTransaction(
         .then(beIgnored => tx.queryAsync('SELECT * FROM article where id = 1'))
         .then(res => res.rows[0])
         .then(result => {
-            console.log('result', result)
+            console.log('result', result.id)
         })
         .catch(err => {
             console.log('err', err)
