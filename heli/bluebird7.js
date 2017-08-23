@@ -32,23 +32,13 @@ const withTransaction = queryChain =>
             .catch(err => connection.queryAsync('ROLLBACK').return(err))
     )
 
-const articleDef = ['id', 'name']
-
-const article = {
-    id: 5,
-    name: 'dudu',
-}
-
 withTransaction(
-    tx => {
-        const query = 'insert into article (' + articleDef.join(', ') + ') VALUES (' + articleDef.map((n, i) => '$' + (i + 1)).join(', ') + ')'
-        console.log(query)
-        tx.queryAsync(query, [article.id, article.name])
+    tx =>
+        tx.queryAsync('delete from article where id = $1', [5])
         .then(result => {
-            //console.log('result', result)
+            console.log('result', result)
         })
         .catch(err => {
-            //console.log('err', err)
+            console.log('err', err)
         })
-    }
 )

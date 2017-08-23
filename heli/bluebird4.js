@@ -45,15 +45,15 @@ withTransaction(
             tx.queryAsync('SELECT * FROM article')
         ])
         .spread((a1, a2, a3) => {
-            console.log('a1, a2, a3', a1.rows[0].id, a2.rows[0], a3.rows[0])
+           // console.log('a1, a2, a3', a1.rows[0].id, a2.rows[0], a3.rows[0])
             return undefined
         })
         .then(() => tx.queryAsync('SELECT * FROM article'))
         .then(res => res.rows)
-        .then(beIgnored => tx.queryAsync('SELECT * FROM article where id = 1'))
-        .then(res => res.rows[0])
+        .then(beIgnored => tx.queryAsync('SELECT * FROM article'))
+        .then(res => res.rows)
         .then(result => {
-            console.log('result', result.id)
+            console.log('result', result)
         })
         .catch(err => {
             console.log('err', err)
