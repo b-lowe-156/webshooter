@@ -34,7 +34,7 @@ const withTransaction = queryChain =>
 
 withTransaction(
     tx =>
-        tx.queryAsync('SELECT * FROM article')
+        tx.queryAsync('insert into mytable (id, firstname, lastname) VALUES ($1, $2, $3)', [1, 'jo', 'ob'])
         .then(result => {
             console.log('result', result)
         })
