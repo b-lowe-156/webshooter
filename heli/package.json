@@ -8,7 +8,9 @@
     "fluture": "^6.3.0",
     "promise": "^8.0.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^20.0.4"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
