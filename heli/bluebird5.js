@@ -41,6 +41,9 @@ const article = {
 
 withTransaction(
     tx => {
+        const lal = 'izg'
+        const `lk ${lal} jl`
+        
         const query = 'insert into article (' + articleDef.join(', ') + ') VALUES (' + articleDef.map((n, i) => '$' + (i + 1)).join(', ') + ')'
         console.log(query)
         tx.queryAsync(query, [article.id, article.name])
