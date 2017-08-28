@@ -22,12 +22,20 @@ const insertArticeStatement = article => {
     columsToInsert.map((n, i) => '$' + (i + 1))
     .join(', ')
   })`
-  return query
+  const params = [article.name, article.lastname]
+  return { query, params }
 }
 
 test('', () => {
-  expect(insertArticeStatement(article))
+  const data = insertArticeStatement(article)
+  expect(data.query)
   .toBe('insert into article (name, lastname) VALUES ($1, $2)')
+})
+
+test('', () => {
+  const data = insertArticeStatement(article)
+  expect(data.params.length)
+  .toBe(2)
 })
 
 test('', () => {
