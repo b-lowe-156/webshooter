@@ -1,26 +1,40 @@
+const technicals = ({ type }) => type !== 'pk' && type !== 'version'
 
-const insertStatement = definition => entity => {
-  const columsToInsert = definition.columns.filter(c => c.type !== 'pk' && c.type !== 'version')
-  const query = `insert into ${
-    definition.tableName
-  } (version, ${
-    columsToInsert.map(n => n.name)
+const insertStatement = ({ columns, tableName }) => entity => ({
+  query: `insert into ${tableName} (version, ${
+    columns
+    .filter(technicals)
+    .map(n => n.name)
     .join(', ')
   }) VALUES ($1, ${
-    columsToInsert.map((n, i) => '$' + (i + 2))
+    columns
+    .filter(technicals)
+    .map((n, i) => '$' + (i + 2))
     .join(', ')
-  })`
-  const params = [1].concat(columsToInsert.map(n => entity[n.name]))
-  return {
-    query,
-    params,
-  }
-}
+  })`,
+  params: [1].concat(
+    columns
+    .filter(technicals)
+    .map(n => entity[n.name])
+  ),
+})
 
-const selectQuery = definition => `select ${
-  definition.columns.map(n => n.name)
-  .join(', ')
-} from ${ definition.tableName }`
+const updateStatement = ({ columns, tableName }) => entity => ({
+  query: `update ${ tableName } set ${
+    columns
+    .filter(technicals)
+    .map((n, i) => n.name + ' = $' + (i + 3))
+    .join(', ')
+  } where id = $1 and version = $2`,
+  params: columns.map(n => entity[n.name]),
+})
+
+const selectQuery = ({ columns, tableName }) =>
+  `select ${
+    columns
+    .map(n => n.name)
+    .join(', ')
+  } from ${ tableName }`
 
 const articleDef = {
   tableName: 'article',
@@ -40,6 +54,7 @@ const article = {
 }
 
 const insertArticeStatement = insertStatement(articleDef)
+const updateArticeStatement = updateStatement(articleDef)
 
 test('select statement', () => {
   expect(selectQuery(articleDef))
@@ -47,20 +62,30 @@ test('select statement', () => {
 })
 
 test('insert statement', () => {
-  const data = insertArticeStatement(article)
-  expect(data.query)
+  const { query } = insertArticeStatement(article)
+  expect(query)
   .toBe('insert into article (version, name, lastname) VALUES ($1, $2, $3)')
 })
 
 test('insert params', () => {
-  const data = insertArticeStatement(article)
-  expect(data.params.length).toBe(3)
-  expect(data.params[0]).toBe(1)
-  expect(data.params[1]).toBe('dudu')
-  expect(data.params[2]).toBe('rar')
+  const { params } = insertArticeStatement(article)
+  expect(params.length).toBe(3)
+  expect(params[0]).toBe(1)
+  expect(params[1]).toBe('dudu')
+  expect(params[2]).toBe('rar')
 })
 
 test('update statement', () => {
-  expect('update article set name = $2, lastname = $3 where id = $1')
-  .toBe('update article set name = $2, lastname = $3 where id = $1')
+  const { query } = updateArticeStatement(article)
+  expect(query)
+  .toBe('update article set name = $3, lastname = $4 where id = $1 and version = $2')
+})
+
+test('update statement params', () => {
+  const { params } = updateArticeStatement(article)
+  expect(params.length).toBe(4)
+  expect(params[0]).toBe(5)
+  expect(params[1]).toBe(3)
+  expect(params[2]).toBe('dudu')
+  expect(params[3]).toBe('rar')
 })
