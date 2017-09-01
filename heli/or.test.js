@@ -1,17 +1,20 @@
+// @flow
+
 const technicals = ({ type }) => type !== 'pk' && type !== 'version'
 
 const insertStatement = ({ columns, tableName }) => entity => ({
-  query: `insert into ${tableName} (version, ${
-    columns
-    .filter(technicals)
-    .map(n => n.name)
-    .join(', ')
-  }) VALUES ($1, ${
-    columns
-    .filter(technicals)
-    .map((n, i) => '$' + (i + 2))
-    .join(', ')
-  })`,
+  query:
+    `INSERT INTO ${tableName} (version, ${
+      columns
+      .filter(technicals)
+      .map(n => n.name)
+      .join(', ')
+    }) VALUES ($1, ${
+      columns
+      .filter(technicals)
+      .map((n, i) => '$' + (i + 2))
+      .join(', ')
+    })`,
   params: [1].concat(
     columns
     .filter(technicals)
@@ -64,7 +67,7 @@ test('select statement', () => {
 test('insert statement', () => {
   const { query } = insertArticeStatement(article)
   expect(query)
-  .toBe('insert into article (version, name, lastname) VALUES ($1, $2, $3)')
+  .toBe('INSERT INTO article (version, name, lastname) VALUES ($1, $2, $3)')
 })
 
 test('insert params', () => {
