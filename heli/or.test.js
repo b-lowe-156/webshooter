@@ -3,21 +3,17 @@
 const technicals = ({ type }) => type !== 'pk' && type !== 'version'
 
 const insertStatement = ({ columns, tableName }) => entity => ({
-  query:
-    `INSERT INTO ${tableName} (version, ${
-      columns
-      .filter(technicals)
-      .map(n => n.name)
-      .join(', ')
-    }) VALUES ($1, ${
-      columns
-      .filter(technicals)
-      .map((n, i) => '$' + (i + 2))
-      .join(', ')
-    })`,
+  query: `insert into ${tableName} (version, ${
+    columns
+    .map(n => n.name)
+    .join(', ')
+  }) VALUES ($1, ${
+    columns
+    .map((n, i) => '$' + (i + 2))
+    .join(', ')
+  })`,
   params: [1].concat(
     columns
-    .filter(technicals)
     .map(n => entity[n.name])
   ),
 })
@@ -25,7 +21,6 @@ const insertStatement = ({ columns, tableName }) => entity => ({
 const updateStatement = ({ columns, tableName }) => entity => ({
   query: `update ${ tableName } set ${
     columns
-    .filter(technicals)
     .map((n, i) => n.name + ' = $' + (i + 3))
     .join(', ')
   } where id = $1 and version = $2`,
@@ -39,15 +34,25 @@ const selectQuery = ({ columns, tableName }) =>
     .join(', ')
   } from ${ tableName }`
 
+const tecCol = [
+  { name: 'id', type: 'pk' },
+  { name: 'version', type: 'version' },
+]
+
 const articleDef = {
   tableName: 'article',
   columns: [
-    { name: 'id', type: 'pk' },
-    { name: 'version', type: 'version' },
+//    { name: 'id', type: 'pk' },
+//    { name: 'version', type: 'version' },
     { name: 'name', type: 'text' },
     { name: 'lastname', type: 'text' },
   ],
 }
+
+const articleCol = [
+  { name: 'name', type: 'text' },
+  { name: 'lastname', type: 'text' },
+]
 
 const article = {
   id: 5,
@@ -60,7 +65,10 @@ const insertArticeStatement = insertStatement(articleDef)
 const updateArticeStatement = updateStatement(articleDef)
 
 test('select statement', () => {
-  expect(selectQuery(articleDef))
+  expect(selectQuery({
+    columns: tecCol.concat(articleCol),
+    tableName: 'article',
+  }))
   .toBe('select id, version, name, lastname from article')
 })
 
