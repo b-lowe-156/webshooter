@@ -1,3 +1,7 @@
 {
-  "presets": ["flow"]
+  "presets": ["flow"],
+  "standard": {
+      "plugins": [ "flowtype" ],
+      "parser": "babel-eslint"
+  }
 }

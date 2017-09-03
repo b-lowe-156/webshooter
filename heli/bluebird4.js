@@ -1,3 +1,5 @@
+// @flow
+
 const pg = require("pg")
 const Pool = require("pg").Pool
 
@@ -37,8 +39,12 @@ const withConnection = queryChain =>
         Promise.try(() => queryChain(connection))
     )
 
-withTransaction(
-    tx =>
+interface articleEntity {
+  name: string,
+  nachname: string,
+}
+
+withTransaction(tx =>
         Promise.all([
             tx.queryAsync('SELECT * FROM article where id = 1'),
             tx.queryAsync('SELECT * FROM article where id = 2'),
@@ -50,10 +56,17 @@ withTransaction(
         })
         .then(() => tx.queryAsync('SELECT * FROM article'))
         .then(res => res.rows)
-        .then(beIgnored => tx.queryAsync('SELECT * FROM article'))
-        .then(res => res.rows)
-        .then(result => {
-            console.log('result', result)
+        .then(beIgnored => tx.queryAsync('SELECT * FROM article where id = 1'))
+        .then(res => res.rows[0])
+        .then((article:articleEntity) => {
+            console.log('article', article.name)
+            return {
+                grrr: article.name,
+                lulululu: article.nachname
+            }
+        })
+        .then(n => {
+            console.log('article', n.grrr)
         })
         .catch(err => {
             console.log('err', err)
