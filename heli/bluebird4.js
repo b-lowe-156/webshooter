@@ -62,10 +62,10 @@ withTransaction(tx =>
             console.log('article', article.name)
             return {
                 grrr: article.name,
-                lulululu: article.nachname
+                lulululu: article.nachname,
             }
         })
-        .then(n => {
+        .then((n) => {
             console.log('article', n.grrr)
         })
         .catch(err => {
