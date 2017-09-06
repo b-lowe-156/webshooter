@@ -28,16 +28,7 @@ const updateStatement = ({ columns, tableName }) => entity => ({
 })
 
 const selectQuery = ({ columns, tableName }) =>
-  `select ${
-    columns
-    .map(n => n.name)
-    .join(', ')
-  } from ${ tableName }`
-
-const tecCol = [
-  { name: 'id', type: 'pk' },
-  { name: 'version', type: 'version' },
-]
+  `select ${ columns.join(', ') } from ${ tableName }`
 
 const articleDef = {
   tableName: 'article',
@@ -49,10 +40,10 @@ const articleDef = {
   ],
 }
 
-const articleCol = [
-  { name: 'name', type: 'text' },
-  { name: 'lastname', type: 'text' },
-]
+const tecCols = ['id', 'version']
+
+const articleCols = ['name', 'lastname']
+const articleAllCols = tecCols.concat(articleCols)
 
 const article = {
   id: 5,
@@ -65,10 +56,7 @@ const insertArticeStatement = insertStatement(articleDef)
 const updateArticeStatement = updateStatement(articleDef)
 
 test('select statement', () => {
-  expect(selectQuery({
-    columns: tecCol.concat(articleCol),
-    tableName: 'article',
-  }))
+  expect(selectQuery({ columns: articleAllCols, tableName: 'article' }))
   .toBe('select id, version, name, lastname from article')
 })
 
