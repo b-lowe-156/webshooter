@@ -1,35 +1,37 @@
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import Tabs from 'react-native-tabs';
+import React, { PureComponent } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { TabViewAnimated, TabBar, SceneMap } from 'react-native-tab-view';
 
-export default class App extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {page:'second'};
-  }
+const FirstRoute = () => <View style={[ styles.container, { backgroundColor: '#ff4081' } ]} />;
+const SecondRoute = () => <View style={[ styles.container, { backgroundColor: '#673ab7' } ]} />;
+
+export default class TabViewExample extends PureComponent {
+  state = {
+    index: 0,
+    routes: [
+      { key: '1', title: 'First' },
+      { key: '2', title: 'Second' },
+    ],
+  };
+
+  _handleIndexChange = index => this.setState({ index });
+
+  _renderHeader = props => <TabBar {...props} />;
+
+  _renderScene = SceneMap({
+    '1': FirstRoute,
+    '2': SecondRoute,
+  });
+
   render() {
     return (
-      <View style={styles.container}>
-        <Tabs selected={this.state.page} style={{backgroundColor:'white'}}
-              selectedStyle={{color:'red'}} onSelect={el=>this.setState({page:el.props.name})}>
-            <Text name="first">First</Text>
-            <Text name="second" selectedIconStyle={{borderTopWidth:2,borderTopColor:'red'}}>Second</Text>
-            <Text name="third">Third</Text>
-            <Text name="fourth" selectedStyle={{color:'green'}}>Fourth</Text>
-            <Text name="fifth">Fifth</Text>
-        </Tabs>
-          <Text style={styles.welcome}>
-              Welcome to React Native
-          </Text>
-          <Text style={styles.instructions}>
-              Selected page: {this.state.page}
-          </Text>
-      </View>
+      <TabViewAnimated
+        style={styles.container}
+        navigationState={this.state}
+        renderScene={this._renderScene}
+        renderHeader={this._renderHeader}
+        onIndexChange={this._handleIndexChange}
+      />
     );
   }
 }
@@ -37,18 +39,5 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
   },
 });
