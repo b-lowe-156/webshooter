@@ -25,65 +25,39 @@ const hudsonVersions = Promise.resolve([{
   },
 ])
 
-const loadHandler = () => {
-  console.log('Wähle version aus zum herunter laden')
-
-
-
-
-  inquirer.prompt({
-    type: 'list',
-    name: 'theme',
-    message: 'What do you want to do?',
-    choices: [
-      { value: 'load', name: 'Lade Version vom Hudson' },
-      { value: 'stop', name:'Stoppe dienste' },
-      { value: 'version', name:'Version aktivieren' },
-      { value: 'start', name:'Starte dienste' },
-      new inquirer.Separator(),
-      { value: 'end', name:'Beenden' },
-    ]
-  })
-  .then(answer => {
-    console.log(JSON.stringify(answer.theme, null, '  '))
-    if (answer.theme === 'load') {
-      loadHandler()
-    } else if (answer.theme !== 'end') {
-      main()
-    }
-  })
-
-
-
-
-  hudsonVersions.then(versions => {
-    console.log(versions)
-  })
-}
-
 const main = () => {
   console.log('\n')
-  inquirer.prompt({
-    type: 'list',
-    name: 'theme',
-    message: 'What do you want to do?',
-    choices: [
-      { value: 'load', name: 'Lade Version vom Hudson' },
-      { value: 'stop', name:'Stoppe dienste' },
-      { value: 'version', name:'Version aktivieren' },
-      { value: 'start', name:'Starte dienste' },
-      new inquirer.Separator(),
-      { value: 'end', name:'Beenden' },
-    ]
+  hudsonVersions
+  .then(v => console.log(v))
+  .then(() => {
+    inquirer.prompt({
+      type: 'list',
+      name: 'theme',
+      message: 'What do you want to do?',
+      choices: [
+        { value: 'load', name: 'Lade Deployment vom Hudson' },
+        { value: 'stop', name:'Stoppe dienste (Wildfly und PM2)' },
+        { value: 'version', name:'Version aktivieren (EAR, server.js und Client)' },
+        { value: 'start', name:'Starte dienste (Wildfly und PM2)' },
+        { value: 'hotpatch', name:'Starte dienste (Wildfly und PM2)' },
+        { value: 'delete', name:'Loesche ungenutze Deployments' },
+        new inquirer.Separator(),
+        { value: 'end', name:'Beenden' },
+        new inquirer.Separator(),
+      ]
+    })
+    .then(answer => {
+      console.log(JSON.stringify(answer.theme, null, '  '))
+      
+      if (answer.theme !== 'end') {
+        main()
+      }
+    })
+    
   })
-  .then(answer => {
-    console.log(JSON.stringify(answer.theme, null, '  '))
-    if (answer.theme === 'load') {
-      loadHandler()
-    } else if (answer.theme !== 'end') {
-      main()
-    }
-  })
+
+  console.log('\n')
+  
   return undefined
 }
 
