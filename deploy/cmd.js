@@ -1,3 +1,6 @@
+'use strict'
+
+const fs = require('fs')
 const { execSync } = require('child_process')
 const inquirer = require('inquirer')
 
@@ -11,57 +14,82 @@ try {
 */
 
 const currentVersions = Promise.resolve({
-  WildFly: 230,
-  PM2: 230,
-  Client: 230
+  WildFly: '229',
+  PM2: '230',
+  Client: '230'
 })
 
-const localVersions = Promise.resolve(['230','229', '276'])
+// const localVersions = Promise.resolve([230, 229, 226, 225, 224])
+const localVersions = new Promise((resolve, reject) => {
+  fs.readdir('./deployments/', (err, data) => {
+    if (err) {
+      reject(err)
+    }
+    resolve(data.sort().reverse())
+  })
+})
 
 const hudsonVersions = Promise.resolve([{
-  number: 233,
-  status: 'RUNNING'
-}, {
-  number: 232,
-  status: 'SUCCESSFUL'
-}, {
-  number: 231,
-  status: 'FAILED'
-}, {
-  number: 230,
-  status: 'SUCCESSFUL'
-},
+    number: '233',
+    status: 'RUNNING'
+  }, {
+    number: '232',
+    status: 'SUCCESSFUL'
+  }, {
+    number: '231',
+    status: 'FAILED'
+  }, {
+    number: '230',
+    status: 'SUCCESSFUL'
+  },
 ])
 
-const printStatus = () => {
-  const table = new Table({
-    head: ['Deployments' ,'Hudson'],
-    colWidths: [50, 50]
-  })
-  const curentState = ['EAR: 230']
-  const localVersion = ['230']
-  const hudsonVersion = ['233']
-  
-  table.push(
-    ['230', '233'],
-    ['230', '230']
-  )
-  console.log(table.toString());
+const removeUnusedVersionsScreen = () => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool | Loesche ungenutze Deployments\n')
+
+  Promise.all([currentVersions, localVersions])
+  .then(a => {
+  const [c, l] = a
+  const used = [c.WildFly, c.PM2, c.Client]
+  console.log(`Deployments     | ${l.filter(v => !used.includes(v)).join(', ')}`)
+})
+
+//  mainScreen({message: 'Version 230 wurde geloescht!'})
 }
 
-const mainScreen = () => {
-  console.log('\n')
-  //printStatus()
-  currentVersions
-  .then(v => console.log(`Versionen WildFly: ${v.WildFly} | PM2: ${v.PM2} | Client: ${v.Client}`))
-  .then(() => localVersions)
-  .then(v => console.log(`Deployments: ${v.join(', ')}\n`))
+const mainScreen = props => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool\n')
+  if(props && props.message) {
+    console.log('\x1b[32m' + props.message + '\x1b[0m\n')
+  }
+  Promise.all([currentVersions, localVersions, hudsonVersions])
+  .then(a => {
+    const [c, l, h] = a
+    const used = [c.WildFly, c.PM2, c.Client]
+    console.log(`Aktive version  | WildFly: ${c.WildFly}`)
+    console.log(`                | PM2:     ${c.PM2}`)
+    console.log(`                | Client:  ${c.Client}`)
+    console.log('                |')
+    console.log(`Deployments     | ${l.map(v => used.includes(v) ? `\x1b[35m${v}\x1b[0m` : v).join(', ')}`)
+    console.log(`Hudsonversionen | ${h.filter(v => (v.status === 'SUCCESSFUL') && !used.includes(v.number)).map(v => v.number).join(', ')}`)
+    if (h[0] && h[0].status === 'RUNNING') {
+      console.log('\x1b[32mDie Version ' + h[0].number + ' wird derzeit vom Hudson gebaut\x1b[0m')
+    }
+    if (c.WildFly !== c.PM2 || c.WildFly !== c.Client || c.PM2 !== c.Client ) {
+      console.log('\x1b[31mEs werden verschiedene Versionen eingesetzt!\x1b[0m')
+    }
+    console.log('')
+  })
   .then(() =>
     inquirer.prompt({
       type: 'list',
       name: 'theme',
       message: 'Was willst du machen?',
+      pageSize: 10,
       choices: [
+        { value: 'refresh', name: 'Aktualisiere (F5)' },
         { value: 'load', name: 'Lade Deployment vom Hudson' },
         { value: 'stop', name:'Stoppe dienste (Wildfly und PM2)' },
         { value: 'version', name:'Version aktivieren (EAR, server.js und Client)' },
@@ -70,7 +98,6 @@ const mainScreen = () => {
         { value: 'delete', name:'Loesche ungenutze Deployments' },
         new inquirer.Separator(),
         { value: 'end', name:'Beenden' },
-        new inquirer.Separator(),
       ]
     })
   )
@@ -78,11 +105,14 @@ const mainScreen = () => {
 		// console.log(JSON.stringify(answer.theme, null, '  '))
 		
 		switch(answer.theme) {
+      case 'refresh':
+        mainScreen()
 			case 'load':
-				hudsonVersions
-				.then(v => console.log(v))
-				.then(() => mainScreen())
+        mainScreen({message: 'Version 230 wurde herunter geladen!'})
 			break
+      case 'delete':
+        removeUnusedVersionsScreen()
+        break
 			case 'end':
         console.log('stop')
       break
