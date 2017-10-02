@@ -1,6 +1,9 @@
 'use strict'
 
-const fs = require('fs')
+const Promise = require("bluebird")
+const fs = Promise.promisifyAll(require("fs"))
+
+//const fs = require('fs')
 const { execSync } = require('child_process')
 const inquirer = require('inquirer')
 
@@ -49,8 +52,7 @@ const removeUnusedVersionsScreen = () => {
   console.log('PIM-CI Tool | Loesche ungenutze Deployments\n')
 
   Promise.all([currentVersions, localVersions])
-  .then(a => {
-  const [c, l] = a
+  .spread((c, l) => {
   const used = [c.WildFly, c.PM2, c.Client]
   console.log(`Deployments     | ${l.filter(v => !used.includes(v)).join(', ')}`)
 })
@@ -65,13 +67,12 @@ const mainScreen = props => {
     console.log('\x1b[32m' + props.message + '\x1b[0m\n')
   }
   Promise.all([currentVersions, localVersions, hudsonVersions])
-  .then(a => {
-    const [c, l, h] = a
+  .spread((c, l, h) => {
     const used = [c.WildFly, c.PM2, c.Client]
     console.log(`Aktive version  | WildFly: ${c.WildFly}`)
     console.log(`                | PM2:     ${c.PM2}`)
     console.log(`                | Client:  ${c.Client}`)
-    console.log('                |')
+    console.log('----------------|----------------------------------')
     console.log(`Deployments     | ${l.map(v => used.includes(v) ? `\x1b[35m${v}\x1b[0m` : v).join(', ')}`)
     console.log(`Hudsonversionen | ${h.filter(v => (v.status === 'SUCCESSFUL') && !used.includes(v.number)).map(v => v.number).join(', ')}`)
     if (h[0] && h[0].status === 'RUNNING') {
