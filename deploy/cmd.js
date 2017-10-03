@@ -25,14 +25,16 @@ const currentVersions = Promise.resolve({
 const localVersions = new Promise((resolve, reject) => {
   fs
   .readdirAsync('./deployments/')
-  .then(data => {
-    Promise.all(data.map(d => fs.statAsync(`./deployments/${d}`)))
+  .then(directories => {
+    Promise.all(directories.map(dir => fs.statAsync(`./deployments/${dir}`)))
     .then(stats => {
-      resolve(data
-      .filter((d, i) => stats[i].isDirectory())
-      .filter(d => d !== '.' && d !== '..')
-      .sort()
-      .reverse())
+      resolve(
+        directories
+        .filter((d, i) => stats[i].isDirectory())
+        .filter(d => d !== '.' && d !== '..')
+        .sort()
+        .reverse()
+      )
     })
   })
   .catch(err => reject(err))
@@ -72,16 +74,13 @@ const removeUnusedVersionsScreen = () => {
   }))
   .then(({ toDelete }) => {
     if (toDelete.length > 0) {
-      Promise.all(toDelete.map(d => fs.rmdirAsync(`./deployments/${d}`)))
-      .then(() => {
-        mainScreen({message: `Version (${toDelete.join(', ')}) wurde geloescht!`})
-      })
-      .catch(err => mainScreen({error: err}))
+      toDelete.forEach(dir => execSync(`rmdir .\\deployments\\${dir} /s /q`))
+      mainScreen({message: `Version (${toDelete.join(', ')}) wurde geloescht!`})
     } else {
       mainScreen()
     }
   })
-  .catch(err => console.log(err))
+ .catch(err => console.log(err))
 //  mainScreen({message: 'Version 230 wurde geloescht!'})
 }
 
