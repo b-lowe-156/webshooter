@@ -1,20 +1,9 @@
 'use strict'
 
-const Promise = require("bluebird")
-const fs = Promise.promisifyAll(require("fs"))
-
-//const fs = require('fs')
+const Promise = require('bluebird')
+const fs = Promise.promisifyAll(require('fs'))
 const { execSync } = require('child_process')
 const { prompt, Separator } = require('inquirer')
-
-/*
-try {
-	const result = execSync('dir', {stdio:[0,1,2]})
-	console.log(result)
-} catch (e) {
-	console.log('breche aktion ab')
-}
-*/
 
 const currentVersions = Promise.resolve({
   WildFly: '229',
@@ -22,23 +11,24 @@ const currentVersions = Promise.resolve({
   Client: '230'
 })
 
-const localVersions = new Promise((resolve, reject) => {
-  fs
-  .readdirAsync('./deployments/')
-  .then(directories => {
-    Promise.all(directories.map(dir => fs.statAsync(`./deployments/${dir}`)))
-    .then(stats => {
-      resolve(
-        directories
-        .filter((d, i) => stats[i].isDirectory())
-        .filter(d => d !== '.' && d !== '..')
-        .sort()
-        .reverse()
-      )
+const localVersions = () =>
+  new Promise((resolve, reject) => 
+    fs
+    .readdirAsync('./deployments/')
+    .then(directories => {
+      Promise.all(directories.map(dir => fs.statAsync(`./deployments/${dir}`)))
+      .then(stats => {
+        resolve(
+          directories
+          .filter((d, i) => stats[i].isDirectory())
+          .filter(d => d !== '.' && d !== '..')
+          .sort()
+          .reverse()
+        )
+      })
     })
-  })
-  .catch(err => reject(err))
-})
+    .catch(err => reject(err))
+  )
 
 const hudsonVersions = Promise.resolve([{
     number: '233',
@@ -55,15 +45,163 @@ const hudsonVersions = Promise.resolve([{
   },
 ])
 
+const mainMenue = {
+  type: 'list',
+  name: 'action',
+  message: 'Was willst du machen?',
+  pageSize: 10,
+  choices: [
+    { value: 'refresh', name: 'Aktualisiere ansicht' },
+    { value: 'load', name: '1. Lade Deployment vom Hudson' },
+    { value: 'stop', name:'2. Stoppe Dienste (Wildfly und Node)' },
+    { value: 'version', name:'3. Version aktivieren (EAR, server.js und Client)' },
+    { value: 'start', name:'4. Starte Dienste (Wildfly und Node)' },
+    { value: 'delete', name:'Loesche ungenutze Deployments' },
+    { value: 'end', name:'Beenden' },
+  ]
+}
+
+const mainScreen = props => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool\n')
+  if(props && props.message) {
+    console.log('\x1b[32m' + props.message + '\x1b[0m\n')
+  }
+  Promise.all([currentVersions, localVersions(), hudsonVersions])
+  .spread((c, l, h) => {
+    const used = [c.WildFly, c.PM2, c.Client]
+    console.log(`Aktiv       | WildFly: ${c.WildFly}`)
+    console.log(`            | PM2:     ${c.PM2}`)
+    console.log(`            | Client:  ${c.Client}`)
+    console.log('------------|------------------------------------------')
+    console.log(`Lokal       | ${l.map(v => used.includes(v) ? `\x1b[35m${v}\x1b[0m` : v).join(', ')}`)
+    console.log(`Hudson      | ${h.filter(v => (v.status === 'SUCCESSFUL') && !l.includes(v.number)).map(v => v.number).join(', ')}\n`)
+    if (h[0] && h[0].status === 'RUNNING') {
+      console.log('\x1b[32mDie Version ' + h[0].number + ' wird derzeit vom Hudson gebaut\x1b[0m')
+    }
+    if (c.WildFly !== c.PM2 || c.WildFly !== c.Client || c.PM2 !== c.Client ) {
+      console.log('\x1b[31mVersionsmix Vorhanden!\x1b[0m')
+    }
+    console.log('')
+  })
+  .then(() => prompt(mainMenue))
+	.then(answer => {
+		switch(answer.action) {
+      case 'refresh':
+        mainScreen()
+      break
+			case 'load':
+        loadVersionFromHudson()
+      break
+			case 'stop':
+        stopDeamons()
+      break
+      case 'version':
+        activateVersion()
+      break
+			case 'start':
+        startDeamons()
+      break
+      case 'delete':
+        removeUnusedVersionsScreen()
+      break
+			case 'end':
+        console.log('end')
+      break
+    }
+	})
+}
+
+const loadVersionFromHudson = () => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool | Loesche ungenutze Lokale verionsen \n')
+  Promise.all([localVersions(), hudsonVersions])
+  .spread((l, h) => h.filter(v => (v.status === 'SUCCESSFUL') && !l.includes(v.number)).map(v => v.number))
+  .then(loadables => prompt({
+    type: 'checkbox',
+    name: 'toLoad',
+    message: 'Welche sollen herunter geladen werden?',
+    pageSize: 10,
+    choices: loadables,
+  }))
+  .then(({ toLoad }) => {
+    if (toLoad.length > 0) {
+      // TODO load version
+      // toLoad.forEach(dir => execSync(`rmdir .\\deployments\\${dir} /s /q`))
+      mainScreen({message: `Versionen: (${toLoad.join(', ')}) wurde herunter geladen!`})
+    } else {
+      mainScreen()
+    }
+  })
+ .catch(err => console.log(err))
+}
+
+const stopDeamons = () => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool | Stoppe Wildfly und Node \n')
+  prompt({
+    type: 'confirm',
+    name: 'stop',
+    message: 'Sollen wirklich die Dienste Wildfly und Node gestoppt werden?',
+  })
+  .then(result => {
+    if (result.stop) {
+      // TODO stop deamons
+      mainScreen({message: `Wildfly und Node wurden getoppt!`})
+    } else {
+      mainScreen()
+    }
+  })
+}
+
+const activateVersion = () => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool | Version aktivieren (EAR, server.js und Client) \n')
+  localVersions()
+  .then(activatables => prompt({
+    type: 'list',
+    name: 'toActivate',
+    message: 'Welche Version soll aktiviert werden?',
+    pageSize: 10,
+    choices: activatables.concat(['Abbrechen']),
+  }))
+  .then(answer => {
+    if (answer.toActivate === 'Abbrechen') {
+      mainScreen()
+    } else {
+      // TODO set symlinks
+      mainScreen({message: `Versionen: (${answer.toActivate}) wurde aktiviert!`})
+    }
+  })
+ .catch(err => console.log(err))
+}
+
+const startDeamons = () => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool | Starte Wildfly und Node \n')
+  prompt({
+    type: 'confirm',
+    name: 'stop',
+    message: 'Sollen wirklich die Dienste Wildfly und Node gestartet werden?',
+  })
+  .then(result => {
+    if (result.stop) {
+      // TODO start deamons
+      mainScreen({message: `Wildfly und Node wurden gestartet!`})
+    } else {
+      mainScreen()
+    }
+    console.log(result)
+  })
+}
+
 const removeUnusedVersionsScreen = () => {
   console.log('\x1Bc')
   console.log('PIM-CI Tool | Loesche ungenutze Deployments\n')
-  Promise.all([currentVersions, localVersions])
+  Promise.all([currentVersions, localVersions()])
   .spread((c, l) => {
     const used = [c.WildFly, c.PM2, c.Client]
-    const deletables = l.filter(v => !used.includes(v))
-    console.log(`Deployments     | ${deletables.join(', ')}`)
-    return deletables
+    return l.filter(v => !used.includes(v))
   })
   .then(deletables => prompt({
     type: 'checkbox',
@@ -81,69 +219,6 @@ const removeUnusedVersionsScreen = () => {
     }
   })
  .catch(err => console.log(err))
-//  mainScreen({message: 'Version 230 wurde geloescht!'})
-}
-
-const mainMenue = {
-  type: 'list',
-  name: 'action',
-  message: 'Was willst du machen?',
-  pageSize: 10,
-  choices: [
-    { value: 'refresh', name: 'Aktualisiere' },
-    { value: 'load', name: 'Lade Deployment vom Hudson' },
-    { value: 'stop', name:'Stoppe dienste (Wildfly und PM2)' },
-    { value: 'version', name:'Version aktivieren (EAR, server.js und Client)' },
-    { value: 'start', name:'Starte dienste (Wildfly und PM2)' },
-    { value: 'hotpatch', name:'Zero downtime JavaScript deploy' },
-    { value: 'delete', name:'Loesche ungenutze Deployments' },
-    new Separator(),
-    { value: 'end', name:'Beenden' },
-  ]
-}
-
-const mainScreen = props => {
-  console.log('\x1Bc')
-  console.log('PIM-CI Tool\n')
-  if(props && props.message) {
-    console.log('\x1b[32m' + props.message + '\x1b[0m\n')
-  }
-  Promise.all([currentVersions, localVersions, hudsonVersions])
-  .spread((c, l, h) => {
-    const used = [c.WildFly, c.PM2, c.Client]
-    console.log(`Aktive version  | WildFly: ${c.WildFly}`)
-    console.log(`                | PM2:     ${c.PM2}`)
-    console.log(`                | Client:  ${c.Client}`)
-    console.log('----------------|----------------------------------')
-    console.log(`Deployments     | ${l.map(v => used.includes(v) ? `\x1b[35m${v}\x1b[0m` : v).join(', ')}`)
-    console.log(`Hudsonversionen | ${h.filter(v => (v.status === 'SUCCESSFUL') && !used.includes(v.number)).map(v => v.number).join(', ')}\n`)
-    if (h[0] && h[0].status === 'RUNNING') {
-      console.log('\x1b[32mDie Version ' + h[0].number + ' wird derzeit vom Hudson gebaut\x1b[0m')
-    }
-    if (c.WildFly !== c.PM2 || c.WildFly !== c.Client || c.PM2 !== c.Client ) {
-      console.log('\x1b[31mEs werden verschiedene Versionen eingesetzt!\x1b[0m')
-    }
-    console.log('')
-  })
-  .then(() => prompt(mainMenue))
-	.then(answer => {
-		// console.log(JSON.stringify(answer.action, null, '  '))
-		
-		switch(answer.action) {
-      case 'refresh':
-        mainScreen()
-      break
-			case 'load':
-        mainScreen({message: 'Version 230 wurde herunter geladen!'})
-			break
-      case 'delete':
-        removeUnusedVersionsScreen()
-        break
-			case 'end':
-        console.log('stop')
-      break
-    }
-	})
 }
 
 mainScreen()
