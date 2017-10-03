@@ -5,7 +5,7 @@ const fs = Promise.promisifyAll(require("fs"))
 
 //const fs = require('fs')
 const { execSync } = require('child_process')
-const inquirer = require('inquirer')
+const { prompt, Separator } = require('inquirer')
 
 /*
 try {
@@ -22,14 +22,20 @@ const currentVersions = Promise.resolve({
   Client: '230'
 })
 
-// const localVersions = Promise.resolve([230, 229, 226, 225, 224])
 const localVersions = new Promise((resolve, reject) => {
-  fs.readdir('./deployments/', (err, data) => {
-    if (err) {
-      reject(err)
-    }
-    resolve(data.sort().reverse())
+  fs
+  .readdirAsync('./deployments/')
+  .then(data => {
+    Promise.all(data.map(d => fs.statAsync(`./deployments/${d}`)))
+    .then(stats => {
+      resolve(data
+      .filter((d, i) => stats[i].isDirectory())
+      .filter(d => d !== '.' && d !== '..')
+      .sort()
+      .reverse())
+    })
   })
+  .catch(err => reject(err))
 })
 
 const hudsonVersions = Promise.resolve([{
@@ -50,13 +56,32 @@ const hudsonVersions = Promise.resolve([{
 const removeUnusedVersionsScreen = () => {
   console.log('\x1Bc')
   console.log('PIM-CI Tool | Loesche ungenutze Deployments\n')
-
   Promise.all([currentVersions, localVersions])
   .spread((c, l) => {
-  const used = [c.WildFly, c.PM2, c.Client]
-  console.log(`Deployments     | ${l.filter(v => !used.includes(v)).join(', ')}`)
-})
-
+    const used = [c.WildFly, c.PM2, c.Client]
+    const deletables = l.filter(v => !used.includes(v))
+    console.log(`Deployments     | ${deletables.join(', ')}`)
+    return deletables
+  })
+  .then(deletables => prompt({
+    type: 'checkbox',
+    name: 'toDelete',
+    message: 'Welche sollen geloescht werden?',
+    pageSize: 10,
+    choices: deletables,
+  }))
+  .then(({ toDelete }) => {
+    if (toDelete.length > 0) {
+      Promise.all(toDelete.map(d => fs.rmdirAsync(`./deployments/${d}`)))
+      .then(() => {
+        mainScreen({message: `Version (${toDelete.join(', ')}) wurde geloescht!`})
+      })
+      .catch(err => mainScreen({error: err}))
+    } else {
+      mainScreen()
+    }
+  })
+  .catch(err => console.log(err))
 //  mainScreen({message: 'Version 230 wurde geloescht!'})
 }
 
@@ -74,7 +99,7 @@ const mainScreen = props => {
     console.log(`                | Client:  ${c.Client}`)
     console.log('----------------|----------------------------------')
     console.log(`Deployments     | ${l.map(v => used.includes(v) ? `\x1b[35m${v}\x1b[0m` : v).join(', ')}`)
-    console.log(`Hudsonversionen | ${h.filter(v => (v.status === 'SUCCESSFUL') && !used.includes(v.number)).map(v => v.number).join(', ')}`)
+    console.log(`Hudsonversionen | ${h.filter(v => (v.status === 'SUCCESSFUL') && !used.includes(v.number)).map(v => v.number).join(', ')}\n`)
     if (h[0] && h[0].status === 'RUNNING') {
       console.log('\x1b[32mDie Version ' + h[0].number + ' wird derzeit vom Hudson gebaut\x1b[0m')
     }
@@ -84,9 +109,9 @@ const mainScreen = props => {
     console.log('')
   })
   .then(() =>
-    inquirer.prompt({
+    prompt({
       type: 'list',
-      name: 'theme',
+      name: 'action',
       message: 'Was willst du machen?',
       pageSize: 10,
       choices: [
@@ -97,16 +122,17 @@ const mainScreen = props => {
         { value: 'start', name:'Starte dienste (Wildfly und PM2)' },
         { value: 'hotpatch', name:'Zero downtime JavaScript deploy' },
         { value: 'delete', name:'Loesche ungenutze Deployments' },
-        new inquirer.Separator(),
+        new Separator(),
         { value: 'end', name:'Beenden' },
       ]
     })
   )
 	.then(answer => {
-		// console.log(JSON.stringify(answer.theme, null, '  '))
+		// console.log(JSON.stringify(answer.action, null, '  '))
 		
-		switch(answer.theme) {
+		switch(answer.action) {
       case 'refresh':
+        prompt.ui.close()
         mainScreen()
 			case 'load':
         mainScreen({message: 'Version 230 wurde herunter geladen!'})
