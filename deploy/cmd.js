@@ -85,6 +85,24 @@ const removeUnusedVersionsScreen = () => {
 //  mainScreen({message: 'Version 230 wurde geloescht!'})
 }
 
+const mainMenue = {
+  type: 'list',
+  name: 'action',
+  message: 'Was willst du machen?',
+  pageSize: 10,
+  choices: [
+    { value: 'refresh', name: 'Aktualisiere' },
+    { value: 'load', name: 'Lade Deployment vom Hudson' },
+    { value: 'stop', name:'Stoppe dienste (Wildfly und PM2)' },
+    { value: 'version', name:'Version aktivieren (EAR, server.js und Client)' },
+    { value: 'start', name:'Starte dienste (Wildfly und PM2)' },
+    { value: 'hotpatch', name:'Zero downtime JavaScript deploy' },
+    { value: 'delete', name:'Loesche ungenutze Deployments' },
+    new Separator(),
+    { value: 'end', name:'Beenden' },
+  ]
+}
+
 const mainScreen = props => {
   console.log('\x1Bc')
   console.log('PIM-CI Tool\n')
@@ -108,32 +126,14 @@ const mainScreen = props => {
     }
     console.log('')
   })
-  .then(() =>
-    prompt({
-      type: 'list',
-      name: 'action',
-      message: 'Was willst du machen?',
-      pageSize: 10,
-      choices: [
-        { value: 'refresh', name: 'Aktualisiere (F5)' },
-        { value: 'load', name: 'Lade Deployment vom Hudson' },
-        { value: 'stop', name:'Stoppe dienste (Wildfly und PM2)' },
-        { value: 'version', name:'Version aktivieren (EAR, server.js und Client)' },
-        { value: 'start', name:'Starte dienste (Wildfly und PM2)' },
-        { value: 'hotpatch', name:'Zero downtime JavaScript deploy' },
-        { value: 'delete', name:'Loesche ungenutze Deployments' },
-        new Separator(),
-        { value: 'end', name:'Beenden' },
-      ]
-    })
-  )
+  .then(() => prompt(mainMenue))
 	.then(answer => {
 		// console.log(JSON.stringify(answer.action, null, '  '))
 		
 		switch(answer.action) {
       case 'refresh':
-        prompt.ui.close()
         mainScreen()
+      break
 			case 'load':
         mainScreen({message: 'Version 230 wurde herunter geladen!'})
 			break
