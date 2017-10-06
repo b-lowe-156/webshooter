@@ -1,0 +1,66 @@
+[
+	{
+		"id": 1,
+		"PIM": {
+			"name": "shampoo"
+		},
+		"SAP": {
+			"name": "shampo"
+		}
+	}, {
+		"id": 2,
+		"PIM": {
+			"name": "zahnpasta"
+		}
+	}, {
+		"id": 3,
+		"PIM": {
+			"name": "nudeln"
+		}
+	},
+	{
+		"id": 4,
+		"PIM": {
+			"name": "shampoo"
+		},
+		"SAP": {
+			"name": "shampoo"
+		}
+	},
+	{
+		"id": 5,
+		"PIM": {
+			"name": "shampoo"
+		},
+		"SAP": {
+			"name": "shampoo"
+		}
+	},
+	{
+		"id": 6,
+		"PIM": {
+			"name": "shampoo"
+		},
+		"SAP": {
+			"name": "shampoo"
+		}
+	},
+	{
+		"id": 7,
+		"PIM": {
+			"name": "shampoo"
+		},
+		"SAP": {
+			"name": "shampoo"
+		}
+	},
+	{
+		"id": 8,
+		"PIM": {
+			"name": "shampoo"
+		},
+		"SAP": {
+			"name": "shampoo"
+		}
+	},
+]

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "inquirer": "^3.3.0"
+    "inquirer": "^3.3.0",
+    "pmx": "^1.5.4"
   }
 }

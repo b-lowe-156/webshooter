@@ -56,6 +56,7 @@ const mainMenue = {
     { value: 'stop', name:'2. Stoppe Dienste (Wildfly und Node)' },
     { value: 'version', name:'3. Version aktivieren (EAR, server.js und Client)' },
     { value: 'start', name:'4. Starte Dienste (Wildfly und Node)' },
+    { value: 'auto', name:'JavaScript zero downtime deploy' },  
     { value: 'delete', name:'Loesche ungenutze Deployments' },
     { value: 'end', name:'Beenden' },
   ]
