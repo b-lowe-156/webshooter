@@ -1,0 +1,16 @@
+[
+	{
+		"client": "21",
+		"api": "21",
+		"wildfly": "21",
+		"date": "10.08.2017",
+		"user": "oberhoferj"
+	},
+	{
+		"client": "23",
+		"api": "23",
+		"wildfly": "",
+		"date": "11.08.2017",
+		"user": "oberhoferj"
+	}
+]

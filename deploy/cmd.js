@@ -52,6 +52,7 @@ const mainMenue = {
   pageSize: 10,
   choices: [
     { value: 'refresh', name: 'Aktualisiere ansicht' },
+    { value: 'history', name:'Zeige Deploy History' },
     { value: 'load', name: '1. Lade Deployment vom Hudson' },
     { value: 'stop', name:'2. Stoppe Dienste (Wildfly und Node)' },
     { value: 'version', name:'3. Version aktivieren (EAR, server.js und Client)' },
@@ -91,7 +92,10 @@ const mainScreen = props => {
       case 'refresh':
         mainScreen()
       break
-			case 'load':
+      case 'history':
+        showHistory()
+      break
+      case 'load':
         loadVersionFromHudson()
       break
 			case 'stop':
@@ -220,6 +224,43 @@ const removeUnusedVersionsScreen = () => {
     }
   })
  .catch(err => console.log(err))
+}
+
+function pad(width, string, padding) { 
+  return (10 <= string.length) ? string : pad(10, padding + string, padding)
+}
+
+const showHistory = () => {
+  console.log('\x1Bc')
+  console.log('PIM-CI Tool | Deploy History \n\n')
+
+  const history = JSON.parse(fs.readFileSync('./history.json'))
+
+  console.log(` Client     | Api       | Wildfly   | Date       | User   `)
+  console.log('------------|-----------|-----------|------------|--------------')
+  console.log(`         23 |        23 |        23 | 11.08.2017 | oberhoferj `)
+  history.forEach(h => {
+    console.log(` ${pad(h.client)} |     ${pad(h.api)} | ${pad(h.wildfly)} | ${h.date} | ${h.user} `)
+  })
+  console.log(`\n`)
+
+  prompt({
+    type: 'list',
+    name: 'history',
+    message: 'Was willst du machen?',
+    pageSize: 2,
+    choices: [
+      { value: 'back', name:'Zurueck' },
+      { value: 'end', name:'Beenden' },
+    ]
+  })
+	.then(answer => {
+		switch(answer.history) {
+			case 'back':
+        mainScreen()
+      break
+    }
+	})
 }
 
 mainScreen()
